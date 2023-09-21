@@ -1,0 +1,49 @@
+
+RBHv3 Terms of Service
+
+Last Updated: September 20, 2023
+
+1. Acceptance of Terms
+
+By using RBHv3 ("the Bot"), you agree to abide by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Bot.
+
+2. Compliance with Riot Games Terms of Use
+
+The Bot is designed to interact with Riot Games' services and data, and as such, it must adhere to Riot Games' Terms of Use. You acknowledge and agree that you are solely responsible for ensuring that your use of the Bot complies with Riot Games' Terms of Use, which can be found at [Link to Riot Games' Terms of Use].
+
+3. API Token Approval
+
+In order to use the Bot and obtain an API token from Riot Games, you must first receive approval from Riot Games. Approval is contingent on your compliance with Riot Games' Terms of Use. [Your Company/Bot Name] shall not be responsible for the approval or denial of your API token request.
+
+4. Changes to Terms
+RBHv3 reserves the right to update or change these Terms at any time. Any changes will be effective immediately upon annoucement. It is your responsibility to review these Terms periodically for any updates or changes.
+
+5. Contact Information
+
+If you have any questions or concerns about these Terms, please contact via our Discord server.
+
+By using the Bot, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service, including your responsibility for compliance with Riot Games' Terms of Use.
+RBHv3 Terms of Service
+
+Last Updated: September 20, 2023
+
+Acceptance of Terms
+
+By using RBHv3 ("the Bot"), you agree to abide by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Bot.
+
+Compliance with Riot Games Terms of Use
+
+The Bot is designed to interact with Riot Games' services and data, and as such, it must adhere to Riot Games' Terms of Use. You acknowledge and agree that you are solely responsible for ensuring that your use of the Bot complies with Riot Games' Terms of Use, which can be found at [Link to Riot Games' Terms of Use].
+
+API Token Approval
+
+In order to use the Bot and obtain an API token from Riot Games, you must first receive approval from Riot Games. Approval is contingent on your compliance with Riot Games' Terms of Use. [Your Company/Bot Name] shall not be responsible for the approval or denial of your API token request.
+
+Changes to Terms
+
+RBHv3 reserves the right to update or change these Terms at any time. Any changes will be effective immediately upon annoucement. It is your responsibility to review these Terms periodically for any updates or changes.
+
+Contact Information
+If you have any questions or concerns about these Terms, please contact via our Discord server.
+
+By using the Bot, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service, including your responsibility for compliance with Riot Games' Terms of Use.
