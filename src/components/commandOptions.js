@@ -65,8 +65,34 @@ function userOption(
 		.setRequired(isRequired);
 }
 
+function seasonOption(
+	name = "season",
+	description = "Season",
+	isRequired = false
+) {
+	return new SlashCommandStringOption()
+		.setName(name)
+		.setDescription(description)
+		.setRequired(isRequired)
+		.setAutocomplete(true);
+}
+
+function championOption(
+	name = "champion",
+	description = "Champion",
+	isRequired = true
+) {
+	return new SlashCommandStringOption()
+		.setName(name)
+		.setDescription(description)
+		.setRequired(isRequired)
+		.setAutocomplete(true);
+}
+
 module.exports = {
 	gameOption,
 	lobbyOption,
 	userOption,
+	seasonOption,
+	championOption,
 };

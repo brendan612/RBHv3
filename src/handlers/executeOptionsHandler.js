@@ -1,10 +1,20 @@
 const { Interaction, SlashCommandStringOption } = require("discord.js");
-const { sequelize, User, Lobby, Game } = require("../models");
+const {
+	sequelize,
+	User,
+	Lobby,
+	Game,
+	Season,
+	Draft,
+	DraftRound,
+	Champion,
+} = require("../models");
+const { Op } = require("sequelize");
 
 /**
  *
  * @param {Interaction} interaction
- * @returns {Game}
+ * @returns {Promise<Game>}
  */
 async function handleGameOption(interaction) {
 	const gameName = interaction.options.getString("game") ?? "League of Legends";
@@ -14,7 +24,7 @@ async function handleGameOption(interaction) {
 /**
  *
  * @param {Interaction} interaction
- * @returns {Lobby}
+ * @returns {Promise<Lobby>}
  */
 async function handleLobbyOption(interaction, game_id) {
 	let lobby = null;
@@ -29,13 +39,22 @@ async function handleLobbyOption(interaction, game_id) {
 		lobby = await Lobby.findOne({ where: { lobby_id: lobby_id } });
 	}
 
+	if (!lobby) {
+		console.log("Lobby not found.");
+		await interaction.reply({
+			content: "Lobby not found.",
+			ephemeral: true,
+		});
+		return null;
+	}
+
 	return lobby;
 }
 
 /**
  *
  * @param {Interaction} interaction
- * @returns {User}
+ * @returns {Promise<User>}
  */
 async function handleUserOption(interaction, optionName) {
 	let user_id = null;
@@ -43,18 +62,78 @@ async function handleUserOption(interaction, optionName) {
 	if (target) {
 		user_id = target.id;
 	} else {
-		await User.findOne({
-			where: { user_id: interaction.member.id },
-		}).then((user) => {
-			user_id = user.user_id;
-		});
+		user_id = interaction.member.id;
 	}
 
-	return user_id;
+	return await User.findOne({
+		where: { user_id: user_id },
+	});
+}
+
+/**
+ *
+ * @param {Interaction} interaction
+ * @param {int} game_id
+ * @returns {Promise<Season>}
+ */
+async function handleSeasonOption(interaction, game_id) {
+	const val = interaction.options.getString("season");
+	if (val == "all") {
+		return null;
+	}
+	const seasonName = interaction.options.getString("season") ?? "current";
+	if (seasonName === "current") {
+		return await Season.findOne({
+			where: {
+				game_id: game_id,
+				start_date: {
+					[Op.lte]: new Date(), // Less than or equal to today
+				},
+				end_date: {
+					[Op.gte]: new Date(), // Greater than or equal to today
+				},
+			},
+			order: [["created_at", "DESC"]],
+		});
+	}
+	return await Season.findOne({ where: { name: seasonName } });
+}
+
+/**
+ *
+ * @param {Interaction} interaction
+ * @param {int} draft_id
+ * @returns {Promise<Champion>}
+ */
+async function handleChampionOption(interaction, draft_id) {
+	const champion_id = interaction.options.getString("champion");
+	const champion = await Champion.findByPk(champion_id);
+	if (!champion) {
+		await interaction.reply({
+			content: "Champion not found.",
+			ephemeral: true,
+		});
+		return null;
+	}
+	const existing = await DraftRound.findOne({
+		where: { draft_id: draft_id, champion_id: champion_id },
+	});
+
+	if (existing) {
+		await interaction.reply({
+			content: "Champion already selected.",
+			ephemeral: true,
+		});
+		return null;
+	}
+
+	return champion;
 }
 
 module.exports = {
 	handleGameOption,
 	handleLobbyOption,
 	handleUserOption,
+	handleSeasonOption,
+	handleChampionOption,
 };

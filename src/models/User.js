@@ -1,21 +1,28 @@
-const { DataTypes, Model, UniqueConstraintError } = require("sequelize");
+const { DataTypes, Model, UniqueConstraintError, Op } = require("sequelize");
 const { baseEmbed } = require("../components/embed.js");
+const { LeagueTier } = require("../components/leagueRankedEnums.js");
 const {
-	LeagueTier,
-	LeagueRank,
-} = require("../components/leagueRankedEnums.js");
-const { Client, ButtonBuilder, ButtonStyle } = require("discord.js");
+	ButtonBuilder,
+	ButtonStyle,
+	Interaction,
+	ActionRowBuilder,
+	GuildMember,
+	Client,
+} = require("discord.js");
 const {
 	getSummonerByName,
 	getRankBySummonerId,
 } = require("../api/riot/riotApiHandler.js");
+const moment = require("moment");
+const { ActionType } = require("../components/moderationActionTypeEnum.js");
+const ModerationLog = require("./ModerationLog.js");
 
 module.exports = (sequelize) => {
 	class User extends Model {
 		/**
 		 *
 		 * @param {bigint} user_id
-		 * @returns {User}
+		 * @returns {Promise<User>}
 		 */
 		static async createUser(user_id, join_date = new Date()) {
 			try {
@@ -30,123 +37,149 @@ module.exports = (sequelize) => {
 				}
 			}
 		}
-		/**
-		 *
-		 * @param {bigint} user_id
-		 * @returns
-		 */
-		static async getUser(user_id) {
-			return await User.findOne({
-				where: { user_id: BigInt(user_id) },
-			});
-		}
-
-		/**
-		 * @param {bigint} summoner_name
-		 * @returns {User}
-		 */
-		static async getUserBySummonerName(summoner_name) {
-			return await User.findOne({ where: { summoner_name: summoner_name } });
-		}
 
 		/**
 		 *
-		 * @param {string} summoner_name_to_verify
-		 * @returns { {embed: MessageEmbed, verifyButton: MessageButton} }
+		 * @param {JSON} vote
+		 * @param {Client} client
 		 */
-		generateVerifyEmbed = async (summoner_name_to_verify) => {
-			const embed = baseEmbed("Verify", "Verify your account.");
+		awardVoteMoney = async (vote, client) => {
+			console.log(vote);
+			const { channels } = require("../../config.json");
+			const money = vote.type === "upvote" ? 50000 : 0;
+			let moneyToAward = 0;
 
-			embed.addFields({
-				name: "Steps to Verify",
-				value:
-					"1. Change your summoner icon to the one shown to the right.\n2. Click the verify button below.",
-				inline: false,
-			});
-			embed.addFields({
-				name: `Account Requirements`,
-				value:
-					"\u2022 Account must be level 50.\n\u2022 Account must be at least Gold 4",
-				inline: false,
-			});
+			if (vote.type !== "upvote") {
+				const current_time = Date.now() / 1000; // Convert milliseconds to seconds
 
-			let verifyIcon = 0;
-			await getSummonerByName(summoner_name_to_verify).then((summoner) => {
-				let icon = summoner.profileIconId;
-				while (icon === summoner.profileIconId) {
-					icon = Math.floor(Math.random() * 29);
+				if (this.last_vote_date === null) {
+					this.last_vote_date = 0;
 				}
-				verifyIcon = icon;
-			});
-			//random between 0 and 28 inclusively
 
-			embed.setThumbnail(
-				`http://ddragon.leagueoflegends.com/cdn/13.18.1/img/profileicon/${verifyIcon}.png`
+				const lastVoteDate = moment.unix(this.last_vote_date);
+				const time_since_last_vote = moment
+					.unix(current_time)
+					.diff(lastVoteDate, "days");
+
+				if (time_since_last_vote >= 1) {
+					this.vote_streak = 0;
+				}
+
+				this.last_vote_date = current_time;
+
+				moneyToAward = money + 2500 * this.vote_streak;
+				this.server_money += moneyToAward;
+				this.vote_streak += 1;
+				this.save();
+			}
+
+			const embed = baseEmbed(
+				"Thanks for voting for RBH!",
+				`<@${this.user_id}> has been awarded ${moneyToAward} :pound: for voting on top.gg!`,
+				true,
+				"Vote Rewards"
 			);
 
-			const verifyButton = new ButtonBuilder()
-				.setCustomId(
-					`verify_${this.user_id}_${summoner_name_to_verify}_${verifyIcon}`
-				)
-				.setLabel("Verify")
-				.setStyle(ButtonStyle.Primary);
+			if (this.vote_streak >= 2) {
+				embed.addFields({
+					name: "Streak",
+					value: `You are on a ${Math.floor(
+						this.vote_streak / 2
+					)} day voting streak!`,
+					inline: false,
+				});
+			}
 
-			return { embed, verifyButton };
+			const actionRow = new ActionRowBuilder().addComponents(
+				new ButtonBuilder()
+					.setLabel("Vote")
+					.setURL(`https://top.gg/servers/${vote.guild}/vote`)
+					.setStyle(ButtonStyle.Link)
+			);
+			await client.guilds.cache
+				.get(vote.guild)
+				.channels.cache.get(channels.vote_bump)
+				.send({ embeds: [embed], components: [actionRow] });
 		};
 
-		handleVerifyButton = async (interaction) => {
-			const customId = interaction.customId;
-			const customIdParts = customId.split("_");
-			const button_user_id = customIdParts[1];
-			const summoner_name = customIdParts[2];
-			const icon = customIdParts[3];
+		/**
+		 *
+		 * @param {BigInt} moderator_id
+		 * @param {Date} bannedUntil
+		 * @param {String} reason
+		 */
+		ihban = async (moderator_id, bannedUntil, reason) => {
+			const { ModerationLog } = require("../models");
+			const log = await ModerationLog.createModerationLog(
+				moderator_id,
+				this.user_id,
+				bannedUntil,
+				ActionType.IHBAN,
+				reason
+			);
+			this.addModerationLog(log);
+			this.save();
+		};
 
-			if (BigInt(button_user_id) !== BigInt(this.user_id)) {
-				return await interaction.followUp({
-					content: "This is not your verification button.",
-					ephemeral: true,
-				});
-			}
+		/**
+		 *
+		 * @param {BigInt} moderator_id
+		 * @param {String} reason
+		 */
+		ihunban = async (moderator_id, reason) => {
+			const { ModerationLog } = require("../models");
+			const log = await ModerationLog.createModerationLog(
+				moderator_id,
+				this.user_id,
+				null,
+				ActionType.IHUNBAN,
+				reason
+			);
+			this.addModerationLog(log);
+			this.save();
+		};
 
-			let correctIcon = false;
-			let validAccountLevel = false;
-			let validRank = false;
+		/**
+		 *
+		 * @returns {ModerationLog[]} ModerationLogs
+		 */
+		activeModerationActions = async () => {
+			const { ModerationLog } = require("../models");
+			const logs = await ModerationLog.findAll({
+				where: {
+					user_id: this.user_id,
+					duration: {
+						[Op.gt]: new Date(),
+					},
+				},
+			});
+			return logs;
+		};
 
-			let summoner_id = null;
-			await getSummonerByName(summoner_name).then((summoner) => {
-				const currentIcon = summoner.profileIconId;
-				summoner_id = summoner.id;
-				correctIcon = currentIcon === icon;
-
-				const accountLevel = summoner.summonerLevel;
-				validAccountLevel = accountLevel >= 50;
+		/**
+		 *
+		 * @returns {boolean} isBanned
+		 */
+		isIHBanned = async () => {
+			const { ModerationLog } = require("../models");
+			const latestLog = await ModerationLog.findOne({
+				where: { user_id: this.user_id },
+				order: [["created_at", "DESC"]],
 			});
 
-			await getRankBySummonerId(summoner_id).then((summoner) => {
-				const tier = summoner.tier;
-				const rank = summoner.rank;
-				validRank = ![
-					LeagueTier.UNRANKED,
-					LeagueTier.IRON,
-					LeagueTier.BRONZE,
-					LeagueTier.SILVER,
-				].includes(tier);
-			});
-
-			if (!correctIcon) {
-				return await interaction.followUp({
-					content: "Incorrect Summoner Icon",
-					ephemeral: true,
-				});
-			} else {
-				this.summoner_name = summoner_name;
-				await this.save();
-
-				return await interaction.followUp({
-					content: "You have successfully verified your account.",
-					ephemeral: true,
-				});
+			if (!latestLog) return false;
+			if (latestLog.type === ActionType.IHUNBAN) {
+				return false;
+			} else if (latestLog.type === ActionType.IHBAN) {
+				const currentDate = new Date();
+				if (latestLog.duration !== null && latestLog.duration > currentDate) {
+					return true;
+				} else {
+					return false;
+				}
 			}
+
+			return false;
 		};
 	}
 	User.init(
@@ -160,13 +193,26 @@ module.exports = (sequelize) => {
 			summoner_name: {
 				type: DataTypes.STRING,
 				allowNull: true,
-				unique: true,
+				//unique: true,
 				validate: {
-					len: [0, 16],
+					len: [3, 16],
+				},
+			},
+			tag_line: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				validate: {
+					len: [3, 5],
 				},
 			},
 			verified: {
 				type: DataTypes.BOOLEAN,
+			},
+			puuid: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				comment:
+					"PUUID for league of legends - Populated on verify via Riot API",
 			},
 			server_experience: {
 				type: DataTypes.INTEGER,
@@ -182,11 +228,6 @@ module.exports = (sequelize) => {
 				type: DataTypes.BIGINT,
 				allowNull: true,
 				defaultValue: 0,
-			},
-			elo_rating: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 1600,
 			},
 			join_date: {
 				type: DataTypes.DATE,
@@ -206,6 +247,28 @@ module.exports = (sequelize) => {
 				type: DataTypes.DATE,
 				allowNull: true,
 				defaultValue: null,
+			},
+			last_message_date: {
+				type: DataTypes.DATE,
+				allowNull: true,
+				defaultValue: null,
+			},
+			region: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				defaultValue: "NA",
+			},
+			primary_role: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				defaultValue: "Fill",
+				comment: "Primary role for league of legends",
+			},
+			secondary_role: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				defaultValue: "Fill",
+				comment: "Secondary role for league of legends",
 			},
 		},
 		{

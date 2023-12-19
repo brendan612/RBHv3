@@ -1,59 +1,102 @@
-const { Kayn, REGIONS } = require("kayn");
+const axios = require("axios");
+const UserDTO = require("../../dataManager/DTOs/userDTO");
+
 require("dotenv").config();
 
-const kayn = Kayn(process.env.riotAPIKey)({
-	region: REGIONS.NORTH_AMERICA,
-	apiURLPrefix: "https://%s.api.riotgames.com",
-	locale: "en_US",
-	debugOptions: {
-		isEnabled: true,
-		showKey: false,
-	},
-	requestOptions: {
-		shouldRetry: true,
-		numberOfRetriesBeforeAbort: 3,
-		delayBeforeRetry: 1000,
-		burst: false,
-		shouldExitOn403: false,
-	},
-	cacheOptions: {
-		cache: null,
-		timeToLives: {
-			useDefault: false,
-			byGroup: {},
-			byMethod: {},
+const REGIONS = {
+	NA: "americas",
+};
+
+/**
+ *
+ * @param {UserDTO} user
+ */
+async function getSummoner(user) {
+	if (user.puuid) {
+		return await getSummonerByPuuid(user.puuid);
+	} else {
+		return await getSummonerByRiotID(
+			user.summoner_name,
+			user.tag_line,
+			REGIONS[user.region]
+		);
+	}
+}
+
+async function getSummonerByRiotID(gameName, tagLine, region = "NA") {
+	const { User } = require("../../models");
+	const user = await User.findOne({
+		where: {
+			summoner_name: gameName,
+			tag_line: tagLine,
+			region: region,
 		},
-	},
-});
-
-async function getSummonerByName(summonerName) {
-	const summoner = await kayn.Summoner.by.name(summonerName);
-	return summoner;
-}
-
-async function getRankBySummonerId(summonerId) {
-	const summoner = await kayn.League.Entries.by.summonerID(summonerId);
-	return summoner;
-}
-
-async function generateTournamentCode() {
-	const provider = await kayn.Tournament.registerProviderData("NA");
-	console.log(provider);
-	const tournament = await kayn.Tournament.register(provider, "RBH In-Houses");
-	console.log(tournament);
-	const code = await kayn.Tournament.create("RBH In-Houses", {
-		mapType: "SUMMONERS_RIFT",
-		pickType: "TOURNAMENT_DRAFT",
-		spectatorType: "ALL",
-		teamSize: 5,
-		metadata: "RBH In-Houses",
 	});
 
-	return code;
+	if (user?.puuid) {
+		return await getSummonerByPuuid(user.puuid);
+	}
+
+	const riotAccount = await axios.get(
+		`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
+		{
+			headers: {
+				"X-Riot-Token": process.env.riotAPIKey,
+				Origin: "https://developer.riotgames.com",
+			},
+		}
+	);
+
+	return await getSummonerByPuuid(riotAccount.data.puuid);
+}
+
+async function getSummonerByPuuid(puuid) {
+	const summoner = await axios.get(
+		`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
+		{
+			headers: {
+				"X-Riot-Token": process.env.riotAPIKey,
+				Origin: "https://developer.riotgames.com",
+			},
+		}
+	);
+
+	return summoner.data;
+}
+
+async function getRankByRiotID(gameName, tagLine, region = "NA") {
+	const summoner = await getSummonerByRiotID(gameName, tagLine, region);
+	const rank = await axios.get(
+		`https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summoner.id}`,
+		{
+			headers: {
+				"X-Riot-Token": process.env.riotAPIKey,
+				Origin: "https://developer.riotgames.com",
+			},
+		}
+	);
+
+	return rank.data;
+}
+
+async function getRiotAccountByPuuid(puuid) {
+	const riotAccount = await axios.get(
+		`https://americas.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`,
+		{
+			headers: {
+				"X-Riot-Token": process.env.riotAPIKey,
+				Origin: "https://developer.riotgames.com",
+			},
+		}
+	);
+
+	return riotAccount.data;
 }
 
 module.exports = {
-	getSummonerByName,
-	getRankBySummonerId,
-	generateTournamentCode,
+	getSummoner,
+	getSummonerByRiotID,
+	getSummonerByPuuid,
+	getRankByRiotID,
+	getRiotAccountByPuuid,
 };

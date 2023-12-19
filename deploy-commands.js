@@ -8,36 +8,36 @@ const token = process.env.token;
 const clientID = process.env.clientID;
 const guildID = process.env.guildID;
 
-const commands = [];
-// Grab all the command files from the commands directory you created earlier
-const foldersPath = path.join(__dirname, "src/commands");
-const commandFolders = fs.readdirSync(foldersPath);
-
-for (const folder of commandFolders) {
+const syncCommands = async () => {
+	const commands = [];
 	// Grab all the command files from the commands directory you created earlier
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs
-		.readdirSync(commandsPath)
-		.filter((file) => file.endsWith(".js"));
-	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		if ("data" in command && "execute" in command) {
-			commands.push(command.data.toJSON());
-		} else {
-			console.log(
-				`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-			);
+	const foldersPath = path.join(__dirname, "src/commands");
+	const commandFolders = fs.readdirSync(foldersPath);
+
+	for (const folder of commandFolders) {
+		// Grab all the command files from the commands directory you created earlier
+		const commandsPath = path.join(foldersPath, folder);
+		const commandFiles = fs
+			.readdirSync(commandsPath)
+			.filter((file) => file.endsWith(".js") && !file.startsWith("index"));
+		// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+		for (const file of commandFiles) {
+			const filePath = path.join(commandsPath, file);
+			const command = require(filePath);
+			if ("data" in command && "execute" in command) {
+				commands.push(command.data.toJSON());
+			} else {
+				console.log(
+					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+				);
+			}
 		}
 	}
-}
 
-// Construct and prepare an instance of the REST module
-const rest = new REST().setToken(token);
+	// Construct and prepare an instance of the REST module
+	const rest = new REST().setToken(token);
 
-// and deploy your commands!
-(async () => {
+	// and deploy your commands!
 	try {
 		console.log(
 			`Started refreshing ${commands.length} application (/) commands.`
@@ -60,4 +60,5 @@ const rest = new REST().setToken(token);
 		// And of course, make sure you catch and log any errors!
 		console.error(error);
 	}
-})();
+};
+syncCommands();

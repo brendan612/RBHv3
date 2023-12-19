@@ -26,6 +26,14 @@ module.exports = (sequelize) => {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
+			icon_url: {
+				type: DataTypes.STRING,
+				allowNull: true,
+			},
+			emote: {
+				type: DataTypes.STRING,
+				allowNull: true,
+			},
 		},
 		{
 			sequelize,

@@ -4,17 +4,22 @@ const {
 	gameAutocomplete,
 	gameOption,
 	handleGameOption,
-	generateEmbed,
 	Lobby,
 	User,
 	Game,
 } = require("./index.js");
 
+const LobbyService = require("../../dataManager/services/lobbyService.js");
+const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
+const {
+	generateLobbyEmbed,
+} = require("../../dataManager/messages/lobbyEmbed.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("host")
 		.setDescription("Host a lobby")
-		.addStringOption((option) => gameOption()),
+		.addStringOption(gameOption()),
 	/**
 	 *
 	 * @param {Interaction} interaction
@@ -23,20 +28,19 @@ module.exports = {
 		// interaction.user is the object representing the User who ran the command
 		// interaction.member is the GuildMember object, which represents the user in the specific guild
 		const game = await handleGameOption(interaction);
-		const lobby = await Lobby.createLobby(interaction.member.id, game.game_id);
-		const host = await User.getUser(interaction.member.id);
-
-		const { embed, components } = await lobby.generateEmbed(
-			interaction.client,
-			interaction.member,
-			false
+		const lobby = await LobbyService.createLobby(
+			interaction.member.id,
+			game.game_id
+		);
+		const lobbyService = new LobbyService(await Lobby.findByPk(lobby.lobby_id));
+		await lobbyService.addUser(interaction.member.id);
+		await lobbyService.generateLobbyEmbed(
+			await LobbyService.getLobby(lobby.lobby_id),
+			true
 		);
 
-		const response = await interaction.reply({
-			embeds: [embed],
-			components: [components],
-			ephemeral: false,
-		});
+		await interaction.deferReply();
+		await interaction.deleteReply();
 	},
 	/**
 	 *

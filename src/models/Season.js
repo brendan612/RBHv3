@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
 		 * @param {number} game_id
 		 * @param {Date} start_date
 		 * @param {Date} end_date
-		 * @returns {Season}
+		 * @returns {Promise<Season>}
 		 */
 		static async createSeason(name, game_id, start_date, end_date) {
 			let start = new Date();
@@ -18,8 +18,8 @@ module.exports = (sequelize) => {
 			end.setMonth(end.getMonth() + 1);
 			end.setDate(1);
 			end.setDate(end.getDate() - 1);
-			if (start_date) start = start_date;
-			if (end_date) end = end_date;
+			if (start_date) start = new Date(start_date);
+			if (end_date) end = new Date(end_date);
 
 			const utcEnd = Date.UTC(
 				end.getUTCFullYear(),
@@ -37,8 +37,10 @@ module.exports = (sequelize) => {
 					where: { game_id: game_id },
 				})) + 1;
 
+			const seasonName = name ? name : `Season ${season_game_id}`;
+
 			return await Season.create({
-				name: name,
+				name: seasonName,
 				game_id: game_id,
 				start_date: start,
 				end_date: endInUTC,
@@ -59,12 +61,19 @@ module.exports = (sequelize) => {
 
 		/**
 		 *
-		 * @returns {Season}
+		 * @returns {Promise<Season>}
 		 */
-		static async getCurrentSeason() {
-			return await Season.findOne({
-				where: { end_date: { [Op.gt]: new Date() } },
+		static async getCurrentSeason(game_id = 1) {
+			let season = await Season.findOne({
+				where: { end_date: { [Op.gt]: new Date() }, game_id: game_id },
 			});
+			if (season == null) {
+				season = await Season.findOne({
+					where: { game_id: game_id },
+					order: [["end_date", "DESC"]],
+				});
+			}
+			return season;
 		}
 	}
 	Season.init(

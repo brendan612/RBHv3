@@ -7,16 +7,24 @@ const {
 	gameOption,
 	lobbyOption,
 	User,
+	Lobby,
 	handleGameOption,
 	handleLobbyOption,
 } = require("./index.js");
+
+const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
+const LobbyService = require("../../dataManager/services/lobbyService.js");
+const permission_roles = require("../../../config.json").roles.permission_roles;
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("dummies")
 		.setDescription("Add dummy users to a lobby")
-		.addStringOption((option) => gameOption())
-		.addIntegerOption((option) => lobbyOption()),
+		.addStringOption(gameOption())
+		.addIntegerOption(lobbyOption()),
 	/**
 	 *
 	 * @param {Interaction} interaction
@@ -27,25 +35,7 @@ module.exports = {
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
-		if (!lobby) {
-			await interaction.reply({
-				content: "No open lobbies found.",
-				ephemeral: true,
-			});
-			return;
-		}
-
 		const lobbyUsers = await lobby.getUsers();
-		//check if lobby is full
-		// const { joinable, reason } = lobby.isJoinable(lobbyUsers.length);
-		// console.log(joinable, reason);
-		// if (!joinable) {
-		// 	await interaction.reply({
-		// 		content: reason,
-		// 		ephemeral: true,
-		// 	});
-		// 	return;
-		// }
 
 		const dummies = await User.findAll({
 			where: {
@@ -55,11 +45,16 @@ module.exports = {
 			},
 		});
 
-		-(await lobby.addUsers(dummies));
+		const lobbyService = new LobbyService(lobby);
 
-		const host = await interaction.client.guild.members.fetch(lobby.host_id);
+		for (const dummy of dummies) {
+			await lobbyService.addUser(dummy.user_id);
+		}
 
-		await lobby.generateEmbed(interaction.client, host, true);
+		await lobbyService.generateLobbyEmbed(
+			await LobbyService.getLobby(lobby.lobby_id),
+			true
+		);
 
 		await interaction.deferReply({ ephemeral: true });
 		await interaction.deleteReply();

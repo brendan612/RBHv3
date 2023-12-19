@@ -1,7 +1,9 @@
-const { DataTypes, Model, Sequelize } = require("sequelize");
+const { DataTypes, Model, Sequelize, Op } = require("sequelize");
 const {
 	lobbyEmbed,
 	generatePlayerListForEmbed,
+	generatePlayerRolesListForEmbed,
+	generatePlayerRanksListForEmbed,
 } = require("../components/lobbyEmbed.js");
 const {
 	GuildMember,
@@ -9,29 +11,28 @@ const {
 	ButtonBuilder,
 	ButtonStyle,
 	ActionRowBuilder,
-	InteractionResponse,
+	Interaction,
+	ButtonInteraction,
 } = require("discord.js");
-const { User } = require("../models");
+
 module.exports = (sequelize) => {
+	/**
+	 * @class Lobby
+	 * @extends {Model}
+	 */
 	class Lobby extends Model {
 		/**
-		 *
-		 * @param {bigint} host_id
-		 * @param {number} game_id
-		 * @returns
+		 * @property {number} lobby_id
+		 * @property {number} season_id
+		 * @property {number} season_lobby_id
+		 * @property {string} lobby_name
+		 * @property {Date} closed_date
+		 * @property {bigint} host_id
+		 * @property {number} draft_id
+		 * @property {number} match_id
+		 * @property {number} game_id
+		 * @property {bigint} message_id
 		 */
-		static async createLobby(host_id, game_id) {
-			const Season = require("./Season.js")(sequelize);
-			const season_id = (await Season.getCurrentSeason()).season_id;
-			console.log(season_id);
-			const season_lobby_id = (await Lobby.count()) + 1;
-			return await Lobby.create({
-				host_id: host_id,
-				game_id: game_id,
-				season_id: season_id,
-				season_lobby_id: season_lobby_id,
-			});
-		}
 
 		static async getLobby(lobby_id) {
 			const User = require("./User.js")(sequelize);
@@ -47,7 +48,14 @@ module.exports = (sequelize) => {
 			const game = await Game.findOne({ where: { name: game_name } });
 			return await Lobby.findAll({
 				where: { closed_date: null, game_id: game.game_id },
-				include: User,
+				include: [
+					User,
+					Game,
+					{
+						model: User,
+						as: "Host",
+					},
+				],
 			});
 		}
 
@@ -83,8 +91,18 @@ module.exports = (sequelize) => {
 			).addFields({
 				name: `Joined Players (${playerList.length}/10)`,
 				value: generatePlayerListForEmbed(playerList),
-				inline: false,
+				inline: true,
 			});
+			// .addFields({
+			// 	name: `Roles`,
+			// 	value: generatePlayerRolesListForEmbed(playerList),
+			// 	inline: true,
+			// })
+			// .addFields({
+			// 	name: `Rank`,
+			// 	value: generatePlayerRanksListForEmbed(playerList),
+			// 	inline: true,
+			// });
 
 			if (reserves.length > 0) {
 				embed.addFields({
@@ -94,34 +112,24 @@ module.exports = (sequelize) => {
 				});
 			}
 
-			const joinButton = new ButtonBuilder()
-				.setStyle(ButtonStyle.Success)
-				.setLabel("Join")
-				.setCustomId(`join_${this.lobby_id}`);
-			const dropButton = new ButtonBuilder()
-				.setStyle(ButtonStyle.Danger)
-				.setLabel("Drop")
-				.setCustomId(`drop_${this.lobby_id}`);
-
-			const components = new ActionRowBuilder();
-			if ((await this.isJoinable()).joinable) {
-				components.addComponents(joinButton);
-			}
-			if ((await this.isDroppable()).droppable) {
-				components.addComponents(dropButton);
-			}
+			const components = await this.#getLobbyButtons();
 
 			if (send) {
 				const channel_id = channels["games"]["League of Legends"];
 				const channel = await client.channels.fetch(channel_id);
-				const message = await channel.send({
+				const user = await client.guild.members.fetch(host.user.id);
+				const message = await user.send({
 					embeds: [embed],
 					components: [components],
 				});
-
-				const previousMessage = await channel.messages.fetch(this.message_id);
-				if (previousMessage) {
-					await previousMessage.delete();
+				console.log("message id", message.id);
+				try {
+					const previousMessage = await channel.messages.fetch(this.message_id);
+					if (previousMessage) {
+						await previousMessage.delete();
+					}
+				} catch (err) {
+					console.log("No previous message found.");
 				}
 
 				this.message_id = message.id;
@@ -131,6 +139,88 @@ module.exports = (sequelize) => {
 			return { embed, components };
 		};
 
+		generateDraftEmbed = async (client, host, send) => {
+			const { channels } = require("../../config.json");
+
+			let playerList = [];
+			let reserves = [];
+			const users = await this.getUsers({
+				order: [[Sequelize.literal("LobbyUsers.created_at"), "ASC"]],
+				through: {
+					attributes: ["created_at"], // This will include the "created_at" field from the join table in the result
+				},
+			});
+
+			//grab summoner name from first 10 users and put into playerList
+			users.forEach((user) => {
+				if (playerList.length < 10) {
+					playerList.push(user.summoner_name);
+				} else {
+					reserves.push(user.summoner_name);
+				}
+			});
+
+			const embed = lobbyEmbed(
+				"Drafting in progress!",
+				`Tentative Lobby ID: ${this.season_lobby_id}`,
+				host,
+				`${this.lobby_id}`
+			);
+
+			embed.addFields({
+				name: `Joined Players (${playerList.length}/10)`,
+				value: generatePlayerListForEmbed(playerList),
+				inline: true,
+			});
+
+			const channel_id = channels["games"]["League of Legends"];
+			const channel = await client.channels.fetch(channel_id);
+			const user = await client.guild.members.fetch(host.user.id);
+			const message = await user.send({
+				embeds: [embed],
+			});
+			try {
+				const previousMessage = await channel.messages.fetch(this.message_id);
+				if (previousMessage) {
+					await previousMessage.delete();
+				}
+			} catch (err) {
+				console.log("No previous message found.");
+			}
+		};
+
+		/**
+		 *
+		 * @returns {ActionRowBuilder}
+		 */
+		#getLobbyButtons = async () => {
+			const joinButton = new ButtonBuilder()
+				.setStyle(ButtonStyle.Success)
+				.setLabel("Join")
+				.setCustomId(`join_${this.lobby_id}`);
+			const dropButton = new ButtonBuilder()
+				.setStyle(ButtonStyle.Danger)
+				.setLabel("Drop")
+				.setCustomId(`drop_${this.lobby_id}`);
+			const draftButton = new ButtonBuilder()
+				.setStyle(ButtonStyle.Primary)
+				.setLabel("Draft")
+				.setCustomId(`draft_${this.lobby_id}`);
+
+			const components = new ActionRowBuilder();
+			if ((await this.isJoinable()).joinable) {
+				components.addComponents(joinButton);
+			}
+			if ((await this.isDroppable()).droppable) {
+				components.addComponents(dropButton);
+			}
+			if ((await this.isDraftable()).draftable) {
+				components.addComponents(draftButton);
+			}
+
+			return components;
+		};
+
 		/**
 		 *
 		 * @param {Interaction} interaction
@@ -138,34 +228,22 @@ module.exports = (sequelize) => {
 		 */
 		handleButton = async (interaction, action) => {
 			const User = require("./User.js")(sequelize);
+			console.log(interaction);
 			const user = await User.findOne({
-				where: { user_id: interaction.member.id },
+				where: { user_id: interaction.user.id },
 			});
-			let message = null;
 			if (action === "join") {
-				const { joinable, reason } = await this.isJoinable(user.user_id);
-				if (!joinable) {
-					message = await interaction.followUp({
-						content: reason,
-						ephemeral: true,
-					});
-					return;
-				}
-
-				await this.addUser(user.user_id);
+				await this.join(interaction, user.user_id);
 			} else if (action === "drop") {
-				const { droppable, reason } = await this.isDroppable(user.user_id);
-				if (!droppable) {
-					message = await interaction.followUp({
-						content: reason,
-						ephemeral: true,
-					});
-					return;
-				}
-
-				await this.removeUser(user.user_id);
+				await this.drop(interaction, user.user_id);
+			} else if (action === "draft") {
+				return await this.draft(interaction);
 			}
-			await this.generateEmbed(interaction.client, interaction.member, true);
+			await this.generateEmbed(
+				interaction.client,
+				interaction.guild.members.fetch(user.user_id),
+				true
+			);
 		};
 
 		/**
@@ -194,7 +272,7 @@ module.exports = (sequelize) => {
 		/**
 		 *
 		 * @param {bigint} user_id
-		 * @returns { {droppable: boolean, reason: string}
+		 * @returns { {droppable: boolean, reason: string} }
 		 */
 		isDroppable = async (user_id) => {
 			if (user_id) {
@@ -216,6 +294,65 @@ module.exports = (sequelize) => {
 
 			return { droppable: true, reason: "" };
 		};
+
+		isDraftable = async () => {
+			const lobbyUsers = await this.getUsers();
+			if (lobbyUsers.length < 10) {
+				return { draftable: false, reason: "Lobby is not full." };
+			}
+
+			return { draftable: true, reason: "" };
+		};
+
+		join = async (interaction, user_id) => {
+			const { joinable, reason } = await this.isJoinable(user_id);
+			if (!joinable) {
+				message = await interaction.followUp({
+					content: reason,
+					ephemeral: true,
+				});
+				return;
+			}
+
+			await this.addUser(user_id);
+		};
+		drop = async (interaction, user_id) => {
+			const { droppable, reason } = await this.isDroppable(user_id);
+			if (!droppable) {
+				message = await interaction.followUp({
+					content: reason,
+					ephemeral: true,
+				});
+				return;
+			}
+
+			await this.removeUser(user_id);
+		};
+		/**
+		 *
+		 * @param {ButtonInteraction} interaction
+		 * @param {BigInt} user_id
+		 * @returns
+		 */
+		draft = async (interaction, user_id) => {};
+
+		pickPlayer = async (interaction, user_id) => {
+			const { draftable, reason } = await this.isDraftable();
+			if (interaction.user.id !== this.host_id) {
+				message = await interaction.followUp({
+					content: "Only the host can draft.",
+					ephemeral: true,
+				});
+				return;
+			}
+			if (!draftable) {
+				message = await interaction.followUp({
+					content: reason,
+					ephemeral: true,
+				});
+				return;
+			}
+		};
 	}
 	Lobby.init(
 		{
@@ -232,8 +369,7 @@ module.exports = (sequelize) => {
 			},
 			season_lobby_id: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
-				unique: true,
+				allowNull: true,
 			},
 			lobby_name: {
 				type: DataTypes.STRING,
@@ -246,6 +382,14 @@ module.exports = (sequelize) => {
 			host_id: {
 				type: DataTypes.BIGINT,
 				allowNull: false,
+			},
+			draft_id: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+			},
+			match_id: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
 			},
 			game_id: {
 				type: DataTypes.INTEGER,
@@ -263,6 +407,5 @@ module.exports = (sequelize) => {
 			updatedAt: "updated_at",
 		}
 	);
-
 	return Lobby;
 };

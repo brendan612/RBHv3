@@ -1,0 +1,155 @@
+const {
+	EmbedBuilder,
+	GuildMember,
+	Interaction,
+	Message,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+} = require("discord.js");
+const LobbyDTO = require("../DTOs/lobbyDTO");
+const { User } = require("../../models");
+const { baseEmbed } = require("../../components/embed.js");
+const { inhouse_icon_url, channels } = require("../../../config.json");
+const client = require("../../client.js");
+const {
+	LeagueRankEmojis,
+	LeagueRoleEmojis,
+} = require("../../assets/emojis.js");
+const PlayerDraftManager = require("../managers/playerDraftManager.js");
+
+/**
+ *
+ * @param {LobbyDTO} lobby
+ * @param {boolean} sendMessage
+ * @returns {Promise<{embed: EmbedBuilder, components: ActionRowBuilder} | Message>} embed and components or message
+ */
+async function generateLobbyEmbed(lobby, sendMessage = true) {
+	return new Promise(async (resolve, reject) => {
+		const guild = await client.guilds.fetch(client.guildID);
+		const host = await guild.members.fetch(lobby.host_id);
+		const embed = baseEmbed(
+			lobby.game_name + " In-House Lobby",
+			"Tentative Game ID: " + lobby.season_lobby_id
+		);
+
+		embed
+			.setFooter({
+				text: `Hosted by ${host.nickname ?? host.user.globalName} • Lobby ID: ${
+					lobby.lobby_id
+				}`,
+				iconURL: host.displayAvatarURL(),
+			})
+			.setThumbnail(inhouse_icon_url);
+		embed.addFields({
+			name: `Joined Players (${lobby.players.length}/10)`,
+			value: await generatePlayerListForEmbed(lobby.players),
+			inline: false,
+		});
+
+		if (lobby.players.length > 10) {
+			embed.addFields({
+				name: `Reserves (${lobby.players.length - 10}/10)`,
+				value: await generatePlayerListForEmbed(lobby.players.slice(10)),
+				inline: false,
+			});
+		}
+
+		const components = generateLobbyButtons(lobby);
+
+		if (sendMessage) {
+			const channel = await guild.channels.fetch(
+				channels.games["League of Legends"]
+			);
+			const user = await client.users.fetch(lobby.host_id);
+			if (lobby.message_id) {
+				try {
+					//const dmChannel = user.dmChannel || (await user.createDM());
+					const message = await channel.messages.fetch(lobby.message_id);
+					if (message) {
+						await message.delete();
+					}
+				} catch (err) {
+					console.log(err);
+				}
+			}
+
+			const message = await channel.send({
+				embeds: [embed],
+				components: [components],
+			});
+
+			resolve(message);
+		}
+		resolve({ embed: embed, components: components });
+	});
+}
+
+/**
+ *
+ * @param {User[]} players
+ * @returns {string}
+ */
+async function generatePlayerListForEmbed(players) {
+	if (players.length === 0) return "\u0020";
+
+	const longestNameLength = Math.max(
+		...players.map((player) => player.summoner_name.length)
+	);
+
+	const PlayerDraftManager = require("../managers/playerDraftManager.js");
+	const ranks = await PlayerDraftManager.getRanks(players);
+
+	const combinedList = players
+		.map((player, index) => {
+			// Pad the player name to have equal length
+			const paddedName = player.summoner_name.padEnd(32, "\u0020");
+			const emojis =
+				`${LeagueRoleEmojis[player.primary_role]}${
+					LeagueRankEmojis[ranks.get(BigInt(player.user_id)).toUpperCase()]
+				}` || "";
+			// Return the combined string, padded as necessary
+			//prettier-ignore
+			return `${(index + 1 < 10 ? `0${index + 1}` : index + 1)
+				.toString()
+				.padStart(2, " ")}. ${emojis} ${paddedName}`;
+		})
+		.join("\n");
+
+	return ">>> " + combinedList;
+}
+
+/**
+ *
+ * @param {LobbyDTO} lobby
+ * @returns {ActionRowBuilder}
+ */
+function generateLobbyButtons(lobby) {
+	const joinButton = new ButtonBuilder()
+		.setStyle(ButtonStyle.Success)
+		.setLabel("Join")
+		.setCustomId(`join_${lobby.lobby_id}`);
+	const dropButton = new ButtonBuilder()
+		.setStyle(ButtonStyle.Danger)
+		.setLabel("Drop")
+		.setCustomId(`drop_${lobby.lobby_id}`);
+	const draftButton = new ButtonBuilder()
+		.setStyle(ButtonStyle.Primary)
+		.setLabel("Draft")
+		.setCustomId(`draft_${lobby.lobby_id}`);
+
+	const components = new ActionRowBuilder();
+	if (lobby.joinable) {
+		components.addComponents(joinButton);
+	}
+	if (lobby.droppable) {
+		components.addComponents(dropButton);
+	}
+	if (lobby.draftable) {
+		components.addComponents(draftButton);
+	}
+
+	return components;
+}
+
+module.exports = { generateLobbyEmbed };

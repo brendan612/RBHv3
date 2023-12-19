@@ -5,17 +5,18 @@ const {
 	lobbyAutocomplete,
 	gameOption,
 	lobbyOption,
-	User,
 	handleGameOption,
 	handleLobbyOption,
 } = require("./index.js");
+
+const LobbyService = require("../../dataManager/services/lobbyService.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("clear")
 		.setDescription("Clear a lobby")
-		.addStringOption((option) => gameOption())
-		.addIntegerOption((option) => lobbyOption()),
+		.addStringOption(gameOption())
+		.addIntegerOption(lobbyOption()),
 	/**
 	 *
 	 * @param {Interaction} interaction
@@ -26,13 +27,14 @@ module.exports = {
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
-		const lobby_id = lobby.lobby_id;
 		if (lobby) {
-			await lobby.destroy();
+			await interaction.reply({
+				content: `Lobby # ${lobby.lobby_id} has been cleared.`,
+			});
+
+			const lobbyService = new LobbyService(lobby);
+			await lobbyService.destroyLobby();
 		}
-		await interaction.reply({
-			content: "Lobby #" + lobby_id + " has been cleared.",
-		});
 	},
 	/**
 	 *

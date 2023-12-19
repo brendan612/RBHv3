@@ -32,6 +32,10 @@ module.exports = (sequelize) => {
 				type: DataTypes.BIGINT,
 				allowNull: false,
 			},
+			season_id: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+			},
 		},
 		{
 			sequelize,

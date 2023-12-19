@@ -1,19 +1,26 @@
-const { ActionRowBuilder } = require("discord.js");
 const {
 	SlashCommandBuilder,
 	Interaction,
 	User,
-	Referral,
 	userOption,
 } = require("./index.js");
+const UserService = require("../../dataManager/services/userService.js");
+const channels = require("../../../config.json").channels;
+const client = require("../../client.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("verify")
-		.setDescription("Verify your account and link with your summoner name")
+		.setDescription("Verify your account and link with your Riot ID")
 		.addStringOption((option) => {
 			return option
-				.setName("summoner_name")
-				.setDescription("Your summoner name")
+				.setName("game-name")
+				.setDescription("Your game name")
+				.setRequired(true);
+		})
+		.addStringOption((option) => {
+			return option
+				.setName("tag-line")
+				.setDescription("Your tag line. Ex: #1234")
 				.setRequired(true);
 		})
 		.addUserOption((option) =>
@@ -24,36 +31,56 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
-		const summoner_name = interaction.options.getString("summoner_name");
-		let user = await User.findOne({
-			where: { user_id: interaction.member.id },
+		if (interaction.channelId !== channels.verify) {
+			return await interaction.reply({
+				content: `Please use <#${channels.verify}> to verify your account.`,
+				ephemeral: true,
+			});
+		}
+
+		const game_name = interaction.options.getString("game-name");
+		const tag_line = interaction.options.getString("tag-line");
+		const referrer = interaction.options.getUser("referrer") ?? null;
+		let user = await User.findByPk(interaction.member.id);
+
+		if (!user) {
+			user = UserService.createUser(
+				interaction.member.id,
+				interaction.member.joinedAt
+			);
+		}
+
+		const duplicateCheck = await User.findOne({
+			where: {
+				summoner_name: game_name,
+				tag_line: tag_line,
+			},
 		});
 
-		const { embed, verifyButton } = user.generateVerifyEmbed(summoner_name);
-		const row = new ActionRowBuilder().addComponents(verifyButton);
-		await interaction.reply({
-			embeds: [embed],
-			components: [row],
-			ephemeral: false,
-		});
+		if (duplicateCheck) {
+			return await interaction.reply({
+				content: "This account has already been verified!",
+				ephemeral: true,
+			});
+		}
 
-		// if (!user) {
-		// 	try {
-		// 		user = await User.create({
-		// 			user_id: interaction.member.id,
-		// 			join_date: interaction.member.joinedAt,
-		// 			summoner_name: summoner_name,
-		// 		});
-		// 	} catch (err) {
-		// 		console.log(err);
-		// 	}
-		// }
+		if (user.verified) {
+			return await interaction.reply({
+				content: "You are already verified!",
+				ephemeral: true,
+			});
+		}
 
-		// interaction.member.setNickname(summoner_name);
+		const userService = new UserService(user);
+		await userService.generateVerifyEmbed(
+			user.user_id,
+			game_name,
+			tag_line,
+			referrer
+		);
 
-		// const referrer = interaction.options.getUser("referrer") || null;
-		// if (referrer) {
-		// 	await Referral.createReferral(user.user_id, referrer.id);
-		// }
+		await interaction.deferReply();
+		await interaction.deleteReply();
+		return;
 	},
 };
