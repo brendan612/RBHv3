@@ -334,9 +334,7 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
 			// 	banSectionHeight - banPadding
 			// );
 		} else {
-			const response = await fetch(champ.square_icon);
-			const buffer = await response.buffer();
-			const image = await loadImage(buffer);
+			const image = await loadImage(champ.square_icon);
 			ctx.drawImage(
 				image,
 				xPosition,
@@ -374,9 +372,7 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
 			// 	banSectionHeight - banPadding
 			// );
 		} else {
-			const response = await fetch(champ.square_icon);
-			const buffer = await response.buffer();
-			const image = await loadImage(buffer);
+			const image = await loadImage(champ.square_icon);
 			ctx.drawImage(
 				image,
 				xPosition,
@@ -437,9 +433,7 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 				pickSectionHeight
 			);
 		} else {
-			const response = await fetch(champ.loading_splash);
-			const buffer = await response.buffer();
-			const image = await loadImage(buffer);
+			const image = await loadImage(champ.loading_splash);
 			ctx.drawImage(
 				image,
 				xPosition,
@@ -465,9 +459,7 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 				pickSectionHeight
 			);
 		} else {
-			const response = await fetch(champ.loading_splash);
-			const buffer = await response.buffer();
-			const image = await loadImage(buffer);
+			const image = await loadImage(champ.loading_splash);
 			ctx.drawImage(
 				image,
 				xPosition,
@@ -481,9 +473,7 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 
 async function generateExtraInfo(ctx) {
 	const logoURL = "https://imgur.com/ug9dvEg.png";
-	const response = await fetch(logoURL);
-	const buffer = await response.buffer();
-	const logo = await loadImage(buffer);
+	const logo = await loadImage(logoURL);
 
 	ctx.drawImage(
 		logo,

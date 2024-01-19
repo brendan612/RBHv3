@@ -1,5 +1,4 @@
 const client = require("../../client.js");
-const fetch = require("node-fetch");
 const { createCanvas, loadImage, GlobalFonts } = require("@napi-rs/canvas");
 const path = require("path");
 const { Match, Lobby, MatchPlayer, User } = require("../../models");
