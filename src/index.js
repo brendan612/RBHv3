@@ -11,7 +11,7 @@ const draftManagerFactory = require("../src/dataManager/managers/factories/draft
 
 require("dotenv").config();
 
-const token = process.env.token;
+const token = process.env.TOKEN;
 
 const loadFiles = (folderName, registerCallback, checkProperties) => {
 	const foldersPath = join(__dirname, folderName);
