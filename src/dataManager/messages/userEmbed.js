@@ -10,7 +10,6 @@ const { baseEmbed } = require("../../components/embed.js");
 const { getSummonerByRiotID } = require("../../api/riot/riotApiHandler.js");
 const { inhouse_icon_url, channels } = require("../../../config.json");
 const client = require("../../client.js");
-const fetch = require("node-fetch");
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const UserLevelManager = require("../managers/userLevelManager.js");
 const UserService = require("../services/userService.js");
