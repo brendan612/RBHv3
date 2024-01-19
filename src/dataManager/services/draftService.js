@@ -15,6 +15,10 @@ const PlayerDraftService = require("./playerDraftService.js");
 const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
 
+const {
+	generatePostGameImage,
+} = require("../../dataManager/messages/postGameImage.js");
+
 const client = require("../../client.js");
 
 class DraftService {
@@ -282,6 +286,8 @@ class DraftService {
 				}
 			}
 		}
+
+		await generatePostGameImage(currentMatch);
 	}
 
 	calculateEloChange(currentRating, opponentRating, winLoss) {

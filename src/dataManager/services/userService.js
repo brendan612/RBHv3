@@ -39,6 +39,7 @@ const {
 } = require("../../utilities/timestamp.js");
 const roleHierarchy = require("../../utilities/role-hierarchy.js");
 const permission_roles = require("../../../config.json").roles.permission_roles;
+const donor_roles = require("../../../config.json").roles.donor_roles;
 
 class UserService {
 	/**
@@ -395,6 +396,34 @@ class UserService {
 
 	async generateProfileEmbed(interaction, user_id) {
 		return await generateProfileEmbed(interaction, user_id);
+	}
+
+	async getDonorRole(user_id) {
+		const guild = await client.guilds.fetch(client.guildID);
+		const member = await guild.members.fetch(user_id);
+
+		const donor = member.roles.cache.find(
+			(role) => role.id === donor_roles["donor"]
+		);
+		const sponsor = member.roles.cache.find(
+			(role) => role.id === donor_roles["sponsor"]
+		);
+		const subsidizer = member.roles.cache.find(
+			(role) => role.id === donor_roles["subsidizer"]
+		);
+
+		if (subsidizer) return "subsidizer";
+		if (sponsor) return "sponsor";
+		if (donor) return "donor";
+
+		return "";
+	}
+
+	async isBooster(user_id) {
+		const guild = await client.guilds.fetch(client.guildID);
+		const member = await guild.members.fetch(user_id);
+		console.log(member.premiumSince);
+		return member.premiumSince !== null;
 	}
 
 	/**

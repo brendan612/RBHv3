@@ -32,6 +32,8 @@ const {
 const fetch = require("node-fetch");
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const Canvas = require("@napi-rs/canvas");
+const sharp = require("sharp");
+const path = require("path");
 const Sequelize = require("sequelize");
 
 const {
@@ -58,6 +60,16 @@ const banPadding = 5;
 const pickPadding = 5;
 const canvasWidth = pickSectionWidth * 11;
 const canvasHeight = headerBarHeight + banSectionHeight + pickSectionHeight;
+
+const banPlaceholderPath = path.join(
+	__dirname,
+	"../../assets/drafting/ban_placeholder.png"
+);
+
+const pickPlaceholderPath = path.join(
+	__dirname,
+	"../../assets/drafting/pick_placeholder.png"
+);
 
 /**
  *
@@ -268,7 +280,12 @@ async function generateHeaderBar(ctx, red_captain, blue_captain) {
 }
 
 async function generateBanSection(ctx, blue_bans, red_bans) {
-	console.log(blue_bans, red_bans);
+	const ban_placeholder = await prepareImage(
+		banPlaceholderPath,
+		banSectionWidth,
+		banSectionHeight
+	);
+
 	let blue_champ_splashes = [];
 	let red_champ_splashes = [];
 	if (blue_bans) {
@@ -297,20 +314,25 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
 
 		const champ = blue_champ_splashes[i];
 		if (!champ) {
-			ctx.fillStyle = "#000";
-			ctx.fillRect(
-				xPosition,
-				headerBarHeight,
-				banSectionWidth,
-				banSectionWidth
-			);
-			ctx.fillStyle = "#ccc";
-			ctx.fillRect(
+			ctx.drawImage(
+				ban_placeholder,
 				xPosition + banPadding,
-				headerBarHeight + banPadding,
-				banSectionWidth - banPadding,
-				banSectionHeight - banPadding
+				headerBarHeight + banPadding
 			);
+			// ctx.fillStyle = "#000";
+			// ctx.fillRect(
+			// 	xPosition,
+			// 	headerBarHeight,
+			// 	banSectionWidth,
+			// 	banSectionWidth
+			// );
+			// ctx.fillStyle = "#ccc";
+			// ctx.fillRect(
+			// 	xPosition + banPadding,
+			// 	headerBarHeight + banPadding,
+			// 	banSectionWidth - banPadding,
+			// 	banSectionHeight - banPadding
+			// );
 		} else {
 			const response = await fetch(champ.square_icon);
 			const buffer = await response.buffer();
@@ -332,20 +354,25 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
 		xPosition = index++ * banSectionWidth + redTeamStartX;
 		const champ = red_champ_splashes[i];
 		if (!champ) {
-			ctx.fillStyle = "#000";
-			ctx.fillRect(
-				xPosition,
-				headerBarHeight,
-				banSectionWidth,
-				banSectionWidth
-			);
-			ctx.fillStyle = "#ccc";
-			ctx.fillRect(
+			ctx.drawImage(
+				ban_placeholder,
 				xPosition + banPadding,
-				headerBarHeight + banPadding,
-				banSectionWidth - banPadding,
-				banSectionHeight - banPadding
+				headerBarHeight + banPadding
 			);
+			// ctx.fillStyle = "#000";
+			// ctx.fillRect(
+			// 	xPosition,
+			// 	headerBarHeight,
+			// 	banSectionWidth,
+			// 	banSectionWidth
+			// );
+			// ctx.fillStyle = "#ccc";
+			// ctx.fillRect(
+			// 	xPosition + banPadding,
+			// 	headerBarHeight + banPadding,
+			// 	banSectionWidth - banPadding,
+			// 	banSectionHeight - banPadding
+			// );
 		} else {
 			const response = await fetch(champ.square_icon);
 			const buffer = await response.buffer();
@@ -368,11 +395,11 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
  * @param {*} red_picks
  */
 async function generatePickSection(ctx, blue_picks, red_picks) {
-	const placeholderImgURL =
-		"https://cdn.discordapp.com/attachments/1141595187307614218/1181358297828307006/image.png?ex=6580c4a6&is=656e4fa6&hm=fe35e2860420ffede0ea6a68fdf045ffb622e3b5b1133b29b1fda9acde5eea00&";
-	const response = await fetch(placeholderImgURL);
-	const buffer = await response.buffer();
-	const placeholderImg = await loadImage(buffer);
+	const pick_placeholder = await prepareImage(
+		pickPlaceholderPath,
+		pickSectionWidth,
+		pickSectionHeight
+	);
 
 	let blue_champ_splashes = [];
 	let red_champ_splashes = [];
@@ -403,7 +430,7 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 		const champ = blue_champ_splashes[i];
 		if (!champ) {
 			ctx.drawImage(
-				placeholderImg,
+				pick_placeholder,
 				xPosition,
 				headerBarHeight + banSectionHeight,
 				pickSectionWidth,
@@ -431,7 +458,7 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 		const champ = red_champ_splashes[i];
 		if (!champ) {
 			ctx.drawImage(
-				placeholderImg,
+				pick_placeholder,
 				xPosition,
 				headerBarHeight + banSectionHeight,
 				pickSectionWidth,
@@ -472,53 +499,32 @@ async function sendEmbedMessage(lobby, draft, embed, components, files) {
 	const channel = await guild.channels.fetch(
 		channels.games["League of Legends"]
 	);
-	const user = await client.users.fetch(lobby.host_id);
-	if (lobby.message_id) {
-		try {
-			//const dmChannel = user.dmChannel || (await user.createDM());
-			const message = await channel.messages.fetch(lobby.message_id);
-			if (message) {
-				await message.delete();
-			}
-		} catch (err) {}
-	}
 
-	if (draft.message_id) {
-		try {
-			const message = await channel.messages.fetch(draft.message_id);
-			if (message) {
-				await message.delete();
-			}
-		} catch (err) {}
-	}
+	const draftManager = client.managers.draftManagerFactory.getDraftManager(
+		draft.draft_id
+	);
 
-	let message = null;
-	if (!components && !files) {
-		message = await channel.send({
-			embeds: [embed],
-		});
-	} else if (files && !components) {
-		message = await channel.send({
-			embeds: [embed],
-			files: [files],
-		});
-	} else if (components && !files) {
-		message = await channel.send({
-			embeds: [embed],
-			components: [components],
-		});
-	} else {
-		message = await channel.send({
-			embeds: [embed],
-			components: [components],
-			files: [files],
-		});
-	}
+	//prettier-ignore
+	const message = await draftManager.sendMessage(draft, channel, "", embed, components, files);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
+	draftService.setThread(message.channelId);
 	draftService.setMessage(message.id);
 
 	return message;
+}
+
+/**
+ *
+ * @param {string} imagePath
+ * @param {number} width
+ * @param {number} height
+ * @returns {Promise<Canvas.Image>}
+ */
+async function prepareImage(imagePath, width, height) {
+	const resizedImage = await sharp(imagePath).resize(width, height).toBuffer();
+	const img = await loadImage(resizedImage);
+	return img;
 }
 
 module.exports = { generateChampionDraftEmbed };

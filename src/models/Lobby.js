@@ -14,6 +14,7 @@ const {
 	Interaction,
 	ButtonInteraction,
 } = require("discord.js");
+const Draft = require("./Draft.js");
 
 module.exports = (sequelize) => {
 	/**
@@ -45,6 +46,7 @@ module.exports = (sequelize) => {
 		static async getOpenLobbies(game_name = "League of Legends") {
 			const User = require("./User.js")(sequelize);
 			const Game = require("./Game.js")(sequelize);
+			const Draft = require("./Draft.js")(sequelize);
 			const game = await Game.findOne({ where: { name: game_name } });
 			return await Lobby.findAll({
 				where: { closed_date: null, game_id: game.game_id },
@@ -55,6 +57,7 @@ module.exports = (sequelize) => {
 						model: User,
 						as: "Host",
 					},
+					Draft,
 				],
 			});
 		}

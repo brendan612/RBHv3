@@ -68,6 +68,33 @@ module.exports = (sequelize) => {
 			modelName: "UserEloRating",
 			createdAt: "created_at",
 			updatedAt: "updated_at",
+			indexes: [
+				{
+					name: "user_game_season_index",
+					unique: false,
+					fields: ["user_id", "game_id", "season_id"],
+				},
+				{
+					name: "user_index",
+					unique: false,
+					fields: ["user_id"],
+				},
+				{
+					name: "game_index",
+					unique: false,
+					fields: ["game_id"],
+				},
+				{
+					name: "season_index",
+					unique: false,
+					fields: ["season_id"],
+				},
+				{
+					name: "elo_rating_index",
+					unique: false,
+					fields: ["elo_rating"],
+				},
+			],
 		}
 	);
 

@@ -18,39 +18,44 @@ const loadFiles = (folderName, registerCallback, checkProperties) => {
 	const folders = fs.readdirSync(foldersPath);
 
 	for (const folder of folders) {
-		const filesPath = join(foldersPath, folder);
-		const stats = fs.statSync(filesPath);
+		try {
+			const filesPath = join(foldersPath, folder);
+			const stats = fs.statSync(filesPath);
 
-		if (stats.isDirectory()) {
-			const files = fs
-				.readdirSync(filesPath)
-				.filter((file) => file.endsWith(".js") && !file.startsWith("index"));
+			if (stats.isDirectory()) {
+				const files = fs
+					.readdirSync(filesPath)
+					.filter((file) => file.endsWith(".js") && !file.startsWith("index"));
 
-			for (const file of files) {
-				const filePath = join(filesPath, file);
-				const item = require(filePath);
+				for (const file of files) {
+					const filePath = join(filesPath, file);
+					const item = require(filePath);
 
-				if (folderName === "commands") {
-					item.category = folder;
+					if (folderName === "commands") {
+						item.category = folder;
+					}
+					if (checkProperties(item)) {
+						registerCallback(item);
+					} else {
+						console.log(
+							`[WARNING] The file at ${filePath} is missing required properties.`
+						);
+					}
 				}
+			} else {
+				const item = require(filesPath);
+
 				if (checkProperties(item)) {
 					registerCallback(item);
 				} else {
 					console.log(
-						`[WARNING] The file at ${filePath} is missing required properties.`
+						`[WARNING] The file at ${filesPath} is missing required properties.`
 					);
 				}
 			}
-		} else {
-			const item = require(filesPath);
-
-			if (checkProperties(item)) {
-				registerCallback(item);
-			} else {
-				console.log(
-					`[WARNING] The file at ${filesPath} is missing required properties.`
-				);
-			}
+		} catch (error) {
+			console.log(error);
+			console.log(`[WARNING] Failed to load ${folderName}/${folder}`);
 		}
 	}
 };

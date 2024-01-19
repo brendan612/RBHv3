@@ -1,4 +1,4 @@
-const { User } = require("../../models");
+const { User, Season } = require("../../models");
 const {
 	EmbedBuilder,
 	ButtonBuilder,
@@ -13,6 +13,11 @@ const client = require("../../client.js");
 const fetch = require("node-fetch");
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const UserLevelManager = require("../managers/userLevelManager.js");
+const UserService = require("../services/userService.js");
+const path = require("path");
+const { getStatsForUser } = require("../queries/stats/stats.js");
+
+const userLevelManager = new UserLevelManager();
 
 /**
  *
@@ -111,50 +116,80 @@ async function generateProfileEmbed(interaction, user_id) {
 	const user = await User.findByPk(user_id);
 	const guild = await client.guilds.fetch(client.guildID);
 
-	const userLevelManager = new UserLevelManager();
-
-	const backgroundImgURL =
-		"https://cdn.discordapp.com/attachments/1141595187307614218/1181814548014043218/image.png?ex=65826d91&is=656ff891&hm=537b01db5db24590f38d153a4f00ffe33965ecaa368b340e6d5253776705b7ec&";
-	const clubsBackground =
-		"https://cdn.discordapp.com/attachments/1141595187307614218/1183821868248072314/SpadeNitroDonorGreen.png?ex=6589bb07&is=65774607&hm=4a20516971e37aeb0df4455b006fd8d20b5c28a1567592a8e9ab8cdac273a332&";
-	const response = await fetch(clubsBackground);
-	const buffer = await response.buffer();
-	const background = await loadImage(buffer);
-
-	const canvas = createCanvas(1300, 365);
-	const context = canvas.getContext("2d");
-
-	context.drawImage(background, 0, 0, canvas.width, canvas.height);
+	const UserService = require("../services/userService.js");
+	const userService = await UserService.createUserService(user_id);
 
 	const { level, remainingExp } =
 		userLevelManager.calculateLevelAndRemainingExp(user.server_experience);
-	console.log("level" + level, remainingExp);
-	const maxExp = userLevelManager.expToNextLevel(level);
-	drawExperienceBar(context, maxExp - remainingExp, maxExp, 500, 50, level);
-	drawNameAndTitle(
-		context,
-		user.summoner_name,
-		userLevelManager.getRoleTitleForProfile(level)
-	);
 
-	const attachment = new AttachmentBuilder(canvas.toBuffer("image/png"), {
-		name: "profile.png",
-	});
+	const donorRole = await userService.getDonorRole(user_id);
+	const isBooster = true; //await userService.isBooster(user_id);
 
-	const message = await interaction.reply({
-		files: [attachment],
-		ephemeral: false,
-	});
+	const currentSeason = await Season.getCurrentSeason(1);
+	const stats = await getStatsForUser(user.user_id, currentSeason.season_id);
+
+	if (!donorRole && !isBooster) {
+		const embed = await generateBasicEmbed(
+			user,
+			userLevelManager.expForNextLevel(level),
+			remainingExp,
+			stats.wins,
+			stats.losses
+		);
+
+		const message = await interaction.reply({
+			embeds: [embed],
+			ephemeral: false,
+		});
+	} else {
+		const title = userLevelManager.getRoleTitleForProfile(level);
+
+		const canvas = createCanvas(1300, 365);
+		const context = canvas.getContext("2d");
+
+		const background = await drawBackgroundImage(
+			context,
+			canvas,
+			donorRole,
+			isBooster,
+			level
+		);
+
+		drawNameAndTitle(context, user.summoner_name, title);
+
+		drawWinLoss(context, stats.wins, stats.losses);
+
+		const maxExp = userLevelManager.expForNextLevel(level);
+		drawExperienceBar(context, maxExp - remainingExp, maxExp, 300, 50, level);
+
+		const attachment = new AttachmentBuilder(canvas.toBuffer("image/png"), {
+			name: "profile.png",
+		});
+
+		const message = await interaction.reply({
+			files: [attachment],
+			ephemeral: false,
+		});
+	}
 }
 
 function drawNameAndTitle(ctx, name, title) {
 	ctx.font = "bold 55px Arial";
+
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 3;
+	ctx.strokeText(name, 400, 100);
+
 	ctx.fillStyle = "#fff";
-	ctx.fillText(name, 450, 100);
+	ctx.fillText(name, 400, 100);
 
 	ctx.font = "bold 35px Arial";
-	ctx.fillStyle = "#fff";
-	ctx.fillText(title, 450, 150);
+
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 3;
+
+	ctx.strokeText(title, 400, 150);
+	ctx.fillText(title, 400, 150);
 }
 
 /**
@@ -169,7 +204,7 @@ function drawExperienceBar(ctx, currentExp, maxExp, width, height, level) {
 	// Calculate the width of the filled part
 	const filledWidth = (currentExp / maxExp) * width;
 
-	const x = 450;
+	const x = 400;
 	const y = 250;
 	const offset = 5;
 
@@ -192,8 +227,103 @@ function drawExperienceBar(ctx, currentExp, maxExp, width, height, level) {
 
 	const fontSize = 30;
 	ctx.font = `bold ${fontSize}px Arial`;
+
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 3;
+	ctx.strokeText(`Level: ${level}`, x, y - offset);
+
 	ctx.fillStyle = "#fff";
 	ctx.fillText(`Level: ${level}`, x, y - offset);
+}
+
+function drawWinLoss(ctx, wins, losses) {
+	const x = 800;
+	const y = 250;
+	const offset = 5;
+
+	ctx.font = "bold 30px Arial";
+
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 3;
+	ctx.strokeText(`Wins: ${wins}`, x, y);
+	ctx.strokeText(`Losses: ${losses}`, x, y + 50);
+
+	ctx.fillStyle = "#fff";
+	ctx.fillText(`Wins: ${wins}`, x, y);
+	ctx.fillText(`Losses: ${losses}`, x, y + 50);
+}
+
+/**
+ *
+ * @param {Canvas.SKRSContext2D} ctx
+ * @param {Canvas} canvas
+ * @param {string} donorRole
+ * @param {boolean} isBooster
+ */
+async function drawBackgroundImage(ctx, canvas, donorRole, isBooster, level) {
+	const { suitNumber, suitName, cardNumber } =
+		userLevelManager.getSuitNumberNameAndCardNumber(level);
+
+	const backgroundImagePath = path.join(
+		__dirname,
+		`../../assets/profiles/${suitName}.png`
+	);
+	const backgroundImage = await loadImage(backgroundImagePath);
+
+	ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+	let banner = "";
+	if (isBooster) {
+		banner += "booster_";
+	}
+
+	if (donorRole) {
+		banner += donorRole.toLowerCase();
+	}
+
+	banner = banner.replace(/_+$/, "");
+	if (banner) {
+		const bannerImagePath = path.join(
+			__dirname,
+			`../../assets/profiles/${banner}.png`
+		);
+		const bannerImage = await loadImage(bannerImagePath);
+		ctx.drawImage(bannerImage, 0, 0, canvas.width, canvas.height);
+	}
+}
+
+async function generateBasicEmbed(user, exp, remainingExp, wins, losses) {
+	const guild = await client.guilds.fetch(client.guildID);
+	const member = await guild.members.fetch(user.user_id);
+
+	const embed = baseEmbed(
+		`${user.summoner_name}#${user.tag_line}`,
+		"Server Profile"
+	);
+
+	console.log(remainingExp, exp);
+
+	embed.addFields(
+		{
+			name: "Level",
+			value: user.server_level.toString(),
+			inline: true,
+		},
+		{
+			name: "Experience",
+			value: `${remainingExp}/${exp}`,
+			inline: true,
+		},
+		{
+			name: "Win/Loss (Season)",
+			value: wins + "/" + losses,
+			inline: true,
+		}
+	);
+
+	embed.setThumbnail(member.user.displayAvatarURL());
+
+	return embed;
 }
 
 module.exports = {

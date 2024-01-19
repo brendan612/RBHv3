@@ -1,4 +1,8 @@
-const { AutocompleteFocusedOption, Interaction } = require("discord.js");
+const {
+	AutocompleteFocusedOption,
+	Interaction,
+	ChannelType,
+} = require("discord.js");
 const {
 	sequelize,
 	User,
@@ -28,7 +32,21 @@ async function gameAutocomplete(focusedValue, interaction) {
 }
 
 async function lobbyAutocomplete(focusedValue, interaction) {
-	const lobbies = await Lobby.getOpenLobbies();
+	let lobbies = await Lobby.getOpenLobbies();
+
+	if (
+		//if the interaction is in a thread, just return the related lobby
+		interaction.channel.type === ChannelType.PublicThread ||
+		interaction.channel.type === ChannelType.PrivateThread
+	) {
+		const draft = await Draft.findOne({
+			where: { thread_id: interaction.channelId },
+		});
+		if (draft) {
+			lobbies = lobbies.filter((lobby) => lobby.lobby_id === draft.lobby_id);
+		}
+	}
+
 	const lobbyDetails = lobbies.map((lobby) => ({
 		label: `${lobby.Game.name} Lobby #${lobby.lobby_id} (${lobby.Users.length}/10) - Hosted By: ${lobby.Host.summoner_name}`,
 		value: lobby.lobby_id.toString(),

@@ -11,20 +11,25 @@ const suitNames = ["spades", "clubs", "diamonds", "hearts", "bandersnatch", "dod
 class UserLevelManager {
 	constructor() {}
 
-	expToNextLevel(level) {
+	expForNextLevel(level) {
 		level = level < 1 ? 1 : level;
 		return Math.floor(500 * Math.pow(level + 1, 0.425));
 	}
 
+	expToNextLevel(level, totalExp) {
+		return this.expForNextLevel(level) - totalExp;
+	}
+
+	//remainingExp is the amount of exp into the current level
 	calculateLevelAndRemainingExp(totalExp) {
 		let level = 1;
-		let xpForLevelUp = this.expToNextLevel(level);
+		let xpForLevelUp = this.expForNextLevel(level);
 		let remainingExp = totalExp;
 
 		while (remainingExp >= xpForLevelUp) {
 			remainingExp -= xpForLevelUp;
 			level += 1;
-			xpForLevelUp = this.expToNextLevel(level);
+			xpForLevelUp = this.expForNextLevel(level);
 		}
 
 		return { level, remainingExp };
@@ -34,14 +39,25 @@ class UserLevelManager {
 		return 1500 * 1.1 ** level;
 	}
 
+	/**
+	 *
+	 * @param {number} level
+	 * @returns
+	 */
+	getSuitNumberNameAndCardNumber(level) {
+		const suitNumber = Math.min(Math.floor(Math.max(level - 2, 0) / 13), 6);
+		const suitName = suitNames[suitNumber];
+		const cardNumber = cardNumbers[Math.max(level - 2, 0) % 13];
+
+		return { suitNumber, suitName, cardNumber };
+	}
+
 	getRoleTitleForProfile(level) {
 		//prettier-ignore
 
-		const suitNumber = Math.min(Math.floor((Math.max(level - 2, 0)) / 13), 6);
-		const cardNumber = cardNumbers[Math.max(level - 2, 0) % 13];
-		const suitName = suitNames[suitNumber];
+		const { suitNumber, suitName, cardNumber } =
+			this.getSuitNumberNameAndCardNumber(level);
 
-		console.log(level, suitNumber, cardNumber, suitName);
 		let title = "";
 		switch (suitNumber) {
 			case 4:
@@ -65,9 +81,8 @@ class UserLevelManager {
 		const guild = client.guilds.cache.get(client.guildID);
 		const member = guild.members.cache.get(user_id);
 
-		const suitNumber = Math.max(Math.min(Math.floor((level - 2) / 13), 6), 0);
-		const cardNumber = cardNumbers[(level - 2) % 13];
-		const suitName = suitNames[suitNumber];
+		const { suitNumber, suitName, cardNumber } =
+			this.getSuitNumberNameAndCardNumber(level);
 
 		const roleId = level_roles[suitName];
 
@@ -82,8 +97,6 @@ class UserLevelManager {
 			})
 			.filter((role) => role); // This will remove undefined roles
 
-		console.log(rolesToRemove);
-		console.log(role);
 		try {
 			await member.roles.add(role);
 			await member.roles.remove(

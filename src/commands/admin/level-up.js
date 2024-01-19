@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, Interaction, User } = require("./index.js");
 const UserService = require("../../dataManager/services/userService.js");
 const UserLevelManager = require("../../dataManager/managers/userLevelManager.js");
+const { user } = require("../../client.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("level-up")
@@ -30,12 +31,17 @@ module.exports = {
 		await interaction.deferReply();
 
 		for (let i = 0; i < amount; i++) {
+			const expToLevelUp = userLevelManager.expForNextLevel(
+				userService.user.server_level
+			);
+
+			userService.user.server_experience += expToLevelUp + 1;
+			userService.user.server_level++;
+
 			await userLevelManager.assignLevelRole(
 				user_id,
-				++userService.user.server_level,
-				true
+				userService.user.server_level
 			);
-			await sleep(2000);
 		}
 
 		await userService.user.save();

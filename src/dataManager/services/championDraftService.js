@@ -80,11 +80,15 @@ class ChampionDraftService {
 
 		console.log(playerDraftManager.captains);
 
-		if (
-			!playerDraftManager.captains.includes(user_id) &&
-			user_id !== "105858401497546752" &&
-			user_id !== "678067592673493005"
-		) {
+		const canForcePick = ["105858401497546752", "678067592673493005"].includes(
+			user_id
+		);
+
+		const isCaptain = playerDraftManager.captains.some(
+			(captain) => captain.user_id === user_id
+		);
+
+		if (!isCaptain && !canForcePick) {
 			return interaction.editReply({
 				content: "You are not a captain",
 				ephemeral: true,
@@ -98,6 +102,26 @@ class ChampionDraftService {
 		if (roundType !== commandRoundType) {
 			return interaction.editReply({
 				content: `It is not time to ${commandRoundType}. It is time to ${roundType}`,
+				ephemeral: true,
+			});
+		}
+
+		if (
+			this.draft.red_captain_id === user_id &&
+			team === "blue" &&
+			!canForcePick
+		) {
+			return interaction.editReply({
+				content: "You cannot pick for the other team",
+				ephemeral: true,
+			});
+		} else if (
+			this.draft.blue_captain_id === user_id &&
+			team === "red" &&
+			!canForcePick
+		) {
+			return interaction.editReply({
+				content: "You cannot pick for the other team",
 				ephemeral: true,
 			});
 		}

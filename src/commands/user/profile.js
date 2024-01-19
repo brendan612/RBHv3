@@ -14,7 +14,6 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		let user = interaction.options.getUser("target");
-		console.log(user);
 		if (!user) {
 			user = interaction.member.user;
 		}

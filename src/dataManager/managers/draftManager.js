@@ -7,6 +7,7 @@ const {
 } = require("discord.js");
 const client = require("../../client.js");
 const ThreadManager = require("../managers/threadManager.js");
+const { Lobby, User, Draft } = require("../../models");
 
 class DraftManager {
 	constructor(draft_id) {
@@ -80,7 +81,9 @@ class DraftManager {
 		attachments,
 		ephemeral = false
 	) {
+		const lobby = await Lobby.findByPk(draft.lobby_id);
 		const thread = await this.#getOrCreateThread(channel, draft);
+		await this.#deletePreviousDraftMessages(channel, lobby.message_id);
 		await this.#deletePreviousDraftMessages(channel, draft.message_id);
 		await this.#deletePreviousDraftMessages(thread, draft.message_id);
 

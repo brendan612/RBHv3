@@ -39,14 +39,15 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 			draft.draft_id
 		);
 
-	const captains = playerDraftManager.captains;
+	let captains = playerDraftManager.captains;
 
 	if (captains.length === 0) {
-		if (draft.red_captain_id && draft.blue_captain_id) {
-			const draftService = new DraftService(draft);
-			const lobby = await LobbyService.getLobby(draft.lobby_id);
-			playerDraftManager.captains = await draftService.pickCaptains(lobby);
-		}
+		const draftService = new DraftService(draft);
+		const lobby = await LobbyService.getLobby(draft.lobby_id);
+		playerDraftManager.captains = await draftService.pickCaptains(lobby);
+		playerDraftManager.red_captain = playerDraftManager.captains[0];
+		playerDraftManager.blue_captain = playerDraftManager.captains[1];
+		captains = playerDraftManager.captains;
 	}
 
 	const lobby = await Lobby.findOne({
@@ -104,9 +105,16 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		//const components = generatePlayerDraftComponents(players);
 		const message = await sendEmbedMessage(lobby, draft, embed, components);
 		return message;
+	} else if (playerDraftRounds.length === 9) {
+	} else {
+		playerDraftManager.currentRound =
+			playerDraftRounds.sort((a, b) => b.round_number - a.round_number)[0]
+				.round_number + 1;
 	}
 
 	let availablePlayers = [...players];
+
+	playerDraftRounds.sort((a, b) => a.round_number - b.round_number);
 
 	for (const playerDraftRound of playerDraftRounds) {
 		availablePlayers = availablePlayers.filter(
@@ -120,6 +128,14 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 	}
 
 	if (availablePlayers.length > 0) {
+		// if (availablePlayers.length === 1) {
+		// 	const playerDraftRound = await PlayerDraftRound.create({
+		// 		draft_id: this.draft.draft_id,
+		// 		user_id: BigInt(availablePlayers[0].user_id),
+		// 		team: team,
+		// 		round_number: 5,
+		// 	});
+		// }
 		const maxPicks = playerDraftManager.maxPicks();
 		if (playerDraftManager.currentTeam === "blue") {
 			embed.setDescription(

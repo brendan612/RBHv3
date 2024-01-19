@@ -25,7 +25,12 @@ module.exports = {
 			message.reply("Thank you!");
 		}
 
-		if (message.content.toLowerCase().includes("wo")) {
+		const cleanedContent = message.content.toLowerCase().trim();
+		if (
+			cleanedContent == "wo" ||
+			cleanedContent == "without" ||
+			cleanedContent == "draft wo"
+		) {
 			message.reply("draft without someone???");
 		}
 

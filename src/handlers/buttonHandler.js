@@ -73,10 +73,17 @@ async function handlePickSidesButton(interaction) {
 	const draft = await Draft.findByPk(draft_id);
 	const playerDraftService = new PlayerDraftService(draft);
 
-	await playerDraftService.setSidesAndCaptains(
-		interaction.member.id,
-		idParts[2]
-	);
+	try {
+		await playerDraftService.setSidesAndCaptains(
+			interaction.member.id,
+			idParts[2]
+		);
+	} catch (error) {
+		return await interaction.reply({
+			content: error.message,
+			ephemeral: true,
+		});
+	}
 
 	await interaction.deferReply();
 	await interaction.deleteReply();
@@ -195,6 +202,13 @@ async function handleBlueWinConfirmButton(interaction) {
 	const draft = await Draft.findByPk(draft_id);
 	const draftService = new DraftService(draft);
 	await draftService.submitMatchWin("blue");
+
+	await interaction.message.edit({
+		components: [],
+	});
+
+	const championDraftService = new ChampionDraftService(draft);
+	await championDraftService.generateChampionDraftEmbed(draft);
 }
 
 async function handleCancelWinButton(interaction) {

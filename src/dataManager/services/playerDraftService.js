@@ -106,7 +106,7 @@ class PlayerDraftService {
 	async addPlayerToTeamByUserID(user_id, team, round) {
 		const playerDraftRound = await PlayerDraftRound.create({
 			draft_id: this.draft.draft_id,
-			user_id: user_id,
+			user_id: BigInt(user_id),
 			team: team,
 			round_number: round,
 		});
@@ -145,7 +145,7 @@ class PlayerDraftService {
 
 		if (!allowedUsers.includes(user_id)) {
 			return await interaction.reply({
-				content: "You are not a captain",
+				content: "You are not the picking captain",
 				ephemeral: true,
 			});
 		}

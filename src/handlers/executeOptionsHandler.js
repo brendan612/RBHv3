@@ -1,4 +1,8 @@
-const { Interaction, SlashCommandStringOption } = require("discord.js");
+const {
+	Interaction,
+	SlashCommandStringOption,
+	ChannelType,
+} = require("discord.js");
 const {
 	sequelize,
 	User,
@@ -27,14 +31,29 @@ async function handleGameOption(interaction) {
  * @returns {Promise<Lobby>}
  */
 async function handleLobbyOption(interaction, game_id) {
+	let flag = false;
 	let lobby = null;
 	let lobby_id = interaction.options.getInteger("lobby");
 	if (!lobby_id) {
-		//get earliest open lobby
-		lobby = await Lobby.findOne({
-			where: { closed_date: null, game_id: game_id },
-			order: [["created_at", "ASC"]],
-		});
+		if (
+			interaction.channel.type === ChannelType.PublicThread ||
+			interaction.channel.type === ChannelType.PrivateThread
+		) {
+			const draft = await Draft.findOne({
+				where: { thread_id: interaction.channelId },
+			});
+			if (draft) {
+				lobby = await Lobby.findOne({ where: { lobby_id: draft.lobby_id } });
+				flag = true;
+			}
+		}
+		if (!flag) {
+			//get earliest open lobby
+			lobby = await Lobby.findOne({
+				where: { closed_date: null, game_id: game_id },
+				order: [["created_at", "ASC"]],
+			});
+		}
 	} else {
 		lobby = await Lobby.findOne({ where: { lobby_id: lobby_id } });
 	}
@@ -46,6 +65,32 @@ async function handleLobbyOption(interaction, game_id) {
 			ephemeral: true,
 		});
 		return null;
+	}
+
+	if (!flag) {
+		if (lobby.draft_id) {
+			const draft = await Draft.findByPk(lobby.draft_id);
+
+			if (draft.thread_id && draft.thread_id != interaction.channelId) {
+				if (
+					interaction.channel.type === ChannelType.PublicThread ||
+					interaction.channel.type === ChannelType.PrivateThread
+				) {
+					const otherDraftWithThread = await Draft.findOne({
+						where: { thread_id: interaction.channelId },
+					});
+
+					if (otherDraftWithThread.draft_id != draft.draft_id) {
+						await interaction.reply({
+							content: `Use <#${draft.thread_id}> to interact with this lobby.`,
+							ephemeral: true,
+						});
+
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	return lobby;

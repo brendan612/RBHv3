@@ -19,6 +19,8 @@ const LobbyService = require("../../dataManager/services/lobbyService.js");
 const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
 const DraftDTO = require("../../dataManager/DTOs/draftDTO.js");
 
+const { ChannelType } = require("discord.js");
+
 const client = require("../../client.js");
 
 module.exports = {
@@ -36,19 +38,37 @@ module.exports = {
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 		if (!lobby) return;
 
-		await interaction.deferReply();
-		await interaction.deleteReply();
-
 		if (lobby.draft_id) {
+			const draft = await Draft.findByPk(lobby.draft_id);
+
+			if (draft.thread_id && draft.thread_id != interaction.channelId) {
+				if (
+					interaction.channel.type === ChannelType.PublicThread ||
+					interaction.channel.type === ChannelType.PrivateThread
+				) {
+					const otherDraftWithThread = await Draft.findOne({
+						where: { thread_id: interaction.channelId },
+					});
+
+					if (otherDraftWithThread.draft_id != draft.draft_id) {
+						return interaction.reply({
+							content: `This lobby is currently being drafted in <#${draft.thread_id}>`,
+							ephemeral: true,
+						});
+					}
+				}
+			}
+
+			await interaction.deferReply({ ephemeral: true });
+			await interaction.deleteReply();
+
 			const draftRounds = await DraftRound.findAll({
 				where: { draft_id: lobby.draft_id },
 			});
 			if (draftRounds.length > 0) {
-				const draft = await Draft.findByPk(lobby.draft_id);
 				const championDraftService = new ChampionDraftService(draft);
 				await championDraftService.generateChampionDraftEmbed(draft);
 			} else {
-				const draft = await Draft.findByPk(lobby.draft_id);
 				const draftDTO = new DraftDTO(draft);
 				const playerDraftService = new PlayerDraftService(draft);
 				await playerDraftService.generatePlayerDraftEmbed(draftDTO, true);
