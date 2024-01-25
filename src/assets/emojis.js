@@ -6,6 +6,7 @@ const LeagueRoleEmojis = {
 	Mid: emojis.mid,
 	Bot: emojis.bot,
 	Support: emojis.support,
+	Fill: emojis.fill,
 };
 
 const LeagueRankEmojis = {
