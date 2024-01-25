@@ -33,7 +33,6 @@ const {
 	Events,
 	GatewayIntentBits,
 } = require("discord.js");
-const fetch = require("node-fetch");
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const Canvas = require("@napi-rs/canvas");
 const sharp = require("sharp");

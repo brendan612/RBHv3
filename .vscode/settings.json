@@ -14,15 +14,19 @@
 		"Jubjub",
 		"leaderboard",
 		"leaderboards",
+		"matchplayers",
 		"multigg",
 		"napi",
 		"pickchamp",
+		"postgame",
 		"PUUID",
 		"redwin",
 		"redwinconfirm",
 		"SKRS",
+		"sparkedhost",
 		"startchampdraft",
 		"UNRANKED",
+		"usereloratings",
 		"Valorant"
 	]
 }
