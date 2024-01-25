@@ -499,6 +499,8 @@ class UserService {
 	 */
 	async verifyAdminCommandPermission(interaction) {
 		//prettier-ignore
+		if(interaction.member.roles.cache.some(role => role.id === permission_roles.developer)) return true;
+		//prettier-ignore
 		if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
 			await interaction.reply({
 				content: "You do not have permission to use this command.",
