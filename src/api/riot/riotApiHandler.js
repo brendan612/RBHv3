@@ -41,7 +41,7 @@ async function getSummonerByRiotID(gameName, tagLine, region = "NA") {
 		`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
 		{
 			headers: {
-				"X-Riot-Token": process.env.riotAPIKey,
+				"X-Riot-Token": process.env.RIOTAPIKEY,
 				Origin: "https://developer.riotgames.com",
 			},
 		}
@@ -55,7 +55,7 @@ async function getSummonerByPuuid(puuid) {
 		`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
 		{
 			headers: {
-				"X-Riot-Token": process.env.riotAPIKey,
+				"X-Riot-Token": process.env.RIOTAPIKEY,
 				Origin: "https://developer.riotgames.com",
 			},
 		}
@@ -70,7 +70,7 @@ async function getRankByRiotID(gameName, tagLine, region = "NA") {
 		`https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summoner.id}`,
 		{
 			headers: {
-				"X-Riot-Token": process.env.riotAPIKey,
+				"X-Riot-Token": process.env.RIOTAPIKEY,
 				Origin: "https://developer.riotgames.com",
 			},
 		}
@@ -84,7 +84,7 @@ async function getRiotAccountByPuuid(puuid) {
 		`https://americas.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`,
 		{
 			headers: {
-				"X-Riot-Token": process.env.riotAPIKey,
+				"X-Riot-Token": process.env.RIOTAPIKEY,
 				Origin: "https://developer.riotgames.com",
 			},
 		}

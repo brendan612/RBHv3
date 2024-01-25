@@ -4,9 +4,9 @@ const path = require("node:path");
 
 require("dotenv").config();
 
-const token = process.env.token;
-const clientID = process.env.clientID;
-const guildID = process.env.guildID;
+const token = process.env.TOKEN;
+const clientID = process.env.CLIENTID;
+const guildID = process.env.GUILDID;
 
 const syncCommands = async () => {
 	const commands = [];

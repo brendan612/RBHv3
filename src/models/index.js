@@ -1,9 +1,9 @@
 const { Sequelize, DataTypes, Model } = require("sequelize");
 require("dotenv").config();
 const sequelize = new Sequelize(
-	process.env.dbName,
-	process.env.dbUser,
-	process.env.dbPassword,
+	process.env.DBNAME,
+	process.env.DBUSER,
+	process.env.DBPASSWORD	,
 	{
 		host: "db-buf-05.sparkedhost.us",
 		port: 3306,

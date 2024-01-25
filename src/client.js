@@ -19,6 +19,6 @@ const client = new Client({
 		GatewayIntentBits.GuildEmojisAndStickers,
 	],
 });
-client.guildID = process.env.guildID;
+client.guildID = process.env.GUILDID;
 
 module.exports = client;
