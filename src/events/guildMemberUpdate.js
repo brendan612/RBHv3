@@ -1,5 +1,5 @@
 const { Events, Interaction } = require("discord.js");
-const config = require("../../config.json").roles;
+const config = require(`../../${process.env.CONFIG_FILE}`).roles;
 
 module.exports = {
 	name: Events.GuildMemberUpdate,

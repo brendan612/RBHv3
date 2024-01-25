@@ -19,7 +19,7 @@ const {
 const LobbyDTO = require("../DTOs/lobbyDTO");
 const { generateLobbyEmbed } = require("../messages/lobbyEmbed");
 const DraftService = require("./draftService");
-const channels = require("../../../config.json").channels;
+const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const client = require("../../client.js");
 const ThreadManager = require("../managers/threadManager.js");
 

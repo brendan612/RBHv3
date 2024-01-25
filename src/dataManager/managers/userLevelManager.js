@@ -1,6 +1,7 @@
 const c = require("config");
 const client = require("../../client.js");
-const level_roles = require("../../../config.json").roles.level_roles;
+const level_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
+	.level_roles;
 const { generateLevelUpEmbed } = require("../messages/userEmbed.js");
 
 //prettier-ignore

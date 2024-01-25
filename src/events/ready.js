@@ -11,7 +11,7 @@ const webhookServer = require("../handlers/voteHandler");
 const {
 	checkAndUpdateServerMessages,
 } = require("../handlers/serverMessageHandler");
-const { channels } = require("../../config.json");
+const { channels } = require(`../../${process.env.CONFIG_FILE}`);
 const {
 	ServerMessage,
 	Match,

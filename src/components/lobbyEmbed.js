@@ -1,6 +1,6 @@
 const { EmbedBuilder, GuildMember } = require("discord.js");
 const { baseEmbed } = require("./embed.js");
-const { inhouse_icon_url } = require("../../config.json");
+const { inhouse_icon_url } = require(`../../${process.env.CONFIG_FILE}`);
 const { LeagueRankEmojis, LeagueRoleEmojis } = require("../assets/emojis.js");
 
 /**

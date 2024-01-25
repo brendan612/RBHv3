@@ -21,7 +21,11 @@ const {
 	Match,
 } = require("../../models");
 const { baseEmbed } = require("../../components/embed.js");
-const { inhouse_icon_url, channels } = require("../../../config.json");
+
+const {
+	inhouse_icon_url,
+	channels,
+} = require(`../../../${process.env.CONFIG_FILE}.json`);
 const client = require("../../client.js");
 const {
 	AttachmentBuilder,

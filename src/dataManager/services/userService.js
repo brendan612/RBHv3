@@ -26,8 +26,8 @@ const {
 const { LeagueTier } = require("../../components/leagueRankedEnums.js");
 const client = require("../../client.js");
 const UserLevelManager = require("../managers/userLevelManager.js");
-const channels = require("../../../config.json").channels;
-const roles = require("../../../config.json").roles.game_roles[
+const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
+const roles = require(`../../../${process.env.CONFIG_FILE}`).roles.game_roles[
 	"League of Legends"
 ];
 const { Op, Sequelize } = require("sequelize");
@@ -38,8 +38,10 @@ const {
 	TimestampFormat,
 } = require("../../utilities/timestamp.js");
 const roleHierarchy = require("../../utilities/role-hierarchy.js");
-const permission_roles = require("../../../config.json").roles.permission_roles;
-const donor_roles = require("../../../config.json").roles.donor_roles;
+const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
+const donor_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
+	.donor_roles;
 
 class UserService {
 	/**

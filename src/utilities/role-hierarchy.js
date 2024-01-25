@@ -1,4 +1,5 @@
-const permission_roles = require("../../config.json").roles.permission_roles;
+const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
 
 const roleHierarchy = {
 	owner: [

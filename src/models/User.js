@@ -45,7 +45,7 @@ module.exports = (sequelize) => {
 		 */
 		awardVoteMoney = async (vote, client) => {
 			console.log(vote);
-			const { channels } = require("../../config.json");
+			const { channels } = require(`../../${process.env.CONFIG_FILE}`);
 			const money = vote.type === "upvote" ? 50000 : 0;
 			let moneyToAward = 0;
 

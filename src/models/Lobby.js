@@ -69,7 +69,7 @@ module.exports = (sequelize) => {
 		 * @param {boolean} send
 		 */
 		generateEmbed = async (client, host, send) => {
-			const { channels } = require("../../config.json");
+			const { channels } = require(`../../${process.env.CONFIG_FILE}`);
 
 			let playerList = [];
 			let reserves = [];
@@ -143,7 +143,7 @@ module.exports = (sequelize) => {
 		};
 
 		generateDraftEmbed = async (client, host, send) => {
-			const { channels } = require("../../config.json");
+			const { channels } = require(`../../${process.env.CONFIG_FILE}`);
 
 			let playerList = [];
 			let reserves = [];

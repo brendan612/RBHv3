@@ -1,5 +1,8 @@
 const { EmbedBuilder } = require("discord.js");
-const { server_icon_url, inhouse_icon_url } = require("../../config.json");
+const {
+	server_icon_url,
+	inhouse_icon_url,
+} = require(`../../${process.env.CONFIG_FILE}`);
 
 /**
  *

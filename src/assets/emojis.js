@@ -1,24 +1,24 @@
+const { emojis } = require(`../../${process.env.CONFIG_FILE}`);
+
 const LeagueRoleEmojis = {
-	Top: "<:top:1154957325828903012>",
-	Jungle: "<:jungle:1154957317339623485>",
-	Mid: "<:mid:1154957322045620246>",
-	Bot: "<:bot:1154957326890057728>",
-	Support: "<:support:1154957323991777320>",
-	Fill: "<:fill:1154957318363037849>",
+	Top: emojis.top,
+	Jungle: emojis.jungle,
+	Mid: emojis.mid,
+	Bot: emojis.bot,
+	Support: emojis.support,
 };
 
 const LeagueRankEmojis = {
-	// UNRANKED: "UNRANKED",
-	// IRON: "<:iron:1154957071909912676>",
-	// BRONZE: "<:bronze:1154957066050490378>",
-	// SILVER: "<:silver:1154957070391591013>",
-	GOLD: "<:gold:1154957064746061865>",
-	PLATINUM: "<:platinum:1154960366439243786>",
-	EMERALD: "<:emerald:1154960364073668638>",
-	DIAMOND: "<:diamond:1154957062611148860>",
-	MASTER: "<:master:1154957074325852181>",
-	GRANDMASTER: "<:grandmaster:1154957077014397028>",
-	CHALLENGER: "<:challenger:1154957075789660220>",
+	IRON: emojis.iron,
+	BRONZE: emojis.bronze,
+	SILVER: emojis.silver,
+	GOLD: emojis.gold,
+	PLATINUM: emojis.platinum,
+	EMERALD: emojis.emerald,
+	DIAMOND: emojis.diamond,
+	MASTER: emojis.master,
+	GRANDMASTER: emojis.grandmaster,
+	CHALLENGER: emojis.challenger,
 };
 
 module.exports = { LeagueRoleEmojis, LeagueRankEmojis };

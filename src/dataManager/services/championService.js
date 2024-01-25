@@ -2,7 +2,7 @@ const axios = require("axios");
 const { Champion } = require("../../models");
 
 const fs = require("fs").promises;
-const configPath = "../../../config.json";
+const configPath = `../../../${process.env.CONFIG_FILE}`;
 
 class ChampionService {
 	constructor() {

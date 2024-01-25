@@ -14,7 +14,8 @@ const {
 
 const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
 const LobbyService = require("../../dataManager/services/lobbyService.js");
-const permission_roles = require("../../../config.json").roles.permission_roles;
+const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");

@@ -6,10 +6,10 @@ const {
 	StringSelectMenuBuilder,
 	StringSelectMenuOptionBuilder,
 } = require("discord.js");
-const { channels } = require("../../../config.json");
+const { channels } = require(`../../../${process.env.CONFIG_FILE}`);
 const { ServerMessage } = require("../../models");
 const { baseEmbed } = require("../embed");
-const roles = require("../../../config.json").roles.game_roles[
+const roles = require(`../../../${process.env.CONFIG_FILE}`).roles.game_roles[
 	"League of Legends"
 ];
 const client = require("../../client.js");

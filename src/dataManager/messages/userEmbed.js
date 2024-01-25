@@ -8,7 +8,10 @@ const {
 } = require("discord.js");
 const { baseEmbed } = require("../../components/embed.js");
 const { getSummonerByRiotID } = require("../../api/riot/riotApiHandler.js");
-const { inhouse_icon_url, channels } = require("../../../config.json");
+const {
+	inhouse_icon_url,
+	channels,
+} = require(`../../../${process.env.CONFIG_FILE}`);
 const client = require("../../client.js");
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const UserLevelManager = require("../managers/userLevelManager.js");

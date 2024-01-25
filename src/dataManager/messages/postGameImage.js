@@ -4,7 +4,7 @@ const path = require("path");
 const { Match, Lobby, MatchPlayer, User } = require("../../models");
 const { AttachmentBuilder } = require("discord.js");
 
-const { channels } = require("../../../config.json");
+const { channels } = require(`../../../${process.env.CONFIG_FILE}`);
 
 const canvasWidth = 1920;
 const canvasHeight = 1080;

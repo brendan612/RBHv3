@@ -6,7 +6,8 @@ const {
 	userOption,
 } = require("./index.js");
 const UserService = require("../../dataManager/services/userService.js");
-const channels = require("../../../config.json").channels;
+
+const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("register")
