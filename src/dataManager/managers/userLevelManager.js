@@ -40,6 +40,14 @@ class UserLevelManager {
 		return 1500 * 1.1 ** level;
 	}
 
+	calculateMatchReward(level, isWin) {
+		if (isWin) {
+			return 50000 * 1.1 ** level;
+		} else {
+			return 25000 * 1.1 ** level;
+		}
+	}
+
 	/**
 	 *
 	 * @param {number} level

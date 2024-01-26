@@ -324,6 +324,25 @@ class UserService {
 		await this.user.save();
 	}
 
+	async addMoney(money) {
+		this.user.server_money += money;
+		await this.user.save();
+	}
+
+	async removeMoney(money) {
+		this.user.server_money -= money;
+		await this.user.save();
+	}
+
+	async addMatchReward(winLoss) {
+		const userLevelManager = new UserLevelManager();
+		this.user.server_money += userLevelManager.calculateMatchReward(
+			this.user.server_level,
+			winLoss
+		);
+		await this.user.save();
+	}
+
 	async setLastMessageDate(date) {
 		this.user.last_message_date = date;
 		await this.user.save();

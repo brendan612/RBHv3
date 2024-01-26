@@ -284,6 +284,16 @@ class DraftService {
 					userEloRating.elo_rating = matchPlayer.elo_after;
 					userEloRating.save();
 				}
+
+				if (matchesToUpdate.length === 1) {
+					const user = await User.findByPk(matchPlayer.user_id);
+					const userService = new UserService(user);
+					if (winLoss === 1) {
+						await userService.addMoney(lobby.game_id, lobby.season_id, 200);
+					} else {
+						await userService.addMoney(lobby.game_id, lobby.season_id, 100);
+					}
+				}
 			}
 		}
 
