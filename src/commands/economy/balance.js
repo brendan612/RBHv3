@@ -41,11 +41,9 @@ module.exports = {
 			let message = "";
 
 			if (target) {
-				userToDisplay = await User.getUser(target.id);
+				userToDisplay = await User.findByPk(target.id);
 				message = `<@${userToDisplay.user_id}> has ${userToDisplay.server_money} :pound:`;
 			} else {
-				console.log(user);
-				console.log(target);
 				userToDisplay = user;
 				message = `You have ${userToDisplay.server_money} :pound:`;
 			}
