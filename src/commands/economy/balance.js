@@ -65,7 +65,7 @@ module.exports = {
 				});
 			}
 
-			const targetUser = await User.findByPk(interaction.user.id);
+			const targetUser = await User.findByPk(target.id);
 
 			user.server_money -= amount;
 			targetUser.server_money += amount;
