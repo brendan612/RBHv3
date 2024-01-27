@@ -157,7 +157,7 @@ async function generateProfileEmbed(interaction, user_id) {
 			level
 		);
 
-		drawNameAndTitle(context, user.summoner_name, title);
+		drawNameAndTitle(context, user.summoner_name + " #" + user.tag_line, title);
 
 		drawWinLoss(context, stats.wins, stats.losses);
 

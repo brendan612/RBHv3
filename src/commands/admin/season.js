@@ -7,6 +7,7 @@ const {
 	gameOption,
 	handleGameOption,
 	seasonAutocomplete,
+	seasonOption,
 } = require("./index.js");
 const UserService = require("../../dataManager/services/userService.js");
 const UserLevelManager = require("../../dataManager/managers/userLevelManager.js");
@@ -51,6 +52,13 @@ module.exports = {
 				.setName("end")
 				.setDescription("End the current season for a game")
 				.addStringOption(gameOption())
+		)
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setName("view")
+				.setDescription("View a season for a game.")
+				.addStringOption(gameOption())
+				.addStringOption(seasonOption())
 		),
 	/**
 	 *
@@ -91,6 +99,16 @@ module.exports = {
 			await interaction.reply({
 				content: `Ended season \`\`${season.name}\`\` for ${game.name}`,
 			});
+		} else if (interaction.options.getSubcommand() === "view") {
+			const season_id = interaction.options.getString("season") ?? "current";
+			const season =
+				season_id == "current"
+					? await Season.getCurrentSeason(game.game_id)
+					: await Season.findByPk(season_id);
+
+			await interaction.reply({
+				content: `Current season for ${game.name}: \`\`${season.name}\`\` \nStart date: \`\`${season.start_date}\`\` \nEnd date: \`\`${season.end_date}\`\``,
+			});
 		}
 	},
 	/**
@@ -101,7 +119,7 @@ module.exports = {
 		const focusedValue = interaction.options.getFocused(true);
 		if (focusedValue.name === "game") {
 			await gameAutocomplete(focusedValue.value, interaction);
-		} else if (focusedValue.name === "season_id") {
+		} else if (focusedValue.name === "season") {
 			await seasonAutocomplete(focusedValue.value, interaction);
 		}
 	},

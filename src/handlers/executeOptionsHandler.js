@@ -122,12 +122,12 @@ async function handleUserOption(interaction, optionName) {
  * @returns {Promise<Season>}
  */
 async function handleSeasonOption(interaction, game_id) {
-	const val = interaction.options.getString("season");
+	const val = interaction.options.getString("season") ?? "current";
+	console.log(val);
 	if (val == "all") {
 		return null;
 	}
-	const seasonName = interaction.options.getString("season") ?? "current";
-	if (seasonName === "current") {
+	if (val === "current") {
 		return await Season.findOne({
 			where: {
 				game_id: game_id,
@@ -141,7 +141,7 @@ async function handleSeasonOption(interaction, game_id) {
 			order: [["created_at", "DESC"]],
 		});
 	}
-	return await Season.findOne({ where: { name: seasonName } });
+	return await Season.findByPk(val);
 }
 
 /**

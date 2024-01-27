@@ -21,6 +21,7 @@ const {
 } = require("./index.js");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { random } = require("mathjs");
+const { Op } = require("sequelize");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -150,25 +151,7 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 	}
 
 	if (season_id) {
-		season = await Season.findOne({
-			where: {
-				game_id: game_id,
-				start_date: {
-					[Op.lte]: new Date(), // Less than or equal to today
-				},
-				end_date: {
-					[Op.gte]: new Date(), // Greater than or equal to today
-				},
-			},
-			order: [["created_at", "DESC"]],
-		});
-	}
-
-	const whereCondition = {
-		game_id: game.game_id,
-	};
-	if (season) {
-		whereCondition.season_id = season.season_id;
+		season = await Season.findByPk(season_id);
 	}
 
 	const limit = 30;
@@ -188,12 +171,18 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 				LEFT JOIN
 					(SELECT
 						user_id,
-						COUNT(DISTINCT match_id) AS matches_played
+						COUNT(DISTINCT MatchPlayers.match_id) AS matches_played
 					FROM
 						MatchPlayers
+					JOIN
+						Matches m ON MatchPlayers.match_id = m.match_id
+					WHERE m.game_id = :game_id
+					${season_id ? "AND m.season_id = :season_id" : ""}
 					GROUP BY
 						user_id) mp ON u.user_id = mp.user_id
 				WHERE uer.user_id > 20
+				AND uer.game_id = :game_id
+				${season_id ? "AND uer.season_id = :season_id" : ""}
 				GROUP BY
 					uer.user_id, mp.matches_played
 				HAVING
@@ -202,7 +191,7 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 					average_elo DESC
 				LIMIT :limit OFFSET :offset;`,
 			{
-				replacements: { limit, offset },
+				replacements: { limit, offset, game_id, season_id },
 				type: sequelize.QueryTypes.SELECT,
 			}
 		),
@@ -225,12 +214,14 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 					GROUP BY
 						user_id) mp ON u.user_id = mp.user_id
 				WHERE uer.user_id > 20
+				AND uer.game_id = :game_id
+				${season_id ? "AND uer.season_id = :season_id" : ""}
 				GROUP BY
 					uer.user_id, mp.matches_played
 				HAVING
 					mp.matches_played > 3`,
 			{
-				replacements: { limit, offset },
+				replacements: { limit, offset, game_id, season_id },
 				type: sequelize.QueryTypes.SELECT,
 			}
 		),
@@ -247,8 +238,7 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 		});
 	}
 
-	const title =
-		(season ? `Season ${season.season_number}` : "All-Time") + " Leaderboard";
+	const title = (season ? season.name : "All-Time") + " Leaderboard";
 
 	const embed = baseEmbed(title, `Leaderboard for ${game.name}`);
 

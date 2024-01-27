@@ -1,6 +1,10 @@
-const { Events } = require("discord.js");
+const { Events, ThreadChannel, ChannelType } = require("discord.js");
 const UserService = require("../dataManager/services/userService.js");
-const { User } = require("../models");
+const { User, Lobby } = require("../models");
+
+const permission_roles = require(`../../config.local.json`).roles
+	.permission_roles;
+const roleHierarchy = require("../utilities/role-hierarchy.js");
 
 const messageCache = new Map();
 
@@ -11,6 +15,21 @@ module.exports = {
 
 		const user_id = message.author.id;
 		const currentTimestamp = new Date(message.createdTimestamp);
+
+		if (message.channel.type === ChannelType.PublicThread) {
+			const lobby = await Lobby.findOne({
+				where: { thread_id: message.channel.id },
+			});
+			if (lobby) {
+				const users = await lobby.getUsers();
+				if (
+					!users.some((user) => user.user_id === user_id) &&
+					!hasRequiredRoleOrHigher(message.member, "trainee")
+				) {
+					message.delete();
+				}
+			}
+		}
 
 		const lastTimestamp = messageCache.get(user_id);
 
@@ -37,6 +56,25 @@ module.exports = {
 		return;
 	},
 };
+
+function hasRequiredRoleOrHigher(member, requiredRoleName) {
+	const requiredRoleID = permission_roles[requiredRoleName];
+	if (!requiredRoleID) {
+		console.error("Invalid requiredRoleName:", requiredRoleName);
+		return false;
+	}
+
+	const requiredRoleIndex = roleHierarchy.indexOf(requiredRoleID);
+	if (requiredRoleIndex === -1) {
+		console.error("Required role not found in roleHierarchy array");
+		return false;
+	}
+
+	return member.roles.cache.some((role) => {
+		const memberRoleIndex = roleHierarchy.indexOf(role.id);
+		return memberRoleIndex !== -1 && memberRoleIndex <= requiredRoleIndex;
+	});
+}
 
 async function updateLastMessageDate(user_id, currentTimestamp) {
 	try {

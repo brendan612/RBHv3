@@ -380,6 +380,9 @@ class LobbyService {
 			draft.draft_id
 		);
 
+		this.lobby.thread_id = thread.id;
+		await this.lobby.save();
+
 		const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 		await draftService.startPlayerDraft();
 	}

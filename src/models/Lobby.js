@@ -402,6 +402,10 @@ module.exports = (sequelize) => {
 				type: DataTypes.BIGINT,
 				allowNull: true,
 			},
+			thread_id: {
+				type: DataTypes.BIGINT,
+				allowNull: true,
+			},
 		},
 		{
 			sequelize,

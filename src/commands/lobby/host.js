@@ -27,6 +27,8 @@ module.exports = {
 	async execute(interaction) {
 		// interaction.user is the object representing the User who ran the command
 		// interaction.member is the GuildMember object, which represents the user in the specific guild
+
+		await interaction.deferReply();
 		const game = await handleGameOption(interaction);
 		const lobby = await LobbyService.createLobby(
 			interaction.member.id,
@@ -38,8 +40,6 @@ module.exports = {
 			await LobbyService.getLobby(lobby.lobby_id),
 			true
 		);
-
-		await interaction.deferReply();
 		await interaction.deleteReply();
 	},
 	/**
