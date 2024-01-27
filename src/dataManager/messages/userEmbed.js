@@ -125,7 +125,7 @@ async function generateProfileEmbed(interaction, user_id) {
 		userLevelManager.calculateLevelAndRemainingExp(user.server_experience);
 
 	const donorRole = await userService.getDonorRole(user_id);
-	const isBooster = true; //await userService.isBooster(user_id);
+	const isBooster = await userService.isBooster(user_id);
 
 	const currentSeason = await Season.getCurrentSeason(1);
 	const stats = await getStatsForUser(user.user_id, currentSeason.season_id);
