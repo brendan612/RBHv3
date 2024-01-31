@@ -65,14 +65,14 @@ class UserService {
 	 *
 	 * @param {bigint} user_id
 	 * @param {Date} join_date
-	 * @returns
+	 * @returns {Promise<User>}
 	 */
 	static async createUser(user_id, join_date) {
 		const user = await User.create({
 			user_id: user_id,
 			join_date: join_date,
 		});
-		return new UserDTO(user);
+		return user;
 	}
 
 	/**
@@ -221,7 +221,6 @@ class UserService {
 
 		await interaction.deferUpdate();
 
-		console.log(user_id, member.id);
 		if (BigInt(user_id) !== BigInt(member.id)) {
 			return await interaction.followUp({
 				content: "This is not your verification button.",
@@ -301,6 +300,7 @@ class UserService {
 		const { level } = userLevelManager.calculateLevelAndRemainingExp(
 			this.user.server_experience
 		);
+
 		this.user.server_experience += experience;
 
 		const newLevelInfo = userLevelManager.calculateLevelAndRemainingExp(
