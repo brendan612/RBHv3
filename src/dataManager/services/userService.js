@@ -53,7 +53,12 @@ class UserService {
 	}
 
 	static async createUserService(user_id) {
-		const user = await User.findByPk(user_id);
+		let user = await User.findByPk(user_id);
+		if (!user) {
+			const guild = await client.guilds.fetch(client.guildID);
+			const member = await guild.members.fetch(user_id);
+			user = await UserService.createUser(user_id, member.joinedAt);
+		}
 		return new UserService(user);
 	}
 	/**

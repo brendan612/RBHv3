@@ -1,11 +1,35 @@
 const PlayerDraftManager = require("../dataManager/managers/playerDraftManager.js");
 const { LeagueRankEmojis, LeagueRoleEmojis } = require("../assets/emojis.js");
 const { User } = require("../models");
+const { GuildMember } = require("discord.js");
 
-function hasRequiredRoleOrHigher(member, requiredRole) {
-	const memberRoles = member.roles.cache.map((role) => role.id);
-	const allowedRoles = [requiredRole, ...roleHierarchy[requiredRole]];
-	return memberRoles.some((role) => allowedRoles.includes(role));
+const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
+const roleHierarchy = require("../utilities/role-hierarchy.js");
+
+/**
+ *
+ * @param {GuildMember} member
+ * @param {string} requiredRoleName
+ * @returns
+ */
+function hasRequiredRoleOrHigher(member, requiredRoleName) {
+	const requiredRoleID = permission_roles[requiredRoleName];
+	if (!requiredRoleID) {
+		console.error("Invalid requiredRoleName:", requiredRoleName);
+		return false;
+	}
+
+	const requiredRoleIndex = roleHierarchy.indexOf(requiredRoleID);
+	if (requiredRoleIndex === -1) {
+		console.error("Required role not found in roleHierarchy array");
+		return false;
+	}
+
+	return member.roles.cache.some((role) => {
+		const memberRoleIndex = roleHierarchy.indexOf(role.id);
+		return memberRoleIndex !== -1 && memberRoleIndex <= requiredRoleIndex;
+	});
 }
 
 function hasRequiredRole(member, requiredRole) {
