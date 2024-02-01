@@ -94,9 +94,10 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 
 		const lowestCaptain = captains.sort(
 			(a, b) => a.elo_rating - b.elo_rating
-		)[0].user_id;
+		)[0];
+		playerDraftManager.picking_captain = lowestCaptain;
 
-		embed.setDescription(`<@${lowestCaptain}> **is picking sides...**`);
+		embed.setDescription(`<@${lowestCaptain.user_id}> **is picking sides...**`);
 
 		embed.addFields({
 			name: "Lobby Players",

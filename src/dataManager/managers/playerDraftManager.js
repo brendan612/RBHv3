@@ -13,6 +13,7 @@ class PlayerDraftManager {
 		this.captains = [];
 		this.red_captain = null;
 		this.blue_captain = null;
+		this.picking_captain = null; //the captain that picks which side to be on. this will be the captain with the lower elo
 	}
 
 	/**

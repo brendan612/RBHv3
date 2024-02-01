@@ -92,6 +92,13 @@ class DraftService {
 				elo = await userService.getEloRating(lobby.game_id);
 				if (elo) {
 					ratings.push(elo);
+				} else {
+					elo = await UserEloRating.create({
+						user_id: player.user_id,
+						game_id: lobby.game_id,
+						season_id: lobby.season_id,
+						elo_rating: 1600,
+					});
 				}
 			}
 		}

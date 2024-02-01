@@ -42,28 +42,17 @@ class PlayerDraftService {
 
 		const lobby = await LobbyService.getLobby(this.draft.lobby_id);
 
-		let pickingCaptain = this.playerDraftManager.captains.find((captain) => {
-			return captain.user_id === user_id;
-		});
+		let canPickSides = user_id == lobby.host_id;
 
-		if (!pickingCaptain && user_id == lobby.host_id) {
-			pickingCaptain = this.playerDraftManager.captains.reduce(
-				(lowest, captain) => {
-					return captain.elo_rating < lowest.elo_rating ? captain : lowest;
-				}
+		let pickingCaptain = this.playerDraftManager.picking_captain;
+		let otherCaptain = this.playerDraftManager.captains.find(
+			(captain) => captain.user_id !== pickingCaptain.user_id
+		);
+
+		if (pickingCaptain.user_id !== user_id && !canPickSides) {
+			throw new Error(
+				`You are not the picking captain. <@${pickingCaptain.user_id}> is.`
 			);
-		}
-
-		if (!pickingCaptain) {
-			throw new Error("You are not a captain");
-		}
-
-		const otherCaptain = this.playerDraftManager.captains.find((captain) => {
-			return captain.user_id !== pickingCaptain.user_id;
-		});
-
-		if (pickingCaptain.elo_rating > otherCaptain.elo_rating) {
-			throw new Error("You are not the picking captain");
 		}
 
 		if (side === "blue") {
@@ -110,6 +99,7 @@ class PlayerDraftService {
 			team: team,
 			round_number: round,
 		});
+		console.log(playerDraftRound);
 	}
 
 	/**
