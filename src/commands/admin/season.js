@@ -12,6 +12,9 @@ const {
 const UserService = require("../../dataManager/services/userService.js");
 const UserLevelManager = require("../../dataManager/managers/userLevelManager.js");
 const ms = require("ms");
+const {
+	formatDateToMMDDYYYY,
+} = require("../../utilities/utility-functions.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -86,6 +89,16 @@ module.exports = {
 				game.game_id,
 				start_date,
 				end_date
+			);
+
+			const channel = await interaction.guild.channels.fetch(
+				interaction.channelId
+			);
+
+			await channel.setTopic(
+				`${newSeason.name} | ${formatDateToMMDDYYYY(
+					newSeason.start_date
+				)} - ${formatDateToMMDDYYYY(newSeason.end_date)}`
 			);
 
 			await interaction.reply({
