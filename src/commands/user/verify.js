@@ -20,7 +20,7 @@ module.exports = {
 		.addStringOption((option) => {
 			return option
 				.setName("tag-line")
-				.setDescription("Your tag line. Ex: #1234")
+				.setDescription("Your tag line. Ex: 1234")
 				.setRequired(true);
 		})
 		.addUserOption((option) =>
@@ -39,7 +39,11 @@ module.exports = {
 		}
 
 		const game_name = interaction.options.getString("game-name");
-		const tag_line = interaction.options.getString("tag-line");
+		let tag_line = interaction.options.getString("tag-line");
+		if (tag_line.includes("#")) {
+			const split = tag_line.split("#");
+			tag_line = split[1];
+		}
 		const referrer = interaction.options.getUser("referrer") ?? null;
 		let user = await User.findByPk(interaction.member.id);
 
