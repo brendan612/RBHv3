@@ -32,6 +32,10 @@ module.exports = {
 		await interaction.reply({
 			content: `Lobby # ${lobby.lobby_id} has been reopened.`,
 		});
+		await lobbyService.generateLobbyEmbed(
+			await LobbyService.getLobby(lobby.lobby_id),
+			true
+		);
 	},
 	/**
 	 *

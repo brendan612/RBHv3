@@ -24,10 +24,12 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: true });
+
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 		if (!lobby && !interaction.responded) {
-			await interaction.reply({
+			await interaction.editReply({
 				content: "Not a valid lobby",
 				ephemeral: true,
 			});
@@ -36,25 +38,21 @@ module.exports = {
 
 		const lobbyService = new LobbyService(lobby);
 
-		const draftable = await lobbyService.isDraftable();
-		if (!draftable.isDraftable) {
-			return await interaction.reply({
-				content: draftable.reason,
+		if (interaction.user.id !== lobby.host_id) {
+			return await interaction.editReply({
+				content: "Only the host can start the draft.",
 				ephemeral: true,
 			});
 		}
 
-		await lobbyService.closeLobby();
+		const { draftable, reason } = await lobbyService.draft();
+		if (!draftable) {
+			return await interaction.editReply({
+				content: reason,
+				ephemeral: true,
+			});
+		}
 
-		const draft = await DraftService.createDraft(lobby.lobby_id);
-		const draftService = new DraftService(draft);
-		await draftService.startPlayerDraft();
-
-		const host = await interaction.guild.members.fetch(lobby.host_id);
-
-		await lobby.generateDraftEmbed(interaction.client, host, true);
-
-		await interaction.deferReply();
 		await interaction.deleteReply();
 	},
 	async autocomplete(interaction) {

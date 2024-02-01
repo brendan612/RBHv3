@@ -32,15 +32,15 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 		const guild = await client.guilds.fetch(client.guildID);
 		const host = await guild.members.fetch(lobby.host_id);
 		const embed = baseEmbed(
-			lobby.game_name + " In-House Lobby",
-			"Tentative Game ID: " + lobby.season_lobby_id
+			lobby.lobby_name,
+			lobby.game_name + " In-House Lobby"
 		);
 
 		embed
 			.setFooter({
 				text: `Hosted by ${host.nickname ?? host.user.globalName} • Lobby ID: ${
 					lobby.lobby_id
-				}`,
+				} • Seasonal Lobby ID: ${lobby.season_lobby_id}`,
 				iconURL: host.displayAvatarURL(),
 			})
 			.setThumbnail(inhouse_icon_url);
@@ -50,10 +50,10 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 			inline: false,
 		});
 
-		if (lobby.players.length > 10) {
+		if (lobby.reserves.length > 0) {
 			embed.addFields({
-				name: `Reserves (${lobby.players.length - 10}/10)`,
-				value: await generatePlayerListForEmbed(lobby.players.slice(10)),
+				name: `Reserves (${lobby.reserves.length}/${lobby.max_reserves})`,
+				value: await generatePlayerListForEmbed(lobby.reserves),
 				inline: false,
 			});
 		}

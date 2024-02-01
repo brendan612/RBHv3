@@ -42,10 +42,18 @@ module.exports = {
 
 			if (target) {
 				userToDisplay = await User.findByPk(target.id);
-				message = `<@${userToDisplay.user_id}> has ${userToDisplay.server_money} :pound:`;
+				const formatted_server_money = new Intl.NumberFormat(
+					"en-US",
+					{}
+				).format(userToDisplay.server_money);
+				message = `<@${userToDisplay.user_id}> has ${formatted_server_money} :pound:`;
 			} else {
 				userToDisplay = user;
-				message = `You have ${userToDisplay.server_money} :pound:`;
+				const formatted_server_money = new Intl.NumberFormat(
+					"en-US",
+					{}
+				).format(userToDisplay.server_money);
+				message = `You have ${formatted_server_money} :pound:`;
 			}
 
 			const embed = baseEmbed("Balance", message, false);

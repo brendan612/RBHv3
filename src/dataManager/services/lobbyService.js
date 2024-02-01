@@ -15,6 +15,7 @@ const {
 	Game,
 	Draft,
 	PlayerDraftRound,
+	Sequelize,
 } = require("../../models/index");
 const LobbyDTO = require("../DTOs/lobbyDTO");
 const { generateLobbyEmbed } = require("../messages/lobbyEmbed");
@@ -42,7 +43,13 @@ class LobbyService {
 			where: {
 				lobby_id: lobby_id,
 			},
-			include: [User, Game],
+			include: [
+				{
+					model: User,
+				},
+				Game,
+			],
+			order: [[Sequelize.literal("`Users->LobbyUsers`.`created_at`", "ASC")]],
 		});
 		return new LobbyDTO(lobby);
 	}
@@ -68,7 +75,7 @@ class LobbyService {
 			season_lobby_id: season_lobby_id,
 		});
 
-		lobby.lobby_name = `Lobby ${lobby.lobby_id}`;
+		lobby.lobby_name = `Lobby #${lobby.lobby_id}`;
 		await lobby.save();
 
 		return await this.getLobby(lobby.lobby_id);
@@ -94,6 +101,13 @@ class LobbyService {
 
 		lobby.closed_date = null;
 		lobby.draft_id = null;
+
+		const channel = await client.guild.channels.fetch(
+			channels.games["League of Legends"]
+		);
+		await ThreadManager.deleteThread(channel, lobby.thread_id);
+		lobby.thread_id = null;
+
 		await lobby.save();
 	}
 
@@ -370,6 +384,11 @@ class LobbyService {
 	}
 
 	async draft() {
+		const { draftable, reason } = await this.lobby.isDraftable();
+		if (!draftable) {
+			return { draftable, reason };
+		}
+
 		const draft = await DraftService.createDraft(this.lobby.lobby_id);
 		const channel = await client.guild.channels.fetch(
 			channels.games["League of Legends"]
@@ -385,6 +404,8 @@ class LobbyService {
 
 		const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 		await draftService.startPlayerDraft();
+
+		return { draftable, reason };
 	}
 
 	/**

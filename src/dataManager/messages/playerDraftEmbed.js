@@ -67,15 +67,13 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 	// 		user.user_id !== blue_captain.user_id
 	// );
 
-	const embed = baseEmbed(
-		`Lobby #${draft.lobby_id} - Player Draft`,
-		"Drafting"
-	);
+	const embed = baseEmbed(`${lobby.lobby_name} - Player Draft`, "Drafting");
+
 	embed
 		.setFooter({
 			text: `Hosted by ${host.nickname ?? host.user.globalName} • Lobby ID: ${
 				lobby.lobby_id
-			}`,
+			} • Seasonal Lobby ID: ${lobby.season_lobby_id}`,
 			iconURL: host.displayAvatarURL(),
 		})
 		.setThumbnail(inhouse_icon_url);

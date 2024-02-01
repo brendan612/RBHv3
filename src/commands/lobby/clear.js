@@ -29,7 +29,7 @@ module.exports = {
 
 		if (lobby) {
 			await interaction.reply({
-				content: `Lobby # ${lobby.lobby_id} has been cleared.`,
+				content: `Lobby #${lobby.lobby_id} has been cleared.`,
 			});
 
 			const lobbyService = new LobbyService(lobby);

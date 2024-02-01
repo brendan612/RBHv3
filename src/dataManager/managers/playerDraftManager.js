@@ -88,7 +88,6 @@ class PlayerDraftManager {
 					PlayerDraftManager.ranks.set(user_id, soloQ.tier);
 					rank = soloQ.tier;
 				} catch (err) {
-					console.error(err);
 					PlayerDraftManager.ranks.set(user_id, defaultRank);
 					rank = defaultRank;
 				}

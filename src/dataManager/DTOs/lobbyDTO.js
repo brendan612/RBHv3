@@ -11,6 +11,7 @@ class LobbyDTO {
 		this.draft_id = lobby.draft_id;
 		this.game_id = lobby.game_id;
 		this.game_name = lobby.Game.name;
+		this.lobby_name = lobby.lobby_name;
 		this.season_id = lobby.season_id;
 		this.season_lobby_id = lobby.season_lobby_id;
 		this.created_at = lobby.created_at;
