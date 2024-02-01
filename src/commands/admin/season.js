@@ -15,6 +15,7 @@ const ms = require("ms");
 const {
 	formatDateToMMDDYYYY,
 } = require("../../utilities/utility-functions.js");
+const { channels } = require(`../../../${process.env.CONFIG_FILE}`);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -68,6 +69,8 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
+		await interaction.deferReply();
+
 		const game = await handleGameOption(interaction);
 
 		const now = new Date();
@@ -91,17 +94,19 @@ module.exports = {
 				end_date
 			);
 
-			const channel = await interaction.guild.channels.fetch(
-				interaction.channelId
-			);
+			const channel_id = channels.games["League of Legends"];
+			const channel = await interaction.guild.channels.fetch(channel_id);
+			const start_string = formatDateToMMDDYYYY(newSeason.start_date);
+			const end_string = formatDateToMMDDYYYY(newSeason.end_date);
 
-			await channel.setTopic(
-				`${newSeason.name} | ${formatDateToMMDDYYYY(
-					newSeason.start_date
-				)} - ${formatDateToMMDDYYYY(newSeason.end_date)}`
-			);
+			channel
+				.setTopic(`${newSeason.name} | ${start_string} - ${end_string}`)
+				.then((newChannel) =>
+					console.log(`Channel's new topic is ${newChannel.topic}`)
+				)
+				.catch(console.error);
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: `Created season \`\`${newSeason.name}\`\` for ${game.name}`,
 			});
 		} else if (interaction.options.getSubcommand() === "end") {
@@ -109,7 +114,7 @@ module.exports = {
 			season.end_date = now;
 			await season.save();
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: `Ended season \`\`${season.name}\`\` for ${game.name}`,
 			});
 		} else if (interaction.options.getSubcommand() === "view") {
@@ -119,7 +124,7 @@ module.exports = {
 					? await Season.getCurrentSeason(game.game_id)
 					: await Season.findByPk(season_id);
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: `Current season for ${game.name}: \`\`${season.name}\`\` \nStart date: \`\`${season.start_date}\`\` \nEnd date: \`\`${season.end_date}\`\``,
 			});
 		}
