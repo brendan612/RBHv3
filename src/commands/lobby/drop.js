@@ -9,9 +9,13 @@ const {
 	User,
 	handleGameOption,
 	handleLobbyOption,
+	handleUserOption,
 } = require("./index.js");
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -29,9 +33,21 @@ module.exports = {
 		// interaction.member is the GuildMember object, which represents the user in the specific guild
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
+		const user = await handleUserOption(interaction, "target");
+
+		if (
+			user.user_id !== interaction.user.id &&
+			!hasRequiredRoleOrHigher(interaction.member, "trainee") &&
+			interaction.user.id !== lobby.host_id
+		) {
+			return interaction.reply({
+				content: "You cannot drop someone else from a lobby",
+				ephemeral: true,
+			});
+		}
 
 		const lobbyService = new LobbyService(lobby);
-		await lobbyService.drop(interaction.member.id);
+		await lobbyService.drop(user.user_id);
 
 		await interaction.deferReply({ ephemeral: true });
 		await interaction.deleteReply();
