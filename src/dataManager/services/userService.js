@@ -314,15 +314,10 @@ class UserService {
 			this.user.server_level = newLevelInfo.level;
 			this.user.server_money += moneyReward;
 
-			await generateLevelUpEmbed(
-				this.user.user_id,
-				newLevelInfo.level,
-				moneyReward
-			);
-
 			await userLevelManager.assignLevelRole(
 				this.user.user_id,
-				newLevelInfo.level
+				newLevelInfo.level,
+				true
 			);
 		}
 
