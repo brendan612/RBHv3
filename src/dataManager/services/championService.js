@@ -2,7 +2,10 @@ const axios = require("axios");
 const { Champion } = require("../../models");
 
 const fs = require("fs").promises;
-const configPath = `../../../${process.env.CONFIG_FILE}`;
+const configPath = require("path").resolve(
+	__dirname,
+	`../../../${process.env.CONFIG_FILE}`
+);
 
 class ChampionService {
 	constructor() {
