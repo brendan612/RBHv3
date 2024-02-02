@@ -34,6 +34,8 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: true });
+
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 		if (!lobby) return;
@@ -59,9 +61,6 @@ module.exports = {
 				}
 			}
 
-			await interaction.deferReply({ ephemeral: true });
-			await interaction.deleteReply();
-
 			const draftRounds = await DraftRound.findAll({
 				where: { draft_id: lobby.draft_id },
 			});
@@ -80,6 +79,8 @@ module.exports = {
 				true
 			);
 		}
+
+		await interaction.deleteReply();
 	},
 	async autocomplete(interaction) {
 		const focusedValue = interaction.options.getFocused(true);
