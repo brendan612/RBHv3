@@ -161,7 +161,7 @@ class UserService {
 		if (!user.verified) {
 			return;
 		}
-		await member.setNickname(user.summoner_name + "#" + user.tag_line, reason);
+		await member.setNickname(user.summoner_name, reason);
 		return true;
 	}
 

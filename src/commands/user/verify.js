@@ -75,8 +75,6 @@ module.exports = {
 			});
 		}
 
-		await interaction.deferReply();
-
 		const userService = new UserService(user);
 		await userService.generateVerifyEmbed(
 			user.user_id,
@@ -84,6 +82,9 @@ module.exports = {
 			tag_line,
 			referrer
 		);
+
+		await interaction.deferReply();
+		await interaction.deleteReply();
 		return;
 	},
 };
