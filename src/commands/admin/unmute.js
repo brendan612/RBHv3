@@ -8,13 +8,13 @@ const { userOption } = require("../lobby/index.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("ihunban")
-		.setDescription("Unban a user from playing inhouses")
+		.setName("unmute")
+		.setDescription("Unmute a user")
 		.addUserOption(userOption("target", "Targeted User", true))
 		.addStringOption((option) =>
 			option
 				.setName("reason")
-				.setDescription("Reason for unban")
+				.setDescription("Reason for unmute")
 				.setRequired(false)
 		),
 	/**
@@ -25,21 +25,21 @@ module.exports = {
 		const user_id = interaction.options.getUser("target").id;
 		const targeted_user = await User.findOne({ where: { user_id: user_id } });
 
-		if (!targeted_user.isIHBanned()) {
+		if (!targeted_user.isMuted()) {
 			await interaction.reply({
-				content: `<@${targeted_user.user_id}> is not banned from inhouses`,
+				content: `<@${targeted_user.user_id}> is not muted.`,
 				ephemeral: true,
 			});
 			return;
 		}
 
-		await targeted_user.ihunban(
+		await targeted_user.unmute(
 			interaction.member.id,
 			interaction.options.getString("reason")
 		);
 
 		await interaction.reply({
-			content: `<@${targeted_user.user_id}> has been unbanned from inhouses`,
+			content: `<@${targeted_user.user_id}> has been unmuted`,
 			ephemeral: false,
 		});
 	},

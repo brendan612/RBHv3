@@ -16,6 +16,9 @@ const {
 const moment = require("moment");
 const { ActionType } = require("../components/moderationActionTypeEnum.js");
 const ModerationLog = require("./ModerationLog.js");
+const client = require("../client.js");
+const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
 
 module.exports = (sequelize) => {
 	class User extends Model {
@@ -117,8 +120,6 @@ module.exports = (sequelize) => {
 				ActionType.IHBAN,
 				reason
 			);
-			this.addModerationLog(log);
-			this.save();
 		};
 
 		/**
@@ -135,8 +136,44 @@ module.exports = (sequelize) => {
 				ActionType.IHUNBAN,
 				reason
 			);
-			this.addModerationLog(log);
-			this.save();
+		};
+
+		mute = async (moderator_id, duration, reason) => {
+			const { ModerationLog } = require("../models");
+			const log = await ModerationLog.createModerationLog(
+				moderator_id,
+				this.user_id,
+				duration,
+				ActionType.MUTE,
+				reason
+			);
+
+			const member = await client.guilds.cache
+				.get(client.guildID)
+				.members.fetch(this.user_id);
+
+			if (member) {
+				member.roles.add(permission_roles.muted);
+			}
+		};
+
+		unmute = async (moderator_id, reason) => {
+			const { ModerationLog } = require("../models");
+			const log = await ModerationLog.createModerationLog(
+				moderator_id,
+				this.user_id,
+				null,
+				ActionType.UNMUTE,
+				reason
+			);
+
+			const member = await client.guilds.cache
+				.get(client.guildID)
+				.members.fetch(this.user_id);
+
+			if (member) {
+				member.roles.remove(permission_roles.muted);
+			}
 		};
 
 		/**
@@ -163,7 +200,12 @@ module.exports = (sequelize) => {
 		isIHBanned = async () => {
 			const { ModerationLog } = require("../models");
 			const latestLog = await ModerationLog.findOne({
-				where: { user_id: this.user_id },
+				where: {
+					targeted_user_id: this.user_id,
+					type: {
+						[Op.in]: [ActionType.IHBAN, ActionType.IHUNBAN],
+					},
+				},
 				order: [["created_at", "DESC"]],
 			});
 
@@ -171,6 +213,33 @@ module.exports = (sequelize) => {
 			if (latestLog.type === ActionType.IHUNBAN) {
 				return false;
 			} else if (latestLog.type === ActionType.IHBAN) {
+				const currentDate = new Date();
+				if (latestLog.duration !== null && latestLog.duration > currentDate) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			return false;
+		};
+
+		isMuted = async () => {
+			const { ModerationLog } = require("../models");
+			const latestLog = await ModerationLog.findOne({
+				where: {
+					targeted_user_id: this.user_id,
+					type: {
+						[Op.in]: [ActionType.MUTE, ActionType.UNMUTE],
+					},
+				},
+				order: [["created_at", "DESC"]],
+			});
+
+			if (!latestLog) return false;
+			if (latestLog.type === ActionType.UNMUTE) {
+				return false;
+			} else if (latestLog.type === ActionType.MUTE) {
 				const currentDate = new Date();
 				if (latestLog.duration !== null && latestLog.duration > currentDate) {
 					return true;

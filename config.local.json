@@ -1,83 +1,84 @@
 {
-  "channels": {
-    "wins": "772727590242484258",
-    "games": {
-      "League of Legends": "772727590242484257",
-      "Valorant": "772727590724960283"
-    },
-    "verify": "772727590242484256",
-    "gambling": "772727590568853514",
-    "shop_log": "772727590242484262",
-    "hall_of_fame": "772727590242484255",
-    "auction_house": "850526734339407923",
-    "vote_bump": "1148454621828878357",
-    "roles": "772727589789892625"
-  },
-  "roles": {
-    "level_roles": {
-      "hearts": "772727589722390541",
-      "diamonds": "772727589722390540",
-      "clubs": "772727589722390539",
-      "spades": "772727589722390538",
-      "bandersnatch": "772727589722390542",
-      "dodo": "772727589722390543",
-      "jabberwock": "772727589722390544"
-    },
-    "game_roles": {
-      "League of Legends": {
-        "top": "772727589668257802",
-        "jungle": "772727589668257803",
-        "mid": "772727589318950921",
-        "bot": "772727589318950920",
-        "support": "772727589318950919",
-        "fill": "1183199636488454184"
-      }
-    },
-    "permission_roles": {
-      "owner": "772727589789892619",
-      "knave": "772727589784649736",
-      "admin": "772727589784649734",
-      "developer": "1199903675406102598",
-      "moderator": "772727589730385926",
-      "trainee": "772727589730385923",
-      "verified": "772727589692768278"
-    },
-    "misc_roles": {
-      "muted": "772727589730385924",
-      "gambling": "772727589730385925",
-      "shop": "772727589730385927",
-      "vote_bump": "772727589730385928",
-      "booster": "597985512715714561"
-    },
-    "donor_roles": {
-      "donor": "772727589730385927",
-      "sponsor": "772727589730385928",
-      "subsidizer": "772727589730385929"
-    }
-  },
-  "emojis": {
-    "top": "<:top:1154957325828903012>",
-    "jungle": "<:jungle:1154957317339623485>",
-    "mid": "<:mid:1154957322045620246>",
-    "bot": "<:bot:1154957326890057728>",
-    "support": "<:support:1154957323991777320>",
-    "fill": "<:fill:1154957318363037849>",
-    "iron": "<:iron:1154957071909912676>",
-    "bronze": "<:bronze:1154957066050490378>",
-    "silver": "<:silver:1154957070391591013>",
-    "gold": "<:gold:1154957064746061865>",
-    "platinum": "<:platinum:1154960366439243786>",
-    "emerald": "<:emerald:1154960364073668638>",
-    "diamond": "<:diamond:1154957062611148860>",
-    "master": "<:master:1154957074325852181>",
-    "grandmaster": "<:grandmaster:1154957077014397028>",
-    "challenger": "<:challenger:1154957075789660220>"
-  },
-  "server_icon_url": "https://i.imgur.com/01kERJV.png",
-  "inhouse_icon_url": "https://i.imgur.com/sYeVvze.png",
-  "level_up_icon": "https://img.pngio.com/playing-cards-suits-png-clipart-cards-png-6368_1765.png",
-  "shop_thumbnail": "https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif",
-  "shop_keeper": "772727589784649728",
-  "lobby_multiplier": 1,
-  "current_league_patch": "14.2.1"
+	"channels": {
+		"wins": "772727590242484258",
+		"games": {
+			"League of Legends": "772727590242484257",
+			"Valorant": "772727590724960283"
+		},
+		"verify": "772727590242484256",
+		"gambling": "772727590568853514",
+		"shop_log": "772727590242484262",
+		"hall_of_fame": "772727590242484255",
+		"auction_house": "850526734339407923",
+		"vote_bump": "1148454621828878357",
+		"roles": "772727589789892625"
+	},
+	"roles": {
+		"level_roles": {
+			"hearts": "772727589722390541",
+			"diamonds": "772727589722390540",
+			"clubs": "772727589722390539",
+			"spades": "772727589722390538",
+			"bandersnatch": "772727589722390542",
+			"dodo": "772727589722390543",
+			"jabberwock": "772727589722390544"
+		},
+		"game_roles": {
+			"League of Legends": {
+				"top": "772727589668257802",
+				"jungle": "772727589668257803",
+				"mid": "772727589318950921",
+				"bot": "772727589318950920",
+				"support": "772727589318950919",
+				"fill": "1183199636488454184"
+			}
+		},
+		"permission_roles": {
+			"owner": "772727589789892619",
+			"knave": "772727589784649736",
+			"admin": "772727589784649734",
+			"developer": "1199903675406102598",
+			"moderator": "772727589730385926",
+			"trainee": "772727589730385923",
+			"verified": "772727589692768278",
+			"muted": "772727589784649731"
+		},
+		"misc_roles": {
+			"muted": "772727589730385924",
+			"gambling": "772727589730385925",
+			"shop": "772727589730385927",
+			"vote_bump": "772727589730385928",
+			"booster": "597985512715714561"
+		},
+		"donor_roles": {
+			"donor": "772727589730385927",
+			"sponsor": "772727589730385928",
+			"subsidizer": "772727589730385929"
+		}
+	},
+	"emojis": {
+		"top": "<:top:1154957325828903012>",
+		"jungle": "<:jungle:1154957317339623485>",
+		"mid": "<:mid:1154957322045620246>",
+		"bot": "<:bot:1154957326890057728>",
+		"support": "<:support:1154957323991777320>",
+		"fill": "<:fill:1154957318363037849>",
+		"iron": "<:iron:1154957071909912676>",
+		"bronze": "<:bronze:1154957066050490378>",
+		"silver": "<:silver:1154957070391591013>",
+		"gold": "<:gold:1154957064746061865>",
+		"platinum": "<:platinum:1154960366439243786>",
+		"emerald": "<:emerald:1154960364073668638>",
+		"diamond": "<:diamond:1154957062611148860>",
+		"master": "<:master:1154957074325852181>",
+		"grandmaster": "<:grandmaster:1154957077014397028>",
+		"challenger": "<:challenger:1154957075789660220>"
+	},
+	"server_icon_url": "https://i.imgur.com/01kERJV.png",
+	"inhouse_icon_url": "https://i.imgur.com/sYeVvze.png",
+	"level_up_icon": "https://img.pngio.com/playing-cards-suits-png-clipart-cards-png-6368_1765.png",
+	"shop_thumbnail": "https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif",
+	"shop_keeper": "772727589784649728",
+	"lobby_multiplier": 1,
+	"current_league_patch": "14.2.1"
 }

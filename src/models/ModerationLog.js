@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
 		/**
 		 *
 		 * @param {string} name
-		 * @returns {ModerationLog}
+		 * @returns {Promise<ModerationLog>}
 		 */
 		static async createModerationLog(
 			user_id,
@@ -14,12 +14,13 @@ module.exports = (sequelize) => {
 			type,
 			reason
 		) {
+			console.log(user_id, targeted_user_id, duration, type, reason);
 			return await ModerationLog.create({
-				user_id,
-				targeted_user_id,
-				duration,
-				type,
-				reason,
+				user_id: user_id,
+				targeted_user_id: targeted_user_id,
+				duration: duration,
+				type: type,
+				reason: reason,
 			});
 		}
 	}
