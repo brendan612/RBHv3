@@ -103,6 +103,7 @@ class UserService {
 			await this.updateMemberNickname(user_id, "Verifying Account");
 			await guild.members.fetch(user_id).then((member) => {
 				member.roles.add(permission_roles.verified);
+				member.roles.remove(permission_roles.unverified);
 			});
 		} catch (e) {
 			console.error("Not enough permissions to change nickname.");
@@ -322,6 +323,36 @@ class UserService {
 		}
 
 		await this.user.save();
+	}
+
+	/**
+	 *
+	 * @param {string} role
+	 */
+	async addRole(role) {
+		try {
+			const guild = await client.guilds.fetch(client.guildID);
+			const member = await guild.members.fetch(this.user.user_id);
+			if (member && !member.roles.cache.has(role)) {
+				const roleToAdd = guild.roles.cache.find((r) => r.id === role);
+				await member.roles.add(roleToAdd);
+			}
+		} catch {}
+	}
+
+	/**
+	 *
+	 * @param {string} role
+	 */
+	async removeRole(role) {
+		try {
+			const guild = await client.guilds.fetch(client.guildID);
+			const member = await guild.members.fetch(this.user.user_id);
+			if (member && member.roles.cache.has(role)) {
+				const roleToRemove = guild.roles.cache.find((r) => r.id === role);
+				await member.roles.remove(roleToRemove);
+			}
+		} catch {}
 	}
 
 	async addMoney(money) {

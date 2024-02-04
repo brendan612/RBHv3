@@ -15,6 +15,8 @@ const PlayerDraftService = require("./playerDraftService.js");
 const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
 
+const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
 const {
 	generatePostGameImage,
 } = require("../../dataManager/messages/postGameImage.js");
@@ -117,9 +119,6 @@ class DraftService {
 
 		const LobbyService = require("./lobbyService.js");
 		const lobby = await LobbyService.getLobby(this.draft.lobby_id);
-		// const dbLobby = await Lobby.findByPk(this.draft.lobby_id);
-		// dbLobby.closed_date = new Date();
-		// await dbLobby.save();
 
 		playerDraftManager.captains = await this.pickCaptains(lobby);
 
@@ -127,8 +126,6 @@ class DraftService {
 			await DraftService.getDraft(this.draft.draft_id),
 			true
 		);
-		// await playerDraftManager.setDraftService(playerDraftService);
-		// playerDraftManager.startDraft();
 	}
 
 	/**
@@ -137,6 +134,12 @@ class DraftService {
 	 */
 	async submitMatchWin(winningTeam) {
 		const lobby = await Lobby.findByPk(this.draft.lobby_id);
+		const lobbyDTO = new LobbyDTO(lobby);
+
+		for (const player of lobbyDTO.players) {
+			const userService = new UserService(player);
+			await userService.removeRole(permission_roles.lobby_participant);
+		}
 
 		await this.draft.update({ winning_team: winningTeam });
 		await this.draft.save();

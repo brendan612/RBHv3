@@ -13,6 +13,7 @@ const {
 const DraftDTO = require("../DTOs/draftDTO.js");
 const { Lobby, User, PlayerDraftRound, Draft } = require("../../models");
 const { baseEmbed } = require("../../components/embed.js");
+const { generateOPGGButton } = require("../../components/buttons.js");
 const {
 	inhouse_icon_url,
 	channels,
@@ -104,8 +105,9 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		});
 
 		const components = generateSideSelectionButtons(draft);
-		//const components = generatePlayerDraftComponents(players);
-		const message = await sendEmbedMessage(lobby, draft, embed, components);
+		const opggButton = generateOPGGButton(players);
+		const rows = [components, opggButton];
+		const message = await sendEmbedMessage(lobby, draft, embed, rows);
 		return message;
 	} else if (playerDraftRounds.length === 9) {
 	} else {
@@ -179,7 +181,14 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		await sendEmbedMessage(lobby, draft, embed, components);
 	} else {
 		const components = generateChampionDraftComponents(draft.draft_id);
-		await sendEmbedMessage(lobby, draft, embed, components);
+		const blueTeamOPGG = generateOPGGButton(blue_team, "Blue Team OP.GG");
+		const redTeamOPGG = generateOPGGButton(red_team, "Red Team OP.GG");
+		const opggRow = new ActionRowBuilder().addComponents([
+			blueTeamOPGG,
+			redTeamOPGG,
+		]);
+		const rows = [components, opggRow];
+		await sendEmbedMessage(lobby, draft, embed, rows);
 	}
 }
 
@@ -250,21 +259,8 @@ async function generatePlayerDraftComponents(players, draft_id) {
 				.setValue(player.user_id.toString())
 		);
 	}
-
-	const url =
-		"https://www.op.gg/multisearch/na?summoners=" +
-		players
-			.map((user) =>
-				encodeURIComponent(`${user.summoner_name}#${user.tag_line}`)
-			)
-			.join("%2C");
-	const multiGGButton = new ButtonBuilder()
-		.setStyle(ButtonStyle.Link)
-		.setLabel("OP.GG")
-		.setURL(url);
-
 	const actionRow = new ActionRowBuilder().addComponents([select]);
-	const buttonRow = new ActionRowBuilder().addComponents([multiGGButton]);
+	const buttonRow = generateOPGGButton(players);
 	return [actionRow, buttonRow];
 }
 

@@ -51,10 +51,14 @@ const {
 const {
 	generateTeamPlayerList,
 } = require("../../utilities/utility-functions.js");
+const { generateOPGGButton } = require("../../components/buttons.js");
+const { name } = require("../../events/interactionCreate.js");
 
 const headerBarHeight = 150;
 const banSectionHeight = 180;
 const banSectionWidth = 180;
+const namePlateHeight = 50;
+const namePlateWidth = 350;
 const pickSectionHeight = 750;
 const pickSectionWidth = 350;
 const extraInfoHeight = pickSectionWidth;
@@ -62,7 +66,8 @@ const extraInfoWidth = pickSectionWidth;
 const banPadding = 5;
 const pickPadding = 5;
 const canvasWidth = pickSectionWidth * 11;
-const canvasHeight = headerBarHeight + banSectionHeight + pickSectionHeight;
+const canvasHeight =
+	headerBarHeight + banSectionHeight + namePlateHeight + pickSectionHeight;
 
 const banPlaceholderPath = path.join(
 	__dirname,
@@ -90,6 +95,24 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		where: { lobby_id: draft.lobby_id },
 		include: [User],
 	});
+
+	const blue_team = [];
+	const red_team = [];
+
+	const playerDraftRounds = await PlayerDraftRound.findAll({
+		where: { draft_id: draft.draft_id },
+		include: [User],
+		order: [["round_number", "ASC"]],
+	});
+	playerDraftRounds.sort((a, b) => a.round_number - b.round_number);
+
+	for (const playerDraftRound of playerDraftRounds) {
+		if (playerDraftRound.team === "blue") {
+			blue_team.push(playerDraftRound.User);
+		} else {
+			red_team.push(playerDraftRound.User);
+		}
+	}
 
 	const host = await guild.members.fetch(lobby.host_id);
 
@@ -139,6 +162,9 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 	const canvas = Canvas.createCanvas(canvasWidth, canvasHeight);
 	const ctx = canvas.getContext("2d");
 
+	ctx.fillStyle = "#000";
+	ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
 	await generateHeaderBar(
 		ctx,
 		red_captain.summoner_name,
@@ -149,6 +175,9 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		draftManager.blue_team_bans,
 		draftManager.red_team_bans
 	);
+
+	//await generateNamePlateSection(ctx, blue_team, red_team);
+
 	await generatePickSection(
 		ctx,
 		draftManager.blue_team_picks,
@@ -164,9 +193,11 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		embed.setColor(team === "blue" ? "#104ee0" : "#a10003");
 		if (roundType === "ban") {
 			embed.setDescription(
-				`${team.toUpperCase()} TEAM BAN PHASE\n\n${
-					team === "blue" ? "Blue" : "Red"
-				} team, it is your turn to ban a champion.`
+				`${team.toUpperCase()} TEAM BAN PHASE\n${
+					team === "blue"
+						? `<@${blue_captain.user_id}>`
+						: `<@${red_captain.user_id}>`
+				}, it is your team's turn to ban a champion.`
 			);
 
 			embed.addFields({
@@ -175,9 +206,11 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 			});
 		} else if (roundType === "pick") {
 			embed.setDescription(
-				`${team.toUpperCase()} TEAM PICK PHASE\n\n${
-					team === "blue" ? "Blue" : "Red"
-				} team, it is your turn to pick a champion.`
+				`${team.toUpperCase()} TEAM PICK PHASE\n${
+					team === "blue"
+						? `<@${blue_captain.user_id}>`
+						: `<@${red_captain.user_id}>`
+				}, it is your team's turn to pick a champion.`
 			);
 			embed.addFields({
 				name: "Use this command to pick a champion:",
@@ -235,6 +268,18 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		});
 	} //draft is over
 
+	embed.addFields({
+		name: "Blue Team",
+		value: await generateTeamPlayerList(blue_team),
+		inline: false,
+	});
+
+	embed.addFields({
+		name: "Red Team",
+		value: await generateTeamPlayerList(red_team),
+		inline: false,
+	});
+
 	const attachment = new AttachmentBuilder(canvas.toBuffer("image/png"), {
 		name: "champdraft.png",
 	});
@@ -243,8 +288,19 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		const actionRow = await generateWinInputComponents(draft);
 		await sendEmbedMessage(lobby, draft, embed, actionRow, attachment);
 	} else {
-		await sendEmbedMessage(lobby, draft, embed, null, attachment);
+		const row = await generateComponents(blue_team, red_team);
+		await sendEmbedMessage(lobby, draft, embed, row, attachment);
 	}
+}
+
+async function generateComponents(blue_team, red_team) {
+	const blueTeamOPGG = generateOPGGButton(blue_team, "Blue Team OP.GG");
+	const redTeamOPGG = generateOPGGButton(red_team, "Red Team OP.GG");
+	const opggRow = new ActionRowBuilder().addComponents([
+		blueTeamOPGG,
+		redTeamOPGG,
+	]);
+	return opggRow;
 }
 
 /**
@@ -322,20 +378,6 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
 				xPosition + banPadding,
 				headerBarHeight + banPadding
 			);
-			// ctx.fillStyle = "#000";
-			// ctx.fillRect(
-			// 	xPosition,
-			// 	headerBarHeight,
-			// 	banSectionWidth,
-			// 	banSectionWidth
-			// );
-			// ctx.fillStyle = "#ccc";
-			// ctx.fillRect(
-			// 	xPosition + banPadding,
-			// 	headerBarHeight + banPadding,
-			// 	banSectionWidth - banPadding,
-			// 	banSectionHeight - banPadding
-			// );
 		} else {
 			const image = await loadImage(champ.square_icon);
 			ctx.drawImage(
@@ -387,6 +429,61 @@ async function generateBanSection(ctx, blue_bans, red_bans) {
 	}
 }
 
+async function generateNamePlateSection(ctx, blue_team, red_team) {
+	let fontSize = 50;
+	ctx.font = `bold ${fontSize}px Arial`;
+
+	ctx.fillStyle = "#104ee0";
+
+	for (let i = 0; i < 5; i++) {
+		const user = blue_team[i];
+		if (user) {
+			const name = user.summoner_name + "#" + user.tag_line;
+			let nameMetrics = ctx.measureText(name);
+			while (nameMetrics.width > namePlateWidth - 10) {
+				fontSize -= 5;
+				ctx.font = `bold ${fontSize}px Arial`;
+				nameMetrics = ctx.measureText(name);
+			}
+			const centerOfNamePlate = i * namePlateWidth + namePlateWidth / 2;
+			const halfOfName = nameMetrics.width / 2;
+			const xPosition = centerOfNamePlate - halfOfName;
+			//prettier-ignore
+			ctx.fillText(
+				name, 
+				xPosition,
+				headerBarHeight + banSectionHeight + (namePlateHeight / 2 + fontSize / 2)
+			);
+		}
+	}
+
+	fontSize = 50;
+	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.fillStyle = "#a10003";
+
+	for (let i = 0; i < 5; i++) {
+		const user = red_team[i];
+		if (user) {
+			const name = user.summoner_name + "#" + user.tag_line;
+			let nameMetrics = ctx.measureText(name);
+			while (nameMetrics.width > namePlateWidth - 10) {
+				fontSize -= 5;
+				ctx.font = `bold ${fontSize}px Arial`;
+				nameMetrics = ctx.measureText(name);
+			}
+			const centerOfNamePlate = i * namePlateWidth + namePlateWidth / 2;
+			const halfOfName = nameMetrics.width / 2;
+			const xPosition = centerOfNamePlate - halfOfName + namePlateWidth * 6;
+			//prettier-ignore
+			ctx.fillText(
+				name,
+				xPosition,
+				headerBarHeight + banSectionHeight + (namePlateHeight / 2 + fontSize / 2)
+			);
+		}
+	}
+}
+
 /**
  *
  * @param {Canvas.SKRSContext2D} ctx
@@ -420,18 +517,17 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 		);
 	}
 
-	let index = 0;
 	let xPosition = 0;
 
 	for (let i = 0; i < 5; i++) {
-		xPosition = index++ * pickSectionWidth;
+		xPosition = i * pickSectionWidth;
 
 		const champ = blue_champ_splashes[i];
 		if (!champ) {
 			ctx.drawImage(
 				pick_placeholder,
 				xPosition,
-				headerBarHeight + banSectionHeight,
+				headerBarHeight + banSectionHeight + namePlateHeight,
 				pickSectionWidth,
 				pickSectionHeight
 			);
@@ -440,24 +536,22 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 			ctx.drawImage(
 				image,
 				xPosition,
-				headerBarHeight + banSectionHeight,
+				headerBarHeight + banSectionHeight + namePlateHeight,
 				pickSectionWidth,
 				pickSectionHeight
 			);
 		}
 	}
 
-	index = 6;
-
 	for (let i = 0; i < 5; i++) {
-		xPosition = index++ * pickSectionWidth;
+		xPosition = i * pickSectionWidth + pickSectionWidth * 6;
 
 		const champ = red_champ_splashes[i];
 		if (!champ) {
 			ctx.drawImage(
 				pick_placeholder,
 				xPosition,
-				headerBarHeight + banSectionHeight,
+				headerBarHeight + banSectionHeight + namePlateHeight,
 				pickSectionWidth,
 				pickSectionHeight
 			);
@@ -466,7 +560,7 @@ async function generatePickSection(ctx, blue_picks, red_picks) {
 			ctx.drawImage(
 				image,
 				xPosition,
-				headerBarHeight + banSectionHeight,
+				headerBarHeight + banSectionHeight + namePlateHeight,
 				pickSectionWidth,
 				pickSectionHeight
 			);

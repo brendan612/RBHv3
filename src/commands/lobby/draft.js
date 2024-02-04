@@ -12,6 +12,7 @@ const {
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
 const DraftService = require("../../dataManager/services/draftService.js");
+const { err } = require("@sapphire/framework");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -45,10 +46,18 @@ module.exports = {
 			});
 		}
 
-		const { draftable, reason } = await lobbyService.draft();
-		if (!draftable) {
+		try {
+			const { draftable, reason } = await lobbyService.draft();
+			if (!draftable) {
+				return await interaction.editReply({
+					content: reason,
+					ephemeral: true,
+				});
+			}
+		} catch (error) {
+			console.error(error);
 			return await interaction.editReply({
-				content: reason,
+				content: error.message,
 				ephemeral: true,
 			});
 		}

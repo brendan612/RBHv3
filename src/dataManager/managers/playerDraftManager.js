@@ -73,7 +73,7 @@ class PlayerDraftManager {
 	 * @param {User} players
 	 */
 	static async getRanks(players) {
-		const defaultRank = "GOLD";
+		const defaultRank = "UNRANKED";
 		for (const player of players) {
 			const user_id = BigInt(player.user_id);
 			let rank = PlayerDraftManager.ranks.get(user_id);

@@ -10,6 +10,7 @@ const LeagueRoleEmojis = {
 };
 
 const LeagueRankEmojis = {
+	UNRANKED: emojis.unranked,
 	IRON: emojis.iron,
 	BRONZE: emojis.bronze,
 	SILVER: emojis.silver,

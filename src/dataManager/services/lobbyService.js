@@ -23,7 +23,9 @@ const DraftService = require("./draftService");
 const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const client = require("../../client.js");
 const ThreadManager = require("../managers/threadManager.js");
-
+const UserService = require("./userService.js");
+const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
+	.permission_roles;
 class LobbyService {
 	/**
 	 *
@@ -109,6 +111,12 @@ class LobbyService {
 		lobby.thread_id = null;
 
 		await lobby.save();
+
+		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
+		for (const user of lobbyDTO.players) {
+			const userService = new UserService(user);
+			await userService.removeRole(permission_roles.lobby_participant);
+		}
 	}
 
 	/**
@@ -149,6 +157,8 @@ class LobbyService {
 			try {
 				const guildMember = await guild.members.fetch(user.user_id);
 				await channel.permissionOverwrites.delete(guildMember);
+				const userService = new UserService(user);
+				await userService.removeRole(permission_roles.lobby_participant);
 			} catch {}
 		}
 
@@ -404,6 +414,12 @@ class LobbyService {
 
 		const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 		await draftService.startPlayerDraft();
+
+		const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
+		for (const user of lobbyDTO.players) {
+			const userService = new UserService(user);
+			await userService.addRole(permission_roles.lobby_participant);
+		}
 
 		return { draftable, reason };
 	}

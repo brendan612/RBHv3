@@ -22,6 +22,7 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
+		await interaction.deferReply();
 		// interaction.user is the object representing the User who ran the command
 		// interaction.member is the GuildMember object, which represents the user in the specific guild
 		const game = await handleGameOption(interaction);
@@ -29,8 +30,8 @@ module.exports = {
 
 		const lobbyService = new LobbyService(lobby);
 		await lobbyService.openLobby();
-		await interaction.reply({
-			content: `Lobby # ${lobby.lobby_id} has been reopened.`,
+		await interaction.editReply({
+			content: `Lobby #${lobby.lobby_id} has been reopened.`,
 		});
 		await lobbyService.generateLobbyEmbed(
 			await LobbyService.getLobby(lobby.lobby_id),
