@@ -31,6 +31,7 @@ const Match = require("./Match.js")(sequelize);
 const MatchPlayer = require("./MatchPlayer.js")(sequelize);
 const Referral = require("./Referral.js")(sequelize);
 const Champion = require("./Champion.js")(sequelize);
+const AutoResponse = require("./AutoResponse.js")(sequelize);
 
 // Setting up many-to-many relationship
 User.belongsToMany(Lobby, { through: "LobbyUsers" });
@@ -127,6 +128,8 @@ MatchPlayer.belongsTo(User, { foreignKey: "user_id" });
 MatchPlayer.belongsTo(Match, { foreignKey: "match_id" });
 User.hasMany(MatchPlayer, { foreignKey: "user_id" });
 
+AutoResponse.belongsTo(User, { foreignKey: "created_by" });
+
 module.exports = {
 	sequelize,
 	Sequelize,
@@ -147,4 +150,5 @@ module.exports = {
 	PlayerDraftRound,
 	DraftRound,
 	Champion,
+	AutoResponse,
 };

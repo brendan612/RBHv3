@@ -182,7 +182,7 @@ class LobbyService {
 	/**
 	 *
 	 * @param {bigint} user_id
-	 * @returns {Promise<string>}
+	 * @returns {Promise<boolean>}
 	 */
 	async setHost(user_id) {
 		const lobby = await Lobby.findOne({
@@ -192,13 +192,13 @@ class LobbyService {
 		});
 
 		if (lobby.host_id === user_id) {
-			return "User is already host.";
+			return false;
 		}
 
 		lobby.host_id = user_id;
 		await lobby.save();
 
-		return `Host changed to <@${user_id}>.`;
+		return true;
 	}
 
 	/**

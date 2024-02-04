@@ -1,6 +1,6 @@
 const { Events, ThreadChannel, ChannelType } = require("discord.js");
 const UserService = require("../dataManager/services/userService.js");
-const { User, Lobby } = require("../models");
+const { User, Lobby, AutoResponse, Sequelize } = require("../models");
 const {
 	hasRequiredRoleOrHigher,
 } = require("../utilities/utility-functions.js");
@@ -39,17 +39,15 @@ module.exports = {
 			//await updateLastMessageDate(user_id, currentTimestamp);
 		}
 
-		if (message.content.toLowerCase().includes("good bot")) {
-			message.reply("Thank you!");
-		}
+		const autoResponse = await AutoResponse.findOne({
+			where: Sequelize.where(
+				Sequelize.fn("LOWER", Sequelize.col("trigger")),
+				Sequelize.fn("LOWER", message.content)
+			),
+		});
 
-		const cleanedContent = message.content.toLowerCase().trim();
-		if (
-			cleanedContent == "wo" ||
-			cleanedContent == "without" ||
-			cleanedContent == "draft wo"
-		) {
-			message.reply("draft without someone???");
+		if (autoResponse) {
+			message.channel.send(autoResponse.response);
 		}
 
 		return;
