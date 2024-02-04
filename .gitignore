@@ -3,3 +3,5 @@ node_modules
 server.env
 .vscode/settings.json
 config.local.json
+.vscode/settings.json
+config.local.json

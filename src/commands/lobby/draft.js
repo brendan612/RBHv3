@@ -12,7 +12,6 @@ const {
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
 const DraftService = require("../../dataManager/services/draftService.js");
-const { err } = require("@sapphire/framework");
 
 module.exports = {
 	data: new SlashCommandBuilder()
