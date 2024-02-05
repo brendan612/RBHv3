@@ -105,9 +105,7 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		});
 
 		const components = generateSideSelectionButtons(draft);
-		const opggButton = generateOPGGButton(players);
-		const rows = [components, opggButton];
-		const message = await sendEmbedMessage(lobby, draft, embed, rows);
+		const message = await sendEmbedMessage(lobby, draft, embed, components);
 		return message;
 	} else if (playerDraftRounds.length === 9) {
 	} else {
