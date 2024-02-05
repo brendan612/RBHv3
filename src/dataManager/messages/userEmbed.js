@@ -27,7 +27,6 @@ const userLevelManager = new UserLevelManager();
  * @param {string} game_name
  * @param {string} tag_line
  * @param {GuildMember} referrer
- * @returns { bool }
  */
 async function generateVerifyEmbed(user_id, game_name, tag_line, referrer) {
 	const guild = await client.guilds.fetch(client.guildID);
@@ -77,12 +76,10 @@ async function generateVerifyEmbed(user_id, game_name, tag_line, referrer) {
 
 	const components = new ActionRowBuilder().addComponents(verifyButton);
 
-	console.log(channels.verify);
-	const channel = await guild.channels.fetch(channels.verify);
-	const message = await channel.send({
+	return {
 		embeds: [embed],
 		components: [components],
-	});
+	};
 }
 
 /**

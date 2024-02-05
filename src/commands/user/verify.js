@@ -78,12 +78,13 @@ module.exports = {
 		await interaction.deferReply();
 
 		const userService = new UserService(user);
-		await userService.generateVerifyEmbed(
+		const messageParts = await userService.generateVerifyEmbed(
 			user.user_id,
 			game_name,
 			tag_line,
 			referrer
 		);
-		return;
+
+		return await interaction.editReply(messageParts);
 	},
 };
