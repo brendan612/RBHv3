@@ -60,7 +60,7 @@ async function handleLobbyOption(interaction, game_id) {
 
 	if (!lobby) {
 		console.log("Lobby not found.");
-		await interaction.reply({
+		await interaction.editReply({
 			content: "Lobby not found.",
 			ephemeral: true,
 		});
@@ -81,7 +81,7 @@ async function handleLobbyOption(interaction, game_id) {
 					});
 
 					if (otherDraftWithThread.draft_id != draft.draft_id) {
-						await interaction.reply({
+						await interaction.editReply({
 							content: `Use <#${draft.thread_id}> to interact with this lobby.`,
 							ephemeral: true,
 						});

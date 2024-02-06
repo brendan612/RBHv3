@@ -105,7 +105,12 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		});
 
 		const components = generateSideSelectionButtons(draft);
-		const message = await sendEmbedMessage(lobby, draft, embed, components);
+		const opggButton = generateOPGGButton(players);
+		const rows = [
+			components,
+			new ActionRowBuilder().addComponents([opggButton]),
+		];
+		const message = await sendEmbedMessage(lobby, draft, embed, rows);
 		return message;
 	} else if (playerDraftRounds.length === 9) {
 	} else {
@@ -258,7 +263,8 @@ async function generatePlayerDraftComponents(players, draft_id) {
 		);
 	}
 	const actionRow = new ActionRowBuilder().addComponents([select]);
-	const buttonRow = generateOPGGButton(players);
+	const opggButton = generateOPGGButton(players);
+	const buttonRow = new ActionRowBuilder().addComponents([opggButton]);
 	return [actionRow, buttonRow];
 }
 

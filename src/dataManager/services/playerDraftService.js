@@ -99,7 +99,6 @@ class PlayerDraftService {
 			team: team,
 			round_number: round,
 		});
-		console.log(playerDraftRound);
 	}
 
 	/**
