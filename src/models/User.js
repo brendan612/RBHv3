@@ -41,6 +41,10 @@ module.exports = (sequelize) => {
 			}
 		}
 
+		displayName = () => {
+			return `${this.summoner_name}#${this.tag_line}`;
+		};
+
 		/**
 		 *
 		 * @param {JSON} vote

@@ -109,6 +109,86 @@ async function getStatsForUser(user_id, game_id, season_id) {
 	}
 }
 
+/**
+ *
+ * @param {bigint} user1_id
+ * @param {bigint} user2_id
+ * @param {int} game_id
+ * @param {int} season_id
+ * @returns {Object} An object containing various stats.
+ * @property {number} winsWith - The number of wins when playing together.
+ * @property {number} winsAgainst - The number of wins when playing against each other.
+ * @property {number} lossesWith - The number of losses when playing together.
+ * @property {number} lossesAgainst - The number of losses when playing against each other.
+ */
+async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
+	try {
+		let whereClause = {};
+		if (season_id) {
+			console.log("season_id", season_id);
+			whereClause.season_id = season_id;
+		}
+
+		const matches = await Match.findAll({
+			where: {
+				end_time: { [Op.ne]: null },
+				game_id: game_id,
+				...whereClause,
+			},
+			include: [
+				{
+					model: MatchPlayer,
+					attributes: ["match_id", "team", "elo_change"],
+					required: true,
+					where: {
+						user_id: {
+							[Op.in]: [user1_id, user2_id],
+						},
+					},
+				},
+			],
+		});
+
+		let winsWith = 0;
+		let winsAgainst = 0;
+		let lossesWith = 0;
+		let lossesAgainst = 0;
+
+		matches.forEach((match) => {
+			const player1 = match.MatchPlayers.find((p) => p.user_id === user1_id);
+			const player2 = match.MatchPlayers.find((p) => p.user_id === user2_id);
+
+			if (player1 && player2) {
+				if (player1.team === player2.team) {
+					// Together
+					if (player1.elo_change > 0) {
+						// Assuming positive elo_change means a win
+						winsWith++;
+					} else {
+						lossesWith++;
+					}
+				} else {
+					// Against each other
+					if (player1.elo_change > 0) {
+						// Assuming player1 won
+						winsAgainst++;
+					} else {
+						lossesAgainst++;
+					}
+				}
+			}
+		});
+
+		return {
+			winsWith,
+			winsAgainst,
+			lossesWith,
+			lossesAgainst,
+		};
+	} catch {}
+}
+
 module.exports = {
 	getStatsForUser,
+	getSynergyStatsForUsers,
 };

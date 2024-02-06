@@ -27,6 +27,11 @@ module.exports = {
 						.setRequired(true)
 						.setAutocomplete(true)
 				)
+		)
+		.addSubcommand((subcommand) =>
+			subcommand
+				.setName("top")
+				.setDescription("View the users with the most money on the server")
 		),
 	/**
 	 *
@@ -86,6 +91,32 @@ module.exports = {
 				`You have given <@${target.id}> ${amount} :pound:`,
 				false
 			);
+
+			return interaction.reply({
+				embeds: [embed],
+			});
+		} else if (interaction.options.getSubcommand() === "top") {
+			const embed = baseEmbed(
+				":pound: LEADERBOARD :pound:",
+				"Users with the most money."
+			);
+
+			const users = await User.findAll({
+				order: [["server_money", "DESC"]],
+				limit: 10,
+			});
+
+			let userString = "";
+
+			for (const user of users) {
+				const formatted_server_money = new Intl.NumberFormat(
+					"en-US",
+					{}
+				).format(user.server_money);
+				userString += `<@${user.user_id}> | ${formatted_server_money} :pound:\n`;
+			}
+
+			embed.setDescription(userString);
 
 			return interaction.reply({
 				embeds: [embed],

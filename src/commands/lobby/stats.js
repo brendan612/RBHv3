@@ -30,7 +30,7 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply();
 		// interaction.user is the object representing the User who ran the command
 		// interaction.member is the GuildMember object, which represents the user in the specific guild
 		const game = await handleGameOption(interaction);
