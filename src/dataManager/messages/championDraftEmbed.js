@@ -255,17 +255,6 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		} else {
 			embed.setDescription("Drafting has concluded.\n\nGood luck, have fun!");
 		}
-		embed.addFields({
-			name: "Blue Team",
-			value: await generateTeamPlayerList(blue_team),
-			inline: false,
-		});
-
-		embed.addFields({
-			name: "Red Team",
-			value: await generateTeamPlayerList(red_team),
-			inline: false,
-		});
 	} //draft is over
 
 	embed.addFields({

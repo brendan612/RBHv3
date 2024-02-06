@@ -41,7 +41,10 @@
 			"moderator": "772727589730385926",
 			"trainee": "772727589730385923",
 			"verified": "772727589692768278",
-			"muted": "772727589784649731"
+			"muted": "772727589784649731",
+			"unverified": "1117482954977972354",
+			"guest": "772727589709283339",
+			"lobby_participant": "1104484173563048066"
 		},
 		"misc_roles": {
 			"muted": "772727589730385924",
@@ -63,6 +66,8 @@
 		"bot": "<:bot:1154957326890057728>",
 		"support": "<:support:1154957323991777320>",
 		"fill": "<:fill:1154957318363037849>",
+
+		"unranked": "<:unranked:1203443607059824640>",
 		"iron": "<:iron:1154957071909912676>",
 		"bronze": "<:bronze:1154957066050490378>",
 		"silver": "<:silver:1154957070391591013>",
@@ -75,7 +80,7 @@
 		"challenger": "<:challenger:1154957075789660220>"
 	},
 	"server_icon_url": "https://i.imgur.com/01kERJV.png",
-	"inhouse_icon_url": "https://i.imgur.com/sYeVvze.png",
+	"inhouse_icon_url": "https://i.imgur.com/ug9dvEg.png",
 	"level_up_icon": "https://img.pngio.com/playing-cards-suits-png-clipart-cards-png-6368_1765.png",
 	"shop_thumbnail": "https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif",
 	"shop_keeper": "772727589784649728",
