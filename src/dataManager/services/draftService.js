@@ -133,7 +133,7 @@ class DraftService {
 	 * @param {string} winningTeam red or blue
 	 */
 	async submitMatchWin(winningTeam) {
-		const lobby = await Lobby.findByPk(this.draft.lobby_id);
+		const lobby = await LobbyService.getLobby(this.draft.lobby_id);
 		const lobbyDTO = new LobbyDTO(lobby);
 
 		for (const player of lobbyDTO.players) {
