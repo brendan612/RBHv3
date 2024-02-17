@@ -134,8 +134,7 @@ class DraftService {
 	 */
 	async submitMatchWin(winningTeam) {
 		const LobbyService = require("./lobbyService.js");
-		const lobby = await LobbyService.getLobby(this.draft.lobby_id);
-		const lobbyDTO = new LobbyDTO(lobby);
+		const lobbyDTO = await LobbyService.getLobby(this.draft.lobby_id);
 
 		for (const player of lobbyDTO.players) {
 			const userService = new UserService(player);

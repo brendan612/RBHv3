@@ -47,7 +47,7 @@ async function generateTeamPlayerList(players) {
 	const combinedList = players
 		.map((player, index) => {
 			// Pad the player name to have equal length
-			const paddedName = player.summoner_name.padEnd(32, "\u0020");
+			const paddedName = player.summoner_name?.padEnd(32, "\u0020");
 			const emojis =
 				`${LeagueRoleEmojis[player.primary_role]}${
 					LeagueRankEmojis[ranks.get(BigInt(player.user_id)).toUpperCase()]
