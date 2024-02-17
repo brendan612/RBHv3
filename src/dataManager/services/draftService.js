@@ -133,6 +133,7 @@ class DraftService {
 	 * @param {string} winningTeam red or blue
 	 */
 	async submitMatchWin(winningTeam) {
+		const LobbyService = require("./lobbyService.js");
 		const lobby = await Lobby.findByPk(this.draft.lobby_id);
 		const lobbyDTO = new LobbyService.getLobby(lobby.lobby_id);
 
