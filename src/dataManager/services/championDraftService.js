@@ -8,10 +8,15 @@ const {
 const LobbyService = require("./lobbyService.js");
 const UserService = require("./userService.js");
 const PlayerDraftService = require("./playerDraftService.js");
+const MatchService = require("./matchService.js");
 const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
 
 const client = require("../../client.js");
+
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 
 class ChampionDraftService {
 	/**
@@ -78,17 +83,12 @@ class ChampionDraftService {
 				this.draft.draft_id
 			);
 
-		console.log(playerDraftManager.captains);
-
-		const canForcePick = ["105858401497546752", "678067592673493005"].includes(
-			user_id
-		);
-
 		const isCaptain = playerDraftManager.captains.some(
 			(captain) => captain.user_id === user_id
 		);
 
-		if (!isCaptain && !canForcePick) {
+		const canPick = isCaptain || hasRequiredRoleOrHigher(member, "admin");
+		if (!canPick) {
 			return interaction.editReply({
 				content: "You are not a captain",
 				ephemeral: true,
@@ -106,11 +106,7 @@ class ChampionDraftService {
 			});
 		}
 
-		if (
-			this.draft.red_captain_id === user_id &&
-			team === "blue" &&
-			!canForcePick
-		) {
+		if (this.draft.red_captain_id === user_id && team === "blue" && !canPick) {
 			return interaction.editReply({
 				content: "You cannot pick for the other team",
 				ephemeral: true,
@@ -118,7 +114,7 @@ class ChampionDraftService {
 		} else if (
 			this.draft.blue_captain_id === user_id &&
 			team === "red" &&
-			!canForcePick
+			!canPick
 		) {
 			return interaction.editReply({
 				content: "You cannot pick for the other team",

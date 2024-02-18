@@ -78,9 +78,17 @@ function formatDateToMMDDYYYY(date) {
 	return `${month}/${day}/${year}`;
 }
 
+function calculateEloChange(currentRating, opponentRating, winLoss) {
+	const k = 32;
+	const expectedScore =
+		1 / (1 + Math.pow(10, (opponentRating - currentRating) / 400));
+	return Math.round(k * (winLoss - expectedScore));
+}
+
 module.exports = {
 	hasRequiredRole,
 	hasRequiredRoleOrHigher,
 	generateTeamPlayerList,
 	formatDateToMMDDYYYY,
+	calculateEloChange,
 };

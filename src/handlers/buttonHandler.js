@@ -107,7 +107,7 @@ async function handleStartChampDraftButton(interaction) {
 
 	if (
 		draft.host_id !== interaction.member.id &&
-		!hasRequiredRoleOrHigher(interaction.member, "mod")
+		!hasRequiredRoleOrHigher(interaction.member, "admin")
 	) {
 		return await interaction.reply({
 			content: "Only the host can start the champion draft",

@@ -50,7 +50,7 @@ class PlayerDraftService {
 		const member = guild.members.cache.get(user_id);
 
 		let canPickSides =
-			user_id == lobby.host_id || hasRequiredRoleOrHigher(member, "mod");
+			user_id == lobby.host_id || hasRequiredRoleOrHigher(member, "admin");
 
 		let pickingCaptain = this.playerDraftManager.picking_captain;
 		let otherCaptain = this.playerDraftManager.captains.find(
