@@ -51,13 +51,15 @@ async function generateVerifyEmbed(user_id, game_name, tag_line, referrer) {
 	});
 
 	let verifyIcon = 0;
-	await getSummonerByRiotID(game_name, tag_line).then((summoner) => {
-		let icon = summoner.profileIconId;
-		while (icon === summoner.profileIconId) {
-			icon = Math.floor(Math.random() * 29);
-		}
-		verifyIcon = icon;
-	});
+	const summoner = await getSummonerByRiotID(game_name, tag_line);
+	if (!summoner) {
+		return null;
+	}
+	let icon = summoner.profileIconId;
+	while (icon === summoner.profileIconId) {
+		icon = Math.floor(Math.random() * 29);
+	}
+	verifyIcon = icon;
 	//random between 0 and 28 inclusively
 
 	embed.setThumbnail(
