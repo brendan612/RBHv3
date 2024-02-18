@@ -123,6 +123,7 @@ async function drawPlayers(ctx, players, winningTeam) {
 
 	for (let i = 0; i < 5; i++) {
 		const player = blueTeam[i];
+		console.log(player);
 		const user = await User.findByPk(player.user_id);
 
 		let playerEloChange = player.elo_change;
@@ -167,6 +168,7 @@ async function drawPlayers(ctx, players, winningTeam) {
 
 	for (let i = 0; i < 5; i++) {
 		const player = redTeam[i];
+		console.log(player);
 		const user = await User.findByPk(player.user_id);
 
 		let playerEloChange = player.elo_change;
