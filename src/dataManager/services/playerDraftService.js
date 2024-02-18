@@ -5,6 +5,10 @@ const LobbyDTO = require("../DTOs/lobbyDTO");
 const client = require("../../client.js");
 const LobbyService = require("./lobbyService.js");
 
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
+
 class PlayerDraftService {
 	/**
 	 *
@@ -42,7 +46,11 @@ class PlayerDraftService {
 
 		const lobby = await LobbyService.getLobby(this.draft.lobby_id);
 
-		let canPickSides = user_id == lobby.host_id;
+		const guild = client.guilds.cache.get(client.guildID);
+		const member = guild.members.cache.get(user_id);
+
+		let canPickSides =
+			user_id == lobby.host_id || hasRequiredRoleOrHigher(member, "mod");
 
 		let pickingCaptain = this.playerDraftManager.picking_captain;
 		let otherCaptain = this.playerDraftManager.captains.find(

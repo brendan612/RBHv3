@@ -10,6 +10,10 @@ const {
 } = require("../components/embeds/winButtonComponents.js");
 const client = require("../client.js");
 
+const {
+	hasRequiredRoleOrHigher,
+} = require("../utilities/utility-functions.js");
+
 /**
  *
  * @param {Interaction} interaction
@@ -101,7 +105,10 @@ async function handleStartChampDraftButton(interaction) {
 	const draft_id = idParts[1];
 	const draft = await Draft.findByPk(draft_id);
 
-	if (draft.host_id !== interaction.member.id) {
+	if (
+		draft.host_id !== interaction.member.id &&
+		!hasRequiredRoleOrHigher(interaction.member, "mod")
+	) {
 		return await interaction.reply({
 			content: "Only the host can start the champion draft",
 			ephemeral: true,
