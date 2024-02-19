@@ -42,7 +42,7 @@ module.exports = (sequelize) => {
 			},
 			elo_change: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 			elo_before: {
 				type: DataTypes.INTEGER,
@@ -51,7 +51,7 @@ module.exports = (sequelize) => {
 			},
 			elo_after: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 		},
 		{

@@ -1,18 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 
 module.exports = (sequelize) => {
-	class Match extends Model {
-		/**
-		 *
-		 * @param {string} name
-		 * @returns {Match}
-		 */
-		static async createMatch(name) {
-			return await Match.create({
-				name: name,
-			});
-		}
-	}
+	class Match extends Model {}
 	Match.init(
 		{
 			match_id: {
