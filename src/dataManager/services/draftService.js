@@ -121,6 +121,7 @@ class DraftService {
 		const lobby = await LobbyService.getLobby(this.draft.lobby_id);
 
 		playerDraftManager.captains = await this.pickCaptains(lobby);
+		playerDraftManager.picking_captain = playerDraftManager.captains[1];
 
 		await playerDraftService.generatePlayerDraftEmbed(
 			await DraftService.getDraft(this.draft.draft_id),

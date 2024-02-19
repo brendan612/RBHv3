@@ -27,6 +27,8 @@ const {
 	MatchPlayer,
 	Draft,
 	DraftRound,
+	PlayerDraftRound,
+	Champion,
 } = require("../../models");
 const {
 	handleGameOption,
@@ -60,6 +62,8 @@ module.exports = {
 	MatchPlayer,
 	Draft,
 	DraftRound,
+	PlayerDraftRound,
+	Champion,
 	handleGameOption,
 	handleLobbyOption,
 	handleUserOption,

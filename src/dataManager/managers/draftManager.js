@@ -52,6 +52,20 @@ class DraftManager {
 		];
 	}
 
+	async reset() {
+		this.currentRound = 1;
+		this.currentTeam = "blue";
+		this.red_team_bans = [];
+		this.blue_team_bans = [];
+		this.red_team_picks = [];
+		this.blue_team_picks = [];
+		this.begun = false;
+		this.drafted = false;
+		this.showRedConfirm = false;
+		this.showBlueConfirm = false;
+		this.matchOver = false;
+	}
+
 	async setDraftService(draftService) {
 		this.draftService = draftService;
 	}

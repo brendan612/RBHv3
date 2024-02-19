@@ -16,6 +16,14 @@ class PlayerDraftManager {
 		this.picking_captain = null; //the captain that picks which side to be on. this will be the captain with the lower elo
 	}
 
+	async reset() {
+		this.currentRound = 1;
+		this.currentTeam = "blue";
+		this.captains = [];
+		this.red_captain = null;
+		this.blue_captain = null;
+		this.picking_captain = null;
+	}
 	/**
 	 *
 	 * @param {PlayerDraftService} draftService

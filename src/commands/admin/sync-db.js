@@ -15,6 +15,12 @@ module.exports = {
 				.setName("force")
 				.setDescription("Wipe the database")
 				.setRequired(false);
+		})
+		.addBooleanOption((option) => {
+			return option
+				.setName("alter")
+				.setDescription("Alter the database")
+				.setRequired(false);
 		}),
 	/**
 	 *
@@ -31,6 +37,18 @@ module.exports = {
 		await interaction.deferReply({ ephemeral: true });
 
 		try {
+			if (interaction.options.getBoolean("alter")) {
+				console.log("Altering database");
+				await sequelize.sync({ alter: true }).then(async () => {
+					console.log("Database altered");
+					await interaction.editReply({
+						content: `Database altered`,
+						ephemeral: true,
+					});
+				});
+				return;
+			}
+
 			console.log("Syncing database");
 			await sequelize.sync({ force: force }).then(async () => {
 				console.log("Database synced");

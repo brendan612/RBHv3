@@ -273,12 +273,14 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		name: "champdraft.png",
 	});
 
-	if (draftManager.drafted && !draftManager.matchOver) {
-		const actionRow = await generateWinInputComponents(draft);
-		await sendEmbedMessage(lobby, draft, embed, actionRow, attachment);
-	} else {
-		const row = await generateComponents(blue_team, red_team);
-		await sendEmbedMessage(lobby, draft, embed, row, attachment);
+	if (sendMessage) {
+		if (draftManager.drafted && !draftManager.matchOver) {
+			const actionRow = await generateWinInputComponents(draft);
+			await sendEmbedMessage(lobby, draft, embed, actionRow, attachment);
+		} else {
+			const row = await generateComponents(blue_team, red_team);
+			await sendEmbedMessage(lobby, draft, embed, row, attachment);
+		}
 	}
 }
 

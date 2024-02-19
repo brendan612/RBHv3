@@ -15,6 +15,7 @@ const {
 	Game,
 	Draft,
 	PlayerDraftRound,
+	DraftRound,
 	Sequelize,
 } = require("../../models/index");
 const LobbyDTO = require("../DTOs/lobbyDTO");
@@ -168,15 +169,17 @@ class LobbyService {
 	}
 
 	async redraft() {
-		const draftRounds = await PlayerDraftRound.findAll({
+		await DraftRound.destroy({
 			where: {
 				draft_id: this.lobby.draft_id,
 			},
 		});
 
-		for (const draftRound of draftRounds) {
-			await draftRound.destroy();
-		}
+		await PlayerDraftRound.destroy({
+			where: {
+				draft_id: this.lobby.draft_id,
+			},
+		});
 	}
 
 	/**

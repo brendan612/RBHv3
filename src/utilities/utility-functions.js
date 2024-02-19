@@ -6,6 +6,7 @@ const { GuildMember } = require("discord.js");
 const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
 const roleHierarchy = require("../utilities/role-hierarchy.js");
+const { re } = require("mathjs");
 
 /**
  *
@@ -43,6 +44,7 @@ function hasRequiredRole(member, requiredRole) {
  * @returns {Promise<string>}
  */
 async function generateTeamPlayerList(players) {
+	const PlayerDraftManager = require("../dataManager/managers/playerDraftManager.js");
 	const ranks = await PlayerDraftManager.getRanks(players);
 	const combinedList = players
 		.map((player, index) => {

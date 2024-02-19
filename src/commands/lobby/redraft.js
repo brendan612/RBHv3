@@ -7,13 +7,15 @@ const {
 	lobbyOption,
 	handleGameOption,
 	handleLobbyOption,
+	Draft,
 } = require("./index.js");
 
-const { Draft } = require("../../models/index");
 const DraftDTO = require("../../dataManager/DTOs/draftDTO.js");
 
+const DraftService = require("../../dataManager/services/draftService.js");
 const LobbyService = require("../../dataManager/services/lobbyService.js");
 const PlayerDraftService = require("../../dataManager/services/playerDraftService.js");
+const client = require("../../client.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -37,9 +39,32 @@ module.exports = {
 			content: `Lobby # ${lobby.lobby_id} will be redrafted.`,
 		});
 
+		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
+
 		const draft = await Draft.findByPk(lobby.draft_id);
 		const draftDTO = new DraftDTO(draft);
+		const draftService = new DraftService(draft);
 		const playerDraftService = new PlayerDraftService(draft);
+
+		const playerDraftManager =
+			client.managers.playerDraftManagerFactory.getPlayerDraftManager(
+				draft.draft_id
+			);
+
+		playerDraftManager.reset();
+
+		playerDraftManager.captains = await draftService.pickCaptains(lobbyDTO);
+		playerDraftManager.picking_captain = playerDraftManager.captains[1];
+		draft.red_captain_id = playerDraftManager.captains[0].user_id;
+		draft.blue_captain_id = playerDraftManager.captains[1].user_id;
+		await draft.save();
+
+		const draftManager = client.managers.draftManagerFactory.getDraftManager(
+			draft.draft_id
+		);
+
+		draftManager.reset();
+
 		await playerDraftService.generatePlayerDraftEmbed(draftDTO, true);
 	},
 	/**

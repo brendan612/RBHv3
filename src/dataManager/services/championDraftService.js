@@ -73,7 +73,12 @@ class ChampionDraftService {
 		}
 	}
 
-	async handleChampSelect(interaction, champion, commandRoundType) {
+	async handleChampSelect(
+		interaction,
+		champion,
+		commandRoundType,
+		aram = false
+	) {
 		const user_id = interaction.member.id;
 		const draftManager = client.managers.draftManagerFactory.getDraftManager(
 			this.draft.draft_id
@@ -87,6 +92,7 @@ class ChampionDraftService {
 			(captain) => captain.user_id === user_id
 		);
 
+		const member = interaction.member;
 		const canPick = isCaptain || hasRequiredRoleOrHigher(member, "admin");
 		if (!canPick) {
 			return interaction.editReply({
@@ -139,22 +145,24 @@ class ChampionDraftService {
 
 		if (!draftOver) {
 			draftManager.currentRound++;
-			await this.generateChampionDraftEmbed(this.draft);
+			await this.generateChampionDraftEmbed(this.draft, !aram);
 		} else {
 			draftManager.drafted = true;
-			await this.generateChampionDraftEmbed(this.draft);
+			await this.generateChampionDraftEmbed(this.draft, !aram);
 		}
 
-		if (roundType === "ban") {
-			await interaction.editReply({
-				content: `You have banned ${champion.name}`,
-				ephemeral: true,
-			});
-		} else {
-			await interaction.editReply({
-				content: `You have picked ${champion.name}`,
-				ephemeral: true,
-			});
+		if (!aram) {
+			if (roundType === "ban") {
+				await interaction.editReply({
+					content: `You have banned ${champion.name}`,
+					ephemeral: true,
+				});
+			} else {
+				await interaction.editReply({
+					content: `You have picked ${champion.name}`,
+					ephemeral: true,
+				});
+			}
 		}
 	}
 
@@ -162,8 +170,9 @@ class ChampionDraftService {
 		const {
 			generateChampionDraftEmbed,
 		} = require("../messages/championDraftEmbed");
-		const result = await generateChampionDraftEmbed(draft, sendMessage);
-
+		if (sendMessage) {
+			const result = await generateChampionDraftEmbed(draft, sendMessage);
+		}
 		// if (sendMessage) {
 		// 	await this.setMessage(result.id);
 		// }
