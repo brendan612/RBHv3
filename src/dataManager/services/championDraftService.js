@@ -17,6 +17,7 @@ const client = require("../../client.js");
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
+const Match = require("../../models/Match.js");
 
 class ChampionDraftService {
 	/**
@@ -149,6 +150,7 @@ class ChampionDraftService {
 		} else {
 			draftManager.drafted = true;
 			await this.generateChampionDraftEmbed(this.draft, !aram);
+			await MatchService.createMatch(this.draft);
 		}
 
 		if (!aram) {

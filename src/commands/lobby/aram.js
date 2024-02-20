@@ -18,6 +18,7 @@ const {
 const DraftService = require("../../dataManager/services/draftService.js");
 const PlayerDraftService = require("../../dataManager/services/playerDraftService.js");
 const LobbyService = require("../../dataManager/services/lobbyService.js");
+const MatchService = require("../../dataManager/services/matchService.js");
 const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
 const DraftDTO = require("../../dataManager/DTOs/draftDTO.js");
 const ChampionDraftService = require("../../dataManager/services/championDraftService.js");
@@ -195,6 +196,7 @@ module.exports = {
 		}
 
 		await championDraftService.generateChampionDraftEmbed(draft);
+
 		await interaction.editReply({
 			content: "ARAM selections complete",
 			ephemeral: true,

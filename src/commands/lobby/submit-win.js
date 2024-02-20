@@ -11,6 +11,8 @@ const {
 } = require("./index.js");
 
 const DraftService = require("../../dataManager/services/draftService.js");
+const MatchService = require("../../dataManager/services/matchService.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("submit-win")
@@ -48,8 +50,9 @@ module.exports = {
 		const winningTeam = interaction.options.getString("winning_team");
 
 		const draft = await Draft.findByPk(lobby.draft_id);
-		const draftService = new DraftService(draft);
-		await draftService.submitMatchWin(winningTeam);
+
+		const matchService = await MatchService.createMatchService(draft.match_id);
+		await matchService.submitWin(winningTeam);
 
 		await interaction.editReply({
 			content: `This match win has been submitted for #${lobby.lobby_id}.\n Winning team: ${winningTeam}`,

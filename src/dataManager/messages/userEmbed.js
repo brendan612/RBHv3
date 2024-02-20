@@ -127,7 +127,7 @@ async function generateProfileEmbed(interaction, user_id) {
 	const isBooster = await userService.isBooster(user_id);
 
 	const currentSeason = await Season.getCurrentSeason(1);
-	const stats = await getStatsForUser(user.user_id, currentSeason.season_id);
+	const stats = await getStatsForUser(user.user_id, 1, currentSeason.season_id);
 
 	if (!donorRole && !isBooster) {
 		const embed = await generateBasicEmbed(

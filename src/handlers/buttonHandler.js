@@ -1,10 +1,11 @@
 const { Interaction } = require("discord.js");
-const { sequelize, Lobby, User, Draft } = require("../models");
+const { sequelize, Lobby, User, Draft, Match } = require("../models");
 const LobbyService = require("../dataManager/services/lobbyService.js");
 const UserService = require("../dataManager/services/userService.js");
 const DraftService = require("../dataManager/services/draftService.js");
 const PlayerDraftService = require("../dataManager/services/playerDraftService.js");
 const ChampionDraftService = require("../dataManager/services/championDraftService.js");
+const MatchService = require("../dataManager/services/matchService.js");
 const {
 	generateWinInputComponents,
 } = require("../components/embeds/winButtonComponents.js");
@@ -165,8 +166,9 @@ async function handleRedWinConfirmButton(interaction) {
 	const idParts = interaction.customId.split("_");
 	const draft_id = idParts[1];
 	const draft = await Draft.findByPk(draft_id);
-	const draftService = new DraftService(draft);
-	await draftService.submitMatchWin("red");
+
+	const matchService = await MatchService.createMatchService(draft.match_id);
+	await matchService.submitWin("red");
 
 	await interaction.message.edit({
 		components: [],
@@ -207,8 +209,8 @@ async function handleBlueWinConfirmButton(interaction) {
 	const idParts = interaction.customId.split("_");
 	const draft_id = idParts[1];
 	const draft = await Draft.findByPk(draft_id);
-	const draftService = new DraftService(draft);
-	await draftService.submitMatchWin("blue");
+	const matchService = await MatchService.createMatchService(draft.match_id);
+	await matchService.submitWin("blue");
 
 	await interaction.message.edit({
 		components: [],

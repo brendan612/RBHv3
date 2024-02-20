@@ -13,6 +13,7 @@ const LobbyService = require("../../dataManager/services/lobbyService.js");
 const DraftService = require("../../dataManager/services/draftService.js");
 const ChampionDraftService = require("../../dataManager/services/championDraftService.js");
 const PlayerDraftService = require("../../dataManager/services/playerDraftService.js");
+const MatchService = require("../../dataManager/services/matchService.js");
 const client = require("../../client.js");
 const { Op } = require("sequelize");
 
@@ -154,7 +155,7 @@ module.exports = {
 		}
 
 		await championDraftService.generateChampionDraftEmbed(draft);
-
+		await MatchService.createMatch(this.draft);
 		await interaction.editReply("Fake match created");
 	},
 };
