@@ -274,10 +274,9 @@ class MatchService {
 						await nextMatchPlayer.save({ transaction });
 					}
 				}
-
 				await UserEloRating.update(
 					{
-						elo_rating: sequelize.literal(`elo_rating + ${eloChange}`),
+						elo_rating: player.elo_before + eloChange,
 					},
 					{
 						where: {
