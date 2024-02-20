@@ -132,7 +132,7 @@ class PlayerDraftService {
 		let draftOver = false;
 
 		const user_id = interaction.member.id;
-		const allowedUsers = ["105858401497546752", "678067592673493005"];
+		const allowedUsers = [];
 		const currentTeam = this.playerDraftManager.currentTeam;
 		if (currentTeam === "red") {
 			allowedUsers.push(this.playerDraftManager.red_captain.user_id);
@@ -140,7 +140,11 @@ class PlayerDraftService {
 			allowedUsers.push(this.playerDraftManager.blue_captain.user_id);
 		}
 
-		if (!allowedUsers.includes(user_id)) {
+		const canPick =
+			allowedUsers.includes(user_id) ||
+			hasRequiredRoleOrHigher(interaction.member, "moderator");
+
+		if (!canPick) {
 			return await interaction.reply({
 				content: "You are not the picking captain",
 				ephemeral: true,
@@ -148,7 +152,7 @@ class PlayerDraftService {
 		}
 
 		if (currentTeam === "red") {
-			if (allowedUsers.includes(user_id)) {
+			if (canPick) {
 				for (const value of values) {
 					//prettier-ignore
 					await this.addPlayerToTeamByUserID(
@@ -183,7 +187,7 @@ class PlayerDraftService {
 				draftOver = true;
 			}
 		} else {
-			if (allowedUsers.includes(user_id)) {
+			if (canPick) {
 				for (const value of values) {
 					//prettier-ignore
 					await this.addPlayerToTeamByUserID(

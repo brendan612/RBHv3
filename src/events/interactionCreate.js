@@ -129,6 +129,15 @@ module.exports = {
 					);
 					await userService.handleLeagueRoleSelectMenu(interaction, values);
 				}
+			} else if (interaction.isUserContextMenuCommand()) {
+				/** @type {CommandInteraction} */
+				const command = interaction.client.commands.get(
+					interaction.commandName
+				);
+
+				if (!command) return;
+
+				command.execute(interaction);
 			}
 		} catch (error) {
 			console.error(error);
