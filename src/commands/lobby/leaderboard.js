@@ -186,7 +186,7 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 				GROUP BY
 					uer.user_id, mp.matches_played
 				HAVING
-					mp.matches_played > 3
+					mp.matches_played >= 3
 				ORDER BY
 					average_elo DESC
 				LIMIT :limit OFFSET :offset;`,
@@ -219,7 +219,7 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 				GROUP BY
 					uer.user_id, mp.matches_played
 				HAVING
-					mp.matches_played > 3`,
+					mp.matches_played >= 3`,
 			{
 				replacements: { limit, offset, game_id, season_id },
 				type: sequelize.QueryTypes.SELECT,
