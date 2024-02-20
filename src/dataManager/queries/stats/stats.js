@@ -63,11 +63,11 @@ async function getStatsForUser(user_id, game_id, season_id) {
 						@rank := @rank + 1 AS ranking
 					FROM (
 						SELECT DISTINCT u.user_id, u.summoner_name, ur.elo_rating
-						FROM users u
-						JOIN matchplayers mp ON u.user_id = mp.user_id
-						JOIN matches m ON mp.match_id = m.match_id
-						join seasons s on m.season_id = s.season_id  
-						JOIN usereloratings ur ON u.user_id = ur.user_id AND m.game_id = ur.game_id
+						FROM Users u
+						JOIN MatchPlayers mp ON u.user_id = mp.user_id
+						JOIN Matches m ON mp.match_id = m.match_id
+						join Seasons s on m.season_id = s.season_id  
+						JOIN UserEloRatings ur ON u.user_id = ur.user_id AND m.game_id = ur.game_id
 						WHERE 
 							(
 								m.game_id = :game_id
