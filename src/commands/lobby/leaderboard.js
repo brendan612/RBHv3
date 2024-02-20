@@ -305,7 +305,6 @@ async function collectButtonInteractions(
 		const customId = i.customId;
 		const split = customId.split("_");
 		const page = parseInt(split[1], 10);
-		console.log(customId);
 		await updateLeaderboard(interaction, page, game_id, season_id);
 	});
 

@@ -99,7 +99,7 @@ class DraftService {
 						user_id: player.user_id,
 						game_id: lobby.game_id,
 						season_id: lobby.season_id,
-						elo_rating: 1600,
+						elo_rating: 800,
 					});
 				}
 			}

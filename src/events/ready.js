@@ -236,7 +236,7 @@ const createUserEloRating = async (db) => {
 						user_id: user.user_id,
 						game_id: game.game_id,
 						season_id: season.season_id,
-						elo_rating: user.elo ?? 1600,
+						elo_rating: user.elo ?? 800,
 					});
 				}
 			}

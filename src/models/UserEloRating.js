@@ -60,7 +60,7 @@ module.exports = (sequelize) => {
 			elo_rating: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
-				defaultValue: 1600,
+				defaultValue: 800,
 			},
 		},
 		{

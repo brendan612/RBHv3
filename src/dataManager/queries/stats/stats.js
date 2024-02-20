@@ -54,7 +54,7 @@ async function getStatsForUser(user_id, game_id, season_id) {
 		});
 
 		let rank = -1;
-		let rating = 1600;
+		let rating = 800;
 		if (matches.length > 3) {
 			const rankQuery = `
 				SELECT summoner_name, elo_rating, ranking
