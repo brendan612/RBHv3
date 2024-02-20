@@ -32,6 +32,12 @@ module.exports = {
 		await interaction.reply({
 			content: userString,
 		});
+
+		interaction.channel.permissionOverwrites.cache.forEach((permission) => {
+			if (permission.type === 1) {
+				permission.delete();
+			}
+		});
 	},
 	/**
 	 *

@@ -31,10 +31,6 @@ class ThreadManager {
 			try {
 				const guildMember = guild.members.cache.get(user.user_id);
 				await thread.members.add(guildMember);
-				channel.permissionOverwrites.create(guildMember, {
-					SendMessages: true,
-					ReadMessageHistory: true,
-				});
 			} catch {}
 		}
 
