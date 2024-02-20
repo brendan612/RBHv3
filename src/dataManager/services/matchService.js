@@ -225,70 +225,69 @@ class MatchService {
 			{ transaction }
 		);
 
-		for (const match of matchesToUpdate) {
+		for (let i = 0; i < matchesToUpdate.length; i++) {
+			const match = matchesToUpdate[i];
 			if (match.match_id === match_id) {
 				//doing this because transactions are wonky
 				match.winning_team = winning_team;
 				match.end_time = end_time;
 			}
 
-			for (const player of match.MatchPlayers) {
-				try {
-					const winLoss = player.team === match.winning_team ? 1 : 0;
-					const enemyTeam = player.team === "blue" ? "red" : "blue";
-					const enemyPlayers = match.MatchPlayers.filter(
-						(player) => player.team === enemyTeam
-					);
-					const enemyTotalElo = enemyPlayers.reduce(
-						(acc, enemy) => acc + enemy.elo_before,
-						0
-					);
+			const players = match.MatchPlayers;
 
-					const enemyAverageElo = enemyTotalElo / enemyPlayers.length;
+			for (let player of players) {
+				await player.reload({ transaction });
+				const winLoss = player.team === match.winning_team ? 1 : 0;
+				const enemyTeam = player.team === "blue" ? "red" : "blue";
+				const enemyPlayers = match.MatchPlayers.filter(
+					(player) => player.team === enemyTeam
+				);
+				const enemyTotalElo = enemyPlayers.reduce(
+					(acc, enemy) => acc + enemy.elo_before,
+					0
+				);
 
-					const eloChange = calculateEloChange(
-						player.elo_before,
-						enemyAverageElo,
-						winLoss
+				const enemyAverageElo = enemyTotalElo / enemyPlayers.length;
+
+				const eloChange = calculateEloChange(
+					player.elo_before,
+					enemyAverageElo,
+					winLoss
+				);
+
+				await player.update(
+					{
+						elo_change: eloChange,
+						elo_after: player.elo_before + eloChange,
+					},
+					{ transaction }
+				);
+				await player.save({ transaction });
+
+				if (i + 1 < matchesToUpdate.length) {
+					const nextMatch = matchesToUpdate[i + 1];
+					const nextMatchPlayer = nextMatch.MatchPlayers.find(
+						(p) => p.user_id === player.user_id
 					);
-
-					await player.update(
-						{
-							elo_change: eloChange,
-							elo_after: player.elo_before + eloChange,
-						},
-						{ transaction }
-					);
-					await player.save({ transaction });
-
-					const eloRating = await UserEloRating.findOne(
-						{
-							where: {
-								user_id: player.user_id,
-								game_id: this.match.game_id,
-								season_id: this.match.season_id,
-							},
-						},
-						{ transaction }
-					);
-
-					if (eloRating) {
-						eloRating.elo_rating = player.elo_after;
-						await eloRating.save({ transaction });
-					} else {
-						await UserEloRating.create(
-							{
-								user_id: player.user_id,
-								game_id: this.match.game_id,
-								season_id: this.match.season_id,
-								elo_rating: 800 + eloChange,
-							},
-							{ transaction }
-						);
+					if (nextMatchPlayer) {
+						nextMatchPlayer.elo_before = player.elo_after;
+						await nextMatchPlayer.save({ transaction });
 					}
-				} catch (error) {
-					console.error(error);
 				}
+
+				await UserEloRating.update(
+					{
+						elo_rating: sequelize.literal(`elo_rating + ${eloChange}`),
+					},
+					{
+						where: {
+							user_id: player.user_id,
+							game_id: match.game_id,
+							season_id: match.season_id,
+						},
+						transaction,
+					}
+				);
 			}
 		}
 	}
