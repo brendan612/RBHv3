@@ -123,7 +123,6 @@ async function handleUserOption(interaction, optionName) {
  */
 async function handleSeasonOption(interaction, game_id) {
 	const val = interaction.options.getString("season") ?? "current";
-	console.log(val);
 	if (val == "all") {
 		return null;
 	}

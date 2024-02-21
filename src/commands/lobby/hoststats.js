@@ -31,9 +31,6 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
-		// interaction.user is the object representing the User who ran the command
-		// interaction.member is the GuildMember object, which represents the user in the specific guild
-
 		const game = await handleGameOption(interaction);
 		const season = await handleSeasonOption(interaction, game.game_id);
 
@@ -65,7 +62,7 @@ module.exports = {
 
 		const embed = baseEmbed(
 			"Host Stats",
-			`Lobbies Hosted for ${season ? season.name : "All Seasons"}`
+			`${season ? season.name : "All Seasons"}`
 		);
 
 		const sortedHostStats = new Map(
@@ -74,7 +71,7 @@ module.exports = {
 
 		let hostStatsString = "";
 		for (const [host, lobbies] of sortedHostStats) {
-			hostStatsString += `<@${host}>: ${lobbies}\n`;
+			hostStatsString += `<@${host}> | ${lobbies}\n`;
 		}
 
 		embed.addFields({

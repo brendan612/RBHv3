@@ -11,6 +11,7 @@
 		"DBPASSWORD",
 		"DBPORT",
 		"DBUSER",
+		"GUILDID",
 		"IHBAN",
 		"IHUNBAN",
 		"inhouse",
