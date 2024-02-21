@@ -8,6 +8,9 @@ const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
 const roleHierarchy = require("../utilities/role-hierarchy.js");
 const { re } = require("mathjs");
 
+const sharp = require("sharp");
+const { loadImage } = require("@napi-rs/canvas");
+
 /**
  *
  * @param {GuildMember} member
@@ -87,10 +90,24 @@ function calculateEloChange(currentRating, opponentRating, winLoss) {
 	return Math.round(k * (winLoss - expectedScore));
 }
 
+/**
+ *
+ * @param {string} imagePath
+ * @param {number} width
+ * @param {number} height
+ * @returns {Promise<Canvas.Image>}
+ */
+async function prepareImage(imagePath, width, height) {
+	const resizedImage = await sharp(imagePath).resize(width, height).toBuffer();
+	const img = await loadImage(resizedImage);
+	return img;
+}
+
 module.exports = {
 	hasRequiredRole,
 	hasRequiredRoleOrHigher,
 	generateTeamPlayerList,
 	formatDateToMMDDYYYY,
 	calculateEloChange,
+	prepareImage,
 };
