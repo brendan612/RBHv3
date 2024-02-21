@@ -99,6 +99,11 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		embed.setDescription(`<@${lowestCaptain.user_id}> **is picking sides...**`);
 
 		embed.addFields({
+			name: "Captains",
+			value: `<@${playerDraftManager.red_captain.user_id}>\n<@${playerDraftManager.blue_captain.user_id}>`,
+		});
+
+		embed.addFields({
 			name: "Lobby Players",
 			value: await generateRemainingPlayersList(players),
 			inline: true,

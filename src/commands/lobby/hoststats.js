@@ -73,16 +73,8 @@ module.exports = {
 		);
 
 		let hostStatsString = "";
-		let count = 1;
 		for (const [host, lobbies] of sortedHostStats) {
-			const user = await User.findOne({
-				where: { user_id: host },
-			});
-			hostStatsString +=
-				`${count}.`.padStart(1, "").padEnd(5, "") +
-				`<@${user.user_id}>`.padEnd(50, "") +
-				`${lobbies}\n`;
-			count++;
+			hostStatsString += `<@${host}>: ${lobbies}\n`;
 		}
 
 		embed.addFields({
