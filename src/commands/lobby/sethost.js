@@ -37,17 +37,11 @@ module.exports = {
 		const lobby = await handleLobbyOption(interaction);
 		const user = await handleUserOption(interaction, "target");
 
-		if (
-			interaction.member.id !== lobby.host_id &&
-			!hasRequiredRoleOrHigher(interaction.member, "trainee")
-		) {
-			return await interaction.reply({
-				content: "You do not have permission to change the host",
-				ephemeral: true,
-			});
-		}
+		const canSetHost =
+			interaction.member.id === lobby.host_id ||
+			hasRequiredRoleOrHigher(interaction.member, "trainee");
 
-		if (interaction.member.id != lobby.host_id) {
+		if (!canSetHost) {
 			return await interaction.reply({
 				content: "Only the host or staff can change the host of the lobby",
 				ephemeral: true,
