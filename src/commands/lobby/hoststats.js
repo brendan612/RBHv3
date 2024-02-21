@@ -71,7 +71,8 @@ module.exports = {
 
 		let hostStatsString = "";
 		for (const [host, lobbies] of sortedHostStats) {
-			hostStatsString += `<@${host}> | ${lobbies}\n`;
+			const user = await User.findByPk(host);
+			hostStatsString += `${user.summoner_name} #${user.tag_line} | **${lobbies}**\n`;
 		}
 
 		embed.addFields({
