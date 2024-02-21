@@ -103,6 +103,7 @@ class UserService {
 			await this.updateMemberNickname(user_id, "Verifying Account");
 			await guild.members.fetch(user_id).then((member) => {
 				member.roles.add(permission_roles.verified);
+				member.roles.add(permission_roles.guest);
 				member.roles.remove(permission_roles.unverified);
 			});
 		} catch (e) {

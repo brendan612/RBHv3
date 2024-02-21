@@ -274,19 +274,32 @@ class MatchService {
 						await nextMatchPlayer.save({ transaction });
 					}
 				}
-				await UserEloRating.update(
-					{
-						elo_rating: player.elo_before + eloChange,
-					},
+
+				const userEloRating = await UserEloRating.findOne(
 					{
 						where: {
 							user_id: player.user_id,
 							game_id: match.game_id,
 							season_id: match.season_id,
 						},
-						transaction,
-					}
+					},
+					{ transaction }
 				);
+
+				if (userEloRating) {
+					userEloRating.elo_rating = player.elo_before + eloChange;
+					await userEloRating.save({ transaction });
+				} else {
+					await UserEloRating.create(
+						{
+							user_id: player.user_id,
+							game_id: match.game_id,
+							season_id: match.season_id,
+							elo_rating: player.elo_before + eloChange,
+						},
+						{ transaction }
+					);
+				}
 			}
 		}
 	}
