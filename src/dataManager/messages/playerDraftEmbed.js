@@ -103,7 +103,7 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		try {
 			embed.addFields({
 				name: "Captains",
-				value: `<@${playerDraftManager.red_captain.user_id}>\n<@${playerDraftManager.blue_captain.user_id}>`,
+				value: `<@${captains[0].user_id}>\n<@${captains[1].user_id}>`,
 			});
 		} catch {}
 
