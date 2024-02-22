@@ -7,6 +7,7 @@ const {
 	lobbyOption,
 	handleGameOption,
 	handleLobbyOption,
+	Match,
 } = require("./index.js");
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
@@ -28,6 +29,13 @@ module.exports = {
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
 		if (lobby) {
+			const match = await Match.findByPk(lobby.match_id);
+			if (match && match.end_time) {
+				await interaction.reply({
+					content: `Lobby #${lobby.lobby_id} has already been played and cannot be cleared.`,
+				});
+				return;
+			}
 			await interaction.reply({
 				content: `Lobby #${lobby.lobby_id} has been cleared.`,
 			});
