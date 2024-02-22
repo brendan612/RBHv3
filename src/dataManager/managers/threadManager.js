@@ -7,7 +7,6 @@ const {
 	ThreadAutoArchiveDuration,
 } = require("discord.js");
 const client = require("../../client.js");
-const { err } = require("@sapphire/framework");
 
 class ThreadManager {
 	/**
