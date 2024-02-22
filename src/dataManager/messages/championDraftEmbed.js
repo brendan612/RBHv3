@@ -628,7 +628,7 @@ async function sendEmbedMessage(lobby, draft, embed, components, files) {
 	);
 
 	const match = await Match.findByPk(draft.match_id);
-	const useThread = match.end_time ? false : true;
+	const useThread = match?.end_time ? false : true;
 	//prettier-ignore
 	const message = await draftManager.sendMessage(draft, channel, "", embed, components, files, false, useThread);
 
