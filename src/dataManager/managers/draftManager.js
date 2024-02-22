@@ -148,7 +148,7 @@ class DraftManager {
 	async #getOrCreateThread(channel, draft) {
 		let thread = null;
 		if (draft.thread_id) {
-			thread = await channel.threads.fetch(draft.thread_id);
+			thread = await channel.threads.fetch(draft.thread_id.toString());
 			if (!thread) {
 				thread = await ThreadManager.createChannelThread(
 					channel,

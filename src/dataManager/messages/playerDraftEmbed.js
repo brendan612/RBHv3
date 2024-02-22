@@ -59,9 +59,11 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		include: [User],
 	});
 
+	const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
+
 	const host = await guild.members.fetch(lobby.host_id);
 
-	const players = await lobby.Users.slice(0, 10);
+	const players = lobbyDTO.players;
 	// players = players.filter(
 	// 	(user) =>
 	// 		user.user_id !== red_captain.user_id &&
@@ -320,7 +322,7 @@ async function sendEmbedMessage(lobby, draft, embed, components) {
 	);
 
 	//prettier-ignore
-	const message = await draftManager.sendMessage(draft, channel, "", embed, components);
+	const message = await draftManager.sendMessage(draft, channel, "", embed, components, null, false, true);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 	draftService.setThread(message.channelId);
