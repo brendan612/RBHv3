@@ -116,7 +116,7 @@ module.exports = {
 			const wins = parseInt(player.dataValues.wins);
 			const losses = parseInt(player.dataValues.losses);
 
-			const text = `${(i + 1).toString().padStart(2, "\u2003")}. ${(
+			const text = `${(i + 1).toString().padStart(2, "")}. ${(
 				user.summoner_name +
 				"#" +
 				user.tag_line

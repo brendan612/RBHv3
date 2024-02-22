@@ -38,6 +38,7 @@ const Canvas = require("@napi-rs/canvas");
 const sharp = require("sharp");
 const path = require("path");
 const Sequelize = require("sequelize");
+const { prepareImage } = require("../../utilities/utility-functions.js");
 
 const {
 	LeagueRankEmojis,
@@ -156,6 +157,8 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		}
 	});
 
+	const roundInfo = draftManager.roundSequence[draftManager.currentRound - 1];
+
 	const red_captain = await User.findByPk(draft.red_captain_id);
 	const blue_captain = await User.findByPk(draft.blue_captain_id);
 
@@ -165,6 +168,26 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 	ctx.fillStyle = "#000";
 	ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+	if (roundInfo) {
+		if (roundInfo.team === "blue") {
+			ctx.fillStyle = "#104ee0";
+			ctx.fillRect(
+				0,
+				0,
+				pickSectionWidth * 5 + pickSectionWidth / 2,
+				canvasHeight
+			);
+		} else {
+			ctx.fillStyle = "#a10003";
+			ctx.fillRect(
+				pickSectionWidth * 6 - pickSectionWidth / 2,
+				0,
+				pickSectionWidth * 5 + pickSectionWidth / 2,
+				canvasHeight
+			);
+		}
+	}
+
 	await generateHeaderBar(
 		ctx,
 		red_captain.summoner_name,
@@ -173,7 +196,8 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 	await generateBanSection(
 		ctx,
 		draftManager.blue_team_bans,
-		draftManager.red_team_bans
+		draftManager.red_team_bans,
+		lobby.lobby_id
 	);
 
 	//await generateNamePlateSection(ctx, blue_team, red_team);
@@ -181,11 +205,11 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 	await generatePickSection(
 		ctx,
 		draftManager.blue_team_picks,
-		draftManager.red_team_picks
+		draftManager.red_team_picks,
+		lobby.lobby_id
 	);
 	await generateExtraInfo(ctx);
 
-	const roundInfo = draftManager.roundSequence[draftManager.currentRound - 1];
 	if (roundInfo) {
 		const team = roundInfo.team;
 		const roundType = roundInfo.action;
@@ -329,95 +353,100 @@ async function generateHeaderBar(ctx, red_captain, blue_captain) {
 	);
 }
 
-async function generateBanSection(ctx, blue_bans, red_bans) {
-	const ban_placeholder = await prepareImage(
-		banPlaceholderPath,
-		banSectionWidth,
-		banSectionHeight
+async function generateBanSection(ctx, blue_bans, red_bans, lobby_id) {
+	let ban_placeholder = client.cache.get("ban_placeholder");
+	if (!ban_placeholder) {
+		ban_placeholder = await prepareImage(
+			banPlaceholderPath,
+			banSectionWidth,
+			banSectionHeight
+		);
+		client.cache.set("ban_placeholder", ban_placeholder);
+	}
+
+	if (blue_bans.length < 5) {
+		blue_bans = blue_bans.concat(Array(5 - blue_bans.length).fill(null));
+	}
+
+	if (red_bans.length < 5) {
+		red_bans = red_bans.concat(Array(5 - red_bans.length).fill(null));
+	}
+
+	const blueBanImages = await Promise.all(
+		blue_bans.map(async (champId) => {
+			if (champId === null) return ban_placeholder;
+
+			let square_icon = client.cache.get(
+				`champ_${champId}_square_icon`,
+				"lobby_id_" + lobby_id
+			);
+
+			if (!square_icon) {
+				const champ = await Champion.findByPk(champId);
+				square_icon = await loadImage(champ.square_icon);
+				client.cache.set(
+					`champ_${champId}_square_icon`,
+					square_icon,
+					"lobby_id_" + lobby_id
+				);
+			}
+
+			return square_icon;
+		})
 	);
 
-	let blue_champ_splashes = [];
-	let red_champ_splashes = [];
-	if (blue_bans) {
-		blue_champs = await Champion.findAll({
-			where: { champion_id: blue_bans },
-		});
-		blue_champ_splashes = blue_bans.map((banId) =>
-			blue_champs.find((champ) => champ.champion_id === banId)
+	const redBanImages = await Promise.all(
+		red_bans.map(async (champId) => {
+			if (champId === null) return ban_placeholder;
+
+			let square_icon = client.cache.get(
+				`champ_${champId}_square_icon`,
+				"lobby_id_" + lobby_id
+			);
+
+			if (!square_icon) {
+				const champ = await Champion.findByPk(champId);
+				square_icon = await loadImage(champ.square_icon);
+				client.cache.set(
+					`champ_${champId}_square_icon`,
+					square_icon,
+					"lobby_id_" + lobby_id
+				);
+			}
+
+			return square_icon;
+		})
+	);
+
+	blueBanImages.forEach((image, index) => {
+		const xPosition =
+			index * banSectionWidth + (image === ban_placeholder ? banPadding : 0);
+
+		ctx.drawImage(
+			image,
+			xPosition,
+			headerBarHeight,
+			banSectionWidth,
+			banSectionHeight
 		);
-	}
+	});
 
-	if (red_bans) {
-		red_champs = await Champion.findAll({
-			where: { champion_id: red_bans },
-		});
-		red_champ_splashes = red_bans.map((banId) =>
-			red_champs.find((champ) => champ.champion_id === banId)
+	const redTeamStartX = pickSectionWidth * 11 - banSectionWidth * 5;
+
+	redBanImages.forEach((image, index) => {
+		const xPosition =
+			redTeamStartX +
+			index * banSectionWidth +
+			(image === ban_placeholder ? banPadding : 0);
+
+		ctx.drawImage(
+			image,
+			xPosition,
+			headerBarHeight,
+			banSectionWidth,
+			banSectionHeight
 		);
-	}
-
-	let index = 0;
-	let xPosition = 0;
-
-	for (let i = 0; i < 5; i++) {
-		xPosition = index++ * banSectionWidth;
-
-		const champ = blue_champ_splashes[i];
-		if (!champ) {
-			ctx.drawImage(
-				ban_placeholder,
-				xPosition + banPadding,
-				headerBarHeight + banPadding
-			);
-		} else {
-			const image = await loadImage(champ.square_icon);
-			ctx.drawImage(
-				image,
-				xPosition,
-				headerBarHeight,
-				banSectionWidth,
-				banSectionHeight
-			);
-		}
-	}
-
-	index = 0;
-	redTeamStartX = pickSectionWidth * 11 - banSectionWidth * 5; //right justify the red bans
-
-	for (let i = 0; i < 5; i++) {
-		xPosition = index++ * banSectionWidth + redTeamStartX;
-		const champ = red_champ_splashes[i];
-		if (!champ) {
-			ctx.drawImage(
-				ban_placeholder,
-				xPosition + banPadding,
-				headerBarHeight + banPadding
-			);
-			// ctx.fillStyle = "#000";
-			// ctx.fillRect(
-			// 	xPosition,
-			// 	headerBarHeight,
-			// 	banSectionWidth,
-			// 	banSectionWidth
-			// );
-			// ctx.fillStyle = "#ccc";
-			// ctx.fillRect(
-			// 	xPosition + banPadding,
-			// 	headerBarHeight + banPadding,
-			// 	banSectionWidth - banPadding,
-			// 	banSectionHeight - banPadding
-			// );
-		} else {
-			const image = await loadImage(champ.square_icon);
-			ctx.drawImage(
-				image,
-				xPosition,
-				headerBarHeight,
-				banSectionWidth,
-				banSectionHeight
-			);
-		}
-	}
+	});
 }
 
 async function generateNamePlateSection(ctx, blue_team, red_team) {
@@ -481,87 +510,102 @@ async function generateNamePlateSection(ctx, blue_team, red_team) {
  * @param {*} blue_picks
  * @param {*} red_picks
  */
-async function generatePickSection(ctx, blue_picks, red_picks) {
-	const pick_placeholder = await prepareImage(
-		pickPlaceholderPath,
-		pickSectionWidth,
-		pickSectionHeight
+async function generatePickSection(ctx, blue_picks, red_picks, lobby_id) {
+	let pick_placeholder = client.cache.get("pick_placeholder");
+	if (!pick_placeholder) {
+		pick_placeholder = await prepareImage(
+			pickPlaceholderPath,
+			pickSectionWidth,
+			pickSectionHeight
+		);
+		client.cache.set("pick_placeholder", pick_placeholder);
+	}
+
+	if (blue_picks.length < 5) {
+		blue_picks = blue_picks.concat(Array(5 - blue_picks.length).fill(null));
+	}
+
+	if (red_picks.length < 5) {
+		red_picks = red_picks.concat(Array(5 - red_picks.length).fill(null));
+	}
+
+	const bluePickImages = await Promise.all(
+		blue_picks.map(async (champId) => {
+			if (champId === null) return pick_placeholder;
+
+			let loading_splash = client.cache.get(
+				`champ_${champId}_square_icon`,
+				"lobby_id_" + lobby_id
+			);
+
+			if (!loading_splash) {
+				const champ = await Champion.findByPk(champId);
+				loading_splash = await loadImage(champ.loading_splash);
+				client.cache.set(
+					`champ_${champId}_loading_splash`,
+					loading_splash,
+					"lobby_id_" + lobby_id
+				);
+			}
+
+			return loading_splash;
+		})
 	);
 
-	let blue_champ_splashes = [];
-	let red_champ_splashes = [];
-	if (blue_picks) {
-		blue_champs = await Champion.findAll({
-			where: { champion_id: blue_picks },
-		});
-		blue_champ_splashes = blue_picks.map((banId) =>
-			blue_champs.find((champ) => champ.champion_id === banId)
+	const redPickImages = await Promise.all(
+		red_picks.map(async (champId) => {
+			if (champId === null) return pick_placeholder;
+
+			let loading_splash = client.cache.get(
+				`champ_${champId}_square_icon`,
+				"lobby_id_" + lobby_id
+			);
+
+			if (!loading_splash) {
+				const champ = await Champion.findByPk(champId);
+				loading_splash = await loadImage(champ.loading_splash);
+				client.cache.set(
+					`champ_${champId}_loading_splash`,
+					loading_splash,
+					"lobby_id_" + lobby_id
+				);
+			}
+
+			return loading_splash;
+		})
+	);
+
+	bluePickImages.forEach((image, index) => {
+		const xPosition = index * pickSectionWidth;
+
+		ctx.drawImage(
+			image,
+			xPosition,
+			headerBarHeight + banSectionHeight + namePlateHeight,
+			pickSectionWidth,
+			pickSectionHeight
 		);
-	}
+	});
 
-	if (red_picks) {
-		red_champs = await Champion.findAll({
-			where: { champion_id: red_picks },
-		});
-		red_champ_splashes = red_picks.map((banId) =>
-			red_champs.find((champ) => champ.champion_id === banId)
+	redPickImages.forEach((image, index) => {
+		const xPosition = index * pickSectionWidth + pickSectionWidth * 6;
+
+		ctx.drawImage(
+			image,
+			xPosition,
+			headerBarHeight + banSectionHeight + namePlateHeight,
+			pickSectionWidth,
+			pickSectionHeight
 		);
-	}
-
-	let xPosition = 0;
-
-	for (let i = 0; i < 5; i++) {
-		xPosition = i * pickSectionWidth;
-
-		const champ = blue_champ_splashes[i];
-		if (!champ) {
-			ctx.drawImage(
-				pick_placeholder,
-				xPosition,
-				headerBarHeight + banSectionHeight + namePlateHeight,
-				pickSectionWidth,
-				pickSectionHeight
-			);
-		} else {
-			const image = await loadImage(champ.loading_splash);
-			ctx.drawImage(
-				image,
-				xPosition,
-				headerBarHeight + banSectionHeight + namePlateHeight,
-				pickSectionWidth,
-				pickSectionHeight
-			);
-		}
-	}
-
-	for (let i = 0; i < 5; i++) {
-		xPosition = i * pickSectionWidth + pickSectionWidth * 6;
-
-		const champ = red_champ_splashes[i];
-		if (!champ) {
-			ctx.drawImage(
-				pick_placeholder,
-				xPosition,
-				headerBarHeight + banSectionHeight + namePlateHeight,
-				pickSectionWidth,
-				pickSectionHeight
-			);
-		} else {
-			const image = await loadImage(champ.loading_splash);
-			ctx.drawImage(
-				image,
-				xPosition,
-				headerBarHeight + banSectionHeight + namePlateHeight,
-				pickSectionWidth,
-				pickSectionHeight
-			);
-		}
-	}
+	});
 }
 
 async function generateExtraInfo(ctx) {
-	const logoURL = "https://imgur.com/ug9dvEg.png";
-	const logo = await loadImage(logoURL);
+	let logo = client.cache.get("inhouse_logo");
+	if (!logo) {
+		logo = await loadImage("https://imgur.com/ug9dvEg.png");
+		client.cache.set("inhouse_logo", logo);
+	}
 
 	ctx.drawImage(
 		logo,
@@ -590,19 +634,6 @@ async function sendEmbedMessage(lobby, draft, embed, components, files) {
 	draftService.setMessage(message.id);
 
 	return message;
-}
-
-/**
- *
- * @param {string} imagePath
- * @param {number} width
- * @param {number} height
- * @returns {Promise<Canvas.Image>}
- */
-async function prepareImage(imagePath, width, height) {
-	const resizedImage = await sharp(imagePath).resize(width, height).toBuffer();
-	const img = await loadImage(resizedImage);
-	return img;
 }
 
 module.exports = { generateChampionDraftEmbed };

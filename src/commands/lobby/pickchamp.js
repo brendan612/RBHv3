@@ -48,7 +48,6 @@ module.exports = {
 		if (!champion) return;
 
 		await interaction.deferReply({ ephemeral: true });
-		await interaction.deleteReply();
 
 		const draft = await Draft.findByPk(lobby.draft_id);
 		const championDraftService = new ChampionDraftService(draft);

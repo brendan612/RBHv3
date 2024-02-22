@@ -25,6 +25,9 @@ const {
 	Referral,
 	sequelize,
 } = require("../models");
+
+const ChampionService = require("../dataManager/services/championService");
+
 const { row, resolve } = require("mathjs");
 
 const sqlite3 = require("sqlite3").verbose();
@@ -55,6 +58,9 @@ module.exports = {
 		webhookServer.start();
 
 		await checkAndUpdateServerMessages();
+
+		const championService = new ChampionService();
+		await championService.cacheAutocompleteChampionData();
 	},
 };
 

@@ -15,6 +15,8 @@ const {
 } = require("../models");
 const { formatDateToMMDDYYYY } = require("../utilities/utility-functions.js");
 
+const client = require("../client.js");
+
 /**
  *
  * @param {AutocompleteFocusedOption} focusedValue
@@ -122,29 +124,18 @@ async function seasonAutocomplete(focusedValue, interaction) {
 }
 
 async function championAutocomplete(focusedValue, interaction) {
-	const champions = await Champion.findAll({
-		attributes: ["champion_id", "name"],
-		order: sequelize.literal("name ASC"),
-	});
-	const championDetails = champions.map((champ) => ({
-		label: champ.name,
-		value: champ.champion_id.toString(),
-	}));
-	const filteredChampions = championDetails
-		.filter(
-			(champion) =>
-				champion.label
-					.replace("'", "")
-					.replace(" ", "")
-					.toLowerCase()
-					.startsWith(focusedValue?.toLowerCase()) ||
-				champion.value.startsWith(focusedValue)
-		)
+	const strippedSearch = focusedValue
+		.replace("'", "")
+		.replace(" ", "")
+		.toLowerCase();
+
+	const champions = client.cache
+		.findByQuery(strippedSearch, "autoCompleteChampionData")
 		.slice(0, 25);
 
 	await interaction.respond(
-		filteredChampions.map((champion) => ({
-			name: champion.label,
+		champions.map((champion) => ({
+			name: champion.key,
 			value: champion.value,
 		}))
 	);

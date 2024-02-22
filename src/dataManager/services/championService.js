@@ -7,6 +7,8 @@ const configPath = require("path").resolve(
 	`../../../${process.env.CONFIG_FILE}`
 );
 
+const client = require("../../client.js");
+
 class ChampionService {
 	constructor() {
 		this.current_league_patch = "";
@@ -71,6 +73,20 @@ class ChampionService {
 					full_splash: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champion.id}_0.jpg`,
 				});
 			}
+		}
+	}
+
+	async cacheAutocompleteChampionData() {
+		const champions = await Champion.findAll({
+			order: [["name", "ASC"]],
+		});
+
+		for (let champion of champions) {
+			client.cache.set(
+				champion.name.replace("'", "").replace(" ", ""),
+				champion.champion_id.toString(),
+				"autoCompleteChampionData"
+			);
 		}
 	}
 }

@@ -26,6 +26,8 @@ const {
 	generatePostGameImage,
 } = require("../../dataManager/messages/postGameImage.js");
 
+const client = require("../../client.js");
+
 class MatchService {
 	/**
 	 *
@@ -198,6 +200,8 @@ class MatchService {
 				include: [{ model: MatchPlayer }],
 			});
 			await generatePostGameImage(this.match);
+
+			client.cache.clear("lobby_id_" + lobby.lobby_id);
 		} catch (error) {
 			await transaction.rollback();
 			console.error("Error submitting win for match: " + this.match.match_id);

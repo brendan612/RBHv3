@@ -37,8 +37,8 @@ async function generateWinInputComponents(draft, confirmTeam = null) {
 			.setStyle(ButtonStyle.Primary)
 			.setLabel("Blue Win");
 
-		actionRow.addComponents(redWinButton);
 		actionRow.addComponents(blueWinButton);
+		actionRow.addComponents(redWinButton);
 	} else if (draftManager.showRedConfirm) {
 		const redConfirmButton = new ButtonBuilder()
 			.setCustomId(`redwinconfirm_${draft.draft_id}`)

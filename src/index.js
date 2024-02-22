@@ -4,7 +4,9 @@ const { join } = require("node:path");
 const { sequelize, User, Lobby, Game, Season } = require("./models");
 const { register } = require("module");
 const { generateTournamentCode } = require("./api/riot/riotApiHandler.js");
+const GlobalCacheManager = require("./dataManager/managers/cacheManager.js");
 const client = require("./client.js");
+client.cache = new GlobalCacheManager();
 
 const playerDraftManagerFactory = require("../src/dataManager/managers/factories/playerDraftManagerFactory.js");
 const draftManagerFactory = require("../src/dataManager/managers/factories/draftManagerFactory.js");
