@@ -193,6 +193,7 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		red_captain.summoner_name,
 		blue_captain.summoner_name
 	);
+
 	await generateBanSection(
 		ctx,
 		draftManager.blue_team_bans,

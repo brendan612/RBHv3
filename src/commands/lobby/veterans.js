@@ -110,20 +110,36 @@ module.exports = {
 
 		ctx.font = "bold 40px PostGame";
 
+		let maxNameWidth = 0;
+		let maxWinLossWidth = 0;
+
 		for (let i = 0; i < matchPlayers.length; i++) {
 			const player = matchPlayers[i];
 			const user = await User.findByPk(player.user_id);
 			const wins = parseInt(player.dataValues.wins);
 			const losses = parseInt(player.dataValues.losses);
 
-			const text = `${(i + 1).toString().padStart(2, "")}. ${(
+			const name =
+				`${(i + 1).toString().padStart(2, " ")}. ` +
 				user.summoner_name +
 				"#" +
-				user.tag_line
-			).padEnd(32, " ")} ${wins}W ${losses}L`;
+				user.tag_line;
+			const nameMetrics = ctx.measureText(name);
+			if (nameMetrics.width > maxNameWidth) {
+				maxNameWidth = nameMetrics.width;
+			}
+
+			const winLoss = `${wins}W ${losses}L`;
+
 			ctx.fillText(
-				text,
+				name,
 				borderOffset + 50,
+				200 + matchPlayers.indexOf(player) * 50
+			);
+
+			ctx.fillText(
+				winLoss,
+				borderOffset + 50 + maxNameWidth + 150,
 				200 + matchPlayers.indexOf(player) * 50
 			);
 		}
