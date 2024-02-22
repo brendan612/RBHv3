@@ -322,6 +322,7 @@ async function generateBasicEmbed(user, exp, remainingExp, wins, losses) {
 		}
 	);
 
+	console.log(member.user);
 	embed.setThumbnail(member.user.displayAvatarURL());
 
 	return embed;
