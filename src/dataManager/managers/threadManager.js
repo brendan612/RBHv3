@@ -33,11 +33,15 @@ class ThreadManager {
 
 				if (!guildMember && BigInt(user.user_id) > 20) {
 					guildMember = await guild.members.fetch(user.user_id);
+					console.log(guildMember);
 				}
+
 				await thread.members.add(guildMember);
 			} catch (error) {
-				console.log(user);
-				console.log(error);
+				if (BigInt(user.user_id) > 20) {
+					console.log(user);
+					console.log(error);
+				}
 			}
 		}
 
