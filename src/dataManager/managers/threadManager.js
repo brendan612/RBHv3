@@ -7,6 +7,7 @@ const {
 	ThreadAutoArchiveDuration,
 } = require("discord.js");
 const client = require("../../client.js");
+const { err } = require("@sapphire/framework");
 
 class ThreadManager {
 	/**
@@ -30,8 +31,12 @@ class ThreadManager {
 		for (const user of users) {
 			try {
 				const guildMember = guild.members.cache.get(user.user_id);
+				console.log(guildMember);
 				await thread.members.add(guildMember);
-			} catch {}
+			} catch (error) {
+				console.log(user);
+				console.log(error);
+			}
 		}
 
 		draft.thread_id = thread.id;
