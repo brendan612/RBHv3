@@ -10,6 +10,7 @@ const {
 	Lobby,
 	Draft,
 	DraftRound,
+	Match,
 } = require("./index.js");
 
 const DraftService = require("../../dataManager/services/draftService.js");
@@ -43,20 +44,27 @@ module.exports = {
 		if (lobby.draft_id) {
 			const draft = await Draft.findByPk(lobby.draft_id);
 
-			if (draft.thread_id && draft.thread_id != interaction.channelId) {
+			if (lobby.match_id) {
+				const match = await Match.findByPk(lobby.match_id);
 				if (
-					interaction.channel.type === ChannelType.PublicThread ||
-					interaction.channel.type === ChannelType.PrivateThread
+					!match.end_time &&
+					draft.thread_id &&
+					draft.thread_id != interaction.channelId
 				) {
-					const otherDraftWithThread = await Draft.findOne({
-						where: { thread_id: interaction.channelId },
-					});
-
-					if (otherDraftWithThread.draft_id != draft.draft_id) {
-						return interaction.reply({
-							content: `This lobby is currently being drafted in <#${draft.thread_id}>`,
-							ephemeral: true,
+					if (
+						interaction.channel.type === ChannelType.PublicThread ||
+						interaction.channel.type === ChannelType.PrivateThread
+					) {
+						const otherDraftWithThread = await Draft.findOne({
+							where: { thread_id: interaction.channelId },
 						});
+
+						if (otherDraftWithThread.draft_id != draft.draft_id) {
+							return interaction.reply({
+								content: `This lobby is currently being drafted in <#${draft.thread_id}>`,
+								ephemeral: true,
+							});
+						}
 					}
 				}
 			}

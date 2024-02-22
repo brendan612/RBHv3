@@ -93,13 +93,18 @@ class DraftManager {
 		embed,
 		components,
 		attachments,
-		ephemeral = false
+		ephemeral = false,
+		useThread = true
 	) {
 		const lobby = await Lobby.findByPk(draft.lobby_id);
-		const thread = await this.#getOrCreateThread(channel, draft);
+		let thread = null;
+		if (useThread) {
+			thread = await this.#getOrCreateThread(channel, draft);
+			await this.#deletePreviousDraftMessages(thread, draft.message_id);
+		}
+
 		await this.#deletePreviousDraftMessages(channel, lobby.message_id);
 		await this.#deletePreviousDraftMessages(channel, draft.message_id);
-		await this.#deletePreviousDraftMessages(thread, draft.message_id);
 
 		const messageOptions = {
 			ephemeral: ephemeral,
@@ -125,8 +130,13 @@ class DraftManager {
 			messageOptions.content = messageText;
 		}
 
-		const message = await thread.send(messageOptions);
-		return message;
+		if (useThread) {
+			const message = await thread.send(messageOptions);
+			return message;
+		} else {
+			const message = await channel.send(messageOptions);
+			return message;
+		}
 	}
 
 	/**

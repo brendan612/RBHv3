@@ -42,9 +42,13 @@ class ThreadManager {
 	static async createMessageThread(message, draft_id) {}
 
 	static async deleteThread(channel, thread_id) {
-		const thread = await channel.threads.fetch(thread_id);
-		if (thread) {
-			await thread.delete();
+		try {
+			const thread = await channel.threads.fetch(thread_id);
+			if (thread) {
+				await thread.delete();
+			}
+		} catch (error) {
+			console.log("Thread does not exist");
 		}
 	}
 }

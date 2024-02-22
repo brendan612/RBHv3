@@ -12,6 +12,7 @@ const {
 	Draft,
 	DraftRound,
 	Champion,
+	Match,
 } = require("../models");
 const { Op } = require("sequelize");
 
@@ -55,7 +56,7 @@ async function handleLobbyOption(interaction, game_id) {
 			});
 		}
 	} else {
-		lobby = await Lobby.findOne({ where: { lobby_id: lobby_id } });
+		lobby = await Lobby.findByPk(lobby_id);
 	}
 
 	if (!lobby) {
@@ -70,6 +71,13 @@ async function handleLobbyOption(interaction, game_id) {
 	if (!flag) {
 		if (lobby.draft_id) {
 			const draft = await Draft.findByPk(lobby.draft_id);
+
+			if (lobby.match_id) {
+				const match = await Match.findByPk(lobby.match_id);
+				if (match.end_time) {
+					return lobby;
+				}
+			}
 
 			if (draft.thread_id && draft.thread_id != interaction.channelId) {
 				if (

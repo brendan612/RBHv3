@@ -144,6 +144,18 @@ async function handleRedWinButton(interaction) {
 	const idParts = interaction.customId.split("_");
 	const draft_id = idParts[1];
 	const draft = await Draft.findByPk(draft_id);
+
+	const canUse =
+		draft.host_id == interaction.member.id ||
+		hasRequiredRoleOrHigher(interaction.member, "moderator");
+
+	if (!canUse) {
+		return await interaction.reply({
+			content: "You do not have permission to use this button",
+			ephemeral: true,
+		});
+	}
+
 	const draftManager =
 		client.managers.draftManagerFactory.getDraftManager(draft_id);
 
@@ -180,13 +192,6 @@ async function handleRedWinConfirmButton(interaction) {
 
 	const matchService = await MatchService.createMatchService(draft.match_id);
 	await matchService.submitWin("red");
-
-	await interaction.message.edit({
-		components: [],
-	});
-
-	const championDraftService = new ChampionDraftService(draft);
-	await championDraftService.generateChampionDraftEmbed(draft);
 }
 
 /**
@@ -230,15 +235,20 @@ async function handleBlueWinConfirmButton(interaction) {
 	const idParts = interaction.customId.split("_");
 	const draft_id = idParts[1];
 	const draft = await Draft.findByPk(draft_id);
+
+	const canUse =
+		draft.host_id == interaction.member.id ||
+		hasRequiredRoleOrHigher(interaction.member, "moderator");
+
+	if (!canUse) {
+		return await interaction.reply({
+			content: "You do not have permission to use this button",
+			ephemeral: true,
+		});
+	}
+
 	const matchService = await MatchService.createMatchService(draft.match_id);
 	await matchService.submitWin("blue");
-
-	await interaction.message.edit({
-		components: [],
-	});
-
-	const championDraftService = new ChampionDraftService(draft);
-	await championDraftService.generateChampionDraftEmbed(draft);
 }
 
 async function handleCancelWinButton(interaction) {

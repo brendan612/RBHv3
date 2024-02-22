@@ -14,6 +14,8 @@ const LobbyService = require("../services/lobbyService.js");
 const UserService = require("../services/userService.js");
 const DraftService = require("../services/draftService.js");
 
+const ThreadManager = require("../managers/threadManager.js");
+const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
 
@@ -200,6 +202,14 @@ class MatchService {
 				include: [{ model: MatchPlayer }],
 			});
 			await generatePostGameImage(this.match);
+
+			const draft = await Draft.findByPk(lobby.draft_id);
+			if (draft.thread_id) {
+				const channel = client.channels.cache.get(
+					channels.games["League of Legends"]
+				);
+				await ThreadManager.deleteThread(channel, draft.thread_id);
+			}
 
 			client.cache.clear("lobby_id_" + lobby.lobby_id);
 		} catch (error) {
