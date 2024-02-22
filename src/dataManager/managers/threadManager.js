@@ -29,8 +29,11 @@ class ThreadManager {
 		const guild = client.guilds.cache.get(client.guildID);
 		for (const user of users) {
 			try {
-				const guildMember = guild.members.cache.get(user.user_id);
-				console.log(guildMember);
+				let guildMember = guild.members.cache.get(user.user_id);
+
+				if (!guildMember && BigInt(user.user_id) > 20) {
+					guildMember = await guild.members.fetch(user.user_id);
+				}
 				await thread.members.add(guildMember);
 			} catch (error) {
 				console.log(user);
