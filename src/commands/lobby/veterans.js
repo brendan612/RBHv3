@@ -111,7 +111,16 @@ module.exports = {
 		ctx.font = "bold 40px PostGame";
 
 		let maxNameWidth = 0;
-		let maxWinLossWidth = 0;
+
+		matchPlayers.forEach(async (player) => {
+			const user = await User.findByPk(player.user_id);
+
+			const name = user.summoner_name + "#" + user.tag_line;
+			const nameMetrics = ctx.measureText(name);
+			if (nameMetrics.width > maxNameWidth) {
+				maxNameWidth = nameMetrics.width;
+			}
+		});
 
 		for (let i = 0; i < matchPlayers.length; i++) {
 			const player = matchPlayers[i];
@@ -124,10 +133,6 @@ module.exports = {
 				user.summoner_name +
 				"#" +
 				user.tag_line;
-			const nameMetrics = ctx.measureText(name);
-			if (nameMetrics.width > maxNameWidth) {
-				maxNameWidth = nameMetrics.width;
-			}
 
 			const winLoss = `${wins}W ${losses}L`;
 
