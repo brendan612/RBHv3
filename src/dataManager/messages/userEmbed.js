@@ -295,7 +295,13 @@ async function drawBackgroundImage(ctx, canvas, donorRole, isBooster, level) {
 
 async function generateBasicEmbed(user, exp, remainingExp, wins, losses) {
 	const guild = await client.guilds.fetch(client.guildID);
-	const member = await guild.members.fetch(user.user_id);
+	let guildMember = guild.members.cache.get(user.user_id);
+
+	if (!guildMember && BigInt(user.user_id) > 20) {
+		await guild.members.fetch(user.user_id.toString()).then((member) => {
+			guildMember = member;
+		});
+	}
 
 	const embed = baseEmbed(
 		`${user.summoner_name}#${user.tag_line}`,

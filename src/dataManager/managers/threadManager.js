@@ -28,6 +28,8 @@ class ThreadManager {
 		const users = await lobby.getUsers();
 		const guild = client.guilds.cache.get(client.guildID);
 		for (const user of users) {
+			if (!BigInt(user.user_id) > 20) continue;
+
 			try {
 				let guildMember = guild.members.cache.get(user.user_id);
 
@@ -35,16 +37,10 @@ class ThreadManager {
 					await guild.members.fetch(user.user_id.toString()).then((member) => {
 						guildMember = member;
 					});
-					console.log(guildMember);
 				}
 
 				await thread.members.add(guildMember);
-			} catch (error) {
-				if (BigInt(user.user_id) > 20) {
-					console.log(user);
-					console.log(error);
-				}
-			}
+			} catch {}
 		}
 
 		draft.thread_id = thread.id;
