@@ -32,7 +32,9 @@ class ThreadManager {
 				let guildMember = guild.members.cache.get(user.user_id);
 
 				if (!guildMember && BigInt(user.user_id) > 20) {
-					guildMember = await guild.members.fetch(user.user_id);
+					await guild.members.fetch(user.user_id.toString()).then((member) => {
+						guildMember = member;
+					});
 					console.log(guildMember);
 				}
 
