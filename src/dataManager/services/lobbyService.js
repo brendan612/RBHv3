@@ -27,6 +27,10 @@ const ThreadManager = require("../managers/threadManager.js");
 const UserService = require("./userService.js");
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
+
 class LobbyService {
 	/**
 	 *
@@ -349,9 +353,13 @@ class LobbyService {
 				}
 				break;
 			case "draft":
-				if (interaction.user.id !== this.lobby.host_id) {
+				const canUse =
+					interaction.user.id !== this.lobby.host_id ||
+					hasRequiredRoleOrHigher(interaction.member, "moderator");
+
+				if (!canUse) {
 					return await interaction.reply({
-						content: "Only the host can start the draft.",
+						content: "Only the host or staff can start the draft.",
 						ephemeral: true,
 					});
 				}
