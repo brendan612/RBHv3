@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { Interaction } = require("discord.js");
 const { User } = require("../../models");
-const { getRiotAccountByPuuid } = require("../../api/riot/riotApiHandler");
 const UserService = require("../../dataManager/services/userService.js");
 
 module.exports = {

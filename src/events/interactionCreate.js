@@ -140,6 +140,8 @@ module.exports = {
 				command.execute(interaction);
 			}
 		} catch (error) {
+			console.log("here");
+			console.error(interaction);
 			console.error(error);
 			await interaction.reply({
 				content:

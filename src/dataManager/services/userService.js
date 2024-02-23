@@ -126,6 +126,11 @@ class UserService {
 		user.summoner_name = game_name;
 		user.tag_line = tag_line;
 		user.puuid = puuid ? puuid : user.puuid;
+		if (!user.puuid) {
+			await getSummonerByRiotID(game_name, tag_line).then((summoner) => {
+				user.puuid = summoner.puuid;
+			});
+		}
 		await user.save();
 		await this.updateMemberNickname(user_id, "Updating Riot Account");
 		return new UserDTO(user);
@@ -149,6 +154,12 @@ class UserService {
 			account.puuid
 		);
 		return new UserDTO(user);
+	}
+
+	async clearUserPuuid() {
+		const user = await User.findByPk(this.user.user_id);
+		user.puuid = null;
+		await user.save();
 	}
 
 	/**
