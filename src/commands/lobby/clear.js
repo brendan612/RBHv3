@@ -11,7 +11,7 @@ const {
 } = require("./index.js");
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
-const client = require("../../index.js");
+const client = require("../../client.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
