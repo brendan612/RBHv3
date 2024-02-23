@@ -3,6 +3,9 @@ const client = require("../../client.js");
 const level_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.level_roles;
 const { generateLevelUpEmbed } = require("../messages/userEmbed.js");
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 
 //prettier-ignore
 const cardNumbers = ["Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"];
@@ -61,8 +64,18 @@ class UserLevelManager {
 		return { suitNumber, suitName, cardNumber };
 	}
 
-	getRoleTitleForProfile(level) {
+	getRoleTitleForProfile(level, user_id = "") {
 		//prettier-ignore
+
+		if (user_id) {
+			const guild = client.guilds.cache.get(client.guildID);
+			const member = guild.members.cache.get(user_id);
+			const owner = hasRequiredRoleOrHigher(member, "owner");
+
+			if (owner) {
+				return "Queen of Hearts";
+			}
+		}
 
 		const { suitNumber, suitName, cardNumber } =
 			this.getSuitNumberNameAndCardNumber(level);

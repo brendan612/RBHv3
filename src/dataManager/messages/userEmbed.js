@@ -18,6 +18,9 @@ const UserLevelManager = require("../managers/userLevelManager.js");
 const UserService = require("../services/userService.js");
 const path = require("path");
 const { getStatsForUser } = require("../queries/stats/stats.js");
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 
 const userLevelManager = new UserLevelManager();
 
@@ -126,10 +129,12 @@ async function generateProfileEmbed(interaction, user_id) {
 	const donorRole = await userService.getDonorRole(user_id);
 	const isBooster = await userService.isBooster(user_id);
 
+	const staff = hasRequiredRoleOrHigher(interaction.member, "owner");
+
 	const currentSeason = await Season.getCurrentSeason(1);
 	const stats = await getStatsForUser(user.user_id, 1, currentSeason.season_id);
 
-	if (!donorRole && !isBooster) {
+	if (!donorRole && !isBooster && !staff) {
 		const embed = await generateBasicEmbed(
 			user,
 			userLevelManager.expForNextLevel(level),
@@ -143,7 +148,7 @@ async function generateProfileEmbed(interaction, user_id) {
 			ephemeral: false,
 		});
 	} else {
-		const title = userLevelManager.getRoleTitleForProfile(level);
+		const title = userLevelManager.getRoleTitleForProfile(level, user_id);
 
 		const canvas = createCanvas(1300, 365);
 		const context = canvas.getContext("2d");
@@ -153,7 +158,8 @@ async function generateProfileEmbed(interaction, user_id) {
 			canvas,
 			donorRole,
 			isBooster,
-			level
+			level,
+			staff
 		);
 
 		drawNameAndTitle(context, user.summoner_name + " #" + user.tag_line, title);
@@ -261,17 +267,34 @@ function drawWinLoss(ctx, wins, losses) {
  * @param {string} donorRole
  * @param {boolean} isBooster
  */
-async function drawBackgroundImage(ctx, canvas, donorRole, isBooster, level) {
-	const { suitNumber, suitName, cardNumber } =
-		userLevelManager.getSuitNumberNameAndCardNumber(level);
+async function drawBackgroundImage(
+	ctx,
+	canvas,
+	donorRole,
+	isBooster,
+	level,
+	staff = false
+) {
+	if (!staff) {
+		const { suitNumber, suitName, cardNumber } =
+			userLevelManager.getSuitNumberNameAndCardNumber(level);
 
-	const backgroundImagePath = path.join(
-		__dirname,
-		`../../assets/profiles/${suitName}.png`
-	);
-	const backgroundImage = await loadImage(backgroundImagePath);
+		const backgroundImagePath = path.join(
+			__dirname,
+			`../../assets/profiles/${suitName}.png`
+		);
+		const backgroundImage = await loadImage(backgroundImagePath);
 
-	ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+		ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+	} else {
+		const backgroundImagePath = path.join(
+			__dirname,
+			`../../assets/profiles/queen_of_hearts.png`
+		);
+		const backgroundImage = await loadImage(backgroundImagePath);
+
+		ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+	}
 
 	let banner = "";
 	if (isBooster) {
