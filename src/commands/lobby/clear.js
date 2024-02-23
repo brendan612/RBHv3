@@ -11,6 +11,7 @@ const {
 } = require("./index.js");
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
+const client = require("../../index.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -39,6 +40,8 @@ module.exports = {
 			await interaction.reply({
 				content: `Lobby #${lobby.lobby_id} has been cleared.`,
 			});
+
+			client.cache.clear("lobby_id_" + lobby.lobby_id);
 
 			const lobbyService = new LobbyService(lobby);
 			await lobbyService.destroyLobby();
