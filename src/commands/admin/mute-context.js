@@ -30,6 +30,7 @@ module.exports = {
 		const targeted_user = await User.findOne({
 			where: { user_id: interaction.targetUser.id },
 		});
+
 		const current_date = new Date();
 		const expiration_date = new Date(current_date.getTime() + ms("1d"));
 
