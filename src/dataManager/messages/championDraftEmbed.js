@@ -39,6 +39,10 @@ const sharp = require("sharp");
 const path = require("path");
 const Sequelize = require("sequelize");
 const { prepareImage } = require("../../utilities/utility-functions.js");
+const {
+	displayDateAsTimestamp,
+	TimestampFormat,
+} = require("../../utilities/timestamp.js");
 
 const {
 	LeagueRankEmojis,
@@ -215,6 +219,13 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 		const team = roundInfo.team;
 		const roundType = roundInfo.action;
 
+		const round_start_time = new Date();
+		round_start_time.setSeconds(round_start_time.getSeconds() + 3);
+		const display_time = displayDateAsTimestamp(
+			new Date(),
+			TimestampFormat.Relative
+		);
+
 		embed.setColor(team === "blue" ? "#104ee0" : "#a10003");
 		if (roundType === "ban") {
 			embed.setDescription(
@@ -222,7 +233,9 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 					team === "blue"
 						? `<@${blue_captain.user_id}>`
 						: `<@${red_captain.user_id}>`
-				}, it is your team's turn to ban a champion.`
+				}, it is your team's turn to ban a champion.\n${
+					sendMessage ? `This round started ${display_time}` : ""
+				}`
 			);
 
 			embed.addFields({
@@ -235,7 +248,9 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 					team === "blue"
 						? `<@${blue_captain.user_id}>`
 						: `<@${red_captain.user_id}>`
-				}, it is your team's turn to pick a champion.`
+				}, it is your team's turn to pick a champion.\n${
+					sendMessage ? `This round started ${display_time}` : ""
+				}`
 			);
 			embed.addFields({
 				name: "Use this command to pick a champion:",

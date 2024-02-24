@@ -104,10 +104,10 @@ class UserService {
 		await user.save();
 		try {
 			await this.updateMemberNickname(user_id, "Verifying Account");
-			await guild.members.fetch(user_id).then((member) => {
-				member.roles.add(permission_roles.verified);
-				member.roles.add(permission_roles.guest);
-				member.roles.remove(permission_roles.unverified);
+			await guild.members.fetch(user_id).then(async (member) => {
+				await member.roles.add(permission_roles.verified);
+				await member.roles.add(permission_roles.guest);
+				await member.roles.remove(permission_roles.unverified);
 			});
 		} catch (e) {
 			console.error("Not enough permissions to change nickname.");
