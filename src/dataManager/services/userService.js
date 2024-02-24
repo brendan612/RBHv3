@@ -38,6 +38,9 @@ const {
 	TimestampFormat,
 } = require("../../utilities/timestamp.js");
 const roleHierarchy = require("../../utilities/role-hierarchy.js");
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
 const donor_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
@@ -563,7 +566,7 @@ class UserService {
 		//prettier-ignore
 		if(interaction.member.roles.cache.some(role => role.id === permission_roles.developer)) return true;
 		//prettier-ignore
-		if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+		if (!hasRequiredRoleOrHigher(interaction.member, "moderator")) {
 			await interaction.reply({
 				content: "You do not have permission to use this command.",
 				ephemeral: true,
