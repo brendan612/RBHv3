@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Interaction, User } = require("./index.js");
+const { SlashCommandBuilder, Interaction, User } = require("../admin/index.js");
 const ms = require("ms");
 const { ModerationLog } = require("../admin/index.js");
 const { Op } = require("sequelize");
@@ -22,18 +22,27 @@ module.exports = {
 			},
 		});
 
+		if (!banned_users.length) {
+			await interaction.reply({
+				content: "No users are banned from inhouses",
+				ephemeral: true,
+			});
+			return;
+		}
+
 		const embed = baseEmbed("Banned Users", "Users banned from inhouses");
 		const banned_users_string = banned_users.map((user) => {
 			const timestamp = Math.floor(new Date(user.duration).getTime() / 1000); //divide by 1000 to convert to seconds
 			return `<@${user.user_id}> | Expires <t:${Math.floor(timestamp)}:R>\n`;
 		});
+
 		embed.addFields({
 			name: "\r",
 			value: banned_users_string.join(""),
 		});
-		await interaction.reply({
+
+		return await interaction.reply({
 			embeds: [embed],
-			ephemeral: false,
 		});
 	},
 };
