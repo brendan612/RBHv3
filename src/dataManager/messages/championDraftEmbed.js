@@ -221,15 +221,15 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 
 		const round_start_time = new Date();
 		round_start_time.setSeconds(round_start_time.getSeconds() + 3);
-		const display_time = displayDateAsTimestamp(
+		const display_time = `**${displayDateAsTimestamp(
 			new Date(),
 			TimestampFormat.Relative
-		);
+		)}**`;
 
 		embed.setColor(team === "blue" ? "#104ee0" : "#a10003");
 		if (roundType === "ban") {
 			embed.setDescription(
-				`${team.toUpperCase()} TEAM BAN PHASE\n${
+				`${team.toUpperCase()} TEAM BAN PHASE\n\n${
 					team === "blue"
 						? `<@${blue_captain.user_id}>`
 						: `<@${red_captain.user_id}>`
@@ -244,7 +244,7 @@ async function generateChampionDraftEmbed(draft, sendMessage = true) {
 			});
 		} else if (roundType === "pick") {
 			embed.setDescription(
-				`${team.toUpperCase()} TEAM PICK PHASE\n${
+				`${team.toUpperCase()} TEAM PICK PHASE\n\n${
 					team === "blue"
 						? `<@${blue_captain.user_id}>`
 						: `<@${red_captain.user_id}>`

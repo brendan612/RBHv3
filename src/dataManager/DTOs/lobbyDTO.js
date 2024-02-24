@@ -20,7 +20,6 @@ class LobbyDTO {
 		this.max_reserves = 3;
 
 		const playersAndReserves = lobby.Users ?? [];
-		playersAndReserves.sort((a, b) => a.created_at - b.created_at);
 		this.players = playersAndReserves.slice(0, 10);
 		this.reserves = playersAndReserves.slice(10);
 
