@@ -78,13 +78,24 @@ module.exports = {
 		await interaction.deferReply();
 
 		const userService = new UserService(user);
-		const messageParts = await userService.generateVerifyEmbed(
-			user.user_id,
-			game_name,
-			tag_line,
-			referrer
-		);
+		try {
+			const messageParts = await userService.generateVerifyEmbed(
+				user.user_id,
+				game_name,
+				tag_line,
+				referrer
+			);
 
-		return await interaction.editReply(messageParts);
+			return await interaction.editReply(messageParts);
+		} catch (e) {
+			console.error(e);
+			return await interaction.editReply({
+				content:
+					"An error occurred while trying to verify your account.\n" +
+					"Please check the entered Riot ID and try again. \n" +
+					"Also, we are currently only playing on NA servers, so you must have an NA account to verify.",
+				ephemeral: true,
+			});
+		}
 	},
 };

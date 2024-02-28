@@ -124,6 +124,13 @@ module.exports = {
 					? await Season.getCurrentSeason(game.game_id)
 					: await Season.findByPk(season_id);
 
+			if (!season) {
+				await interaction.editReply({
+					content: `No active season for ${game.name}. Use \`\`/season create\`\` to create a new season.`,
+				});
+				return;
+			}
+
 			await interaction.editReply({
 				content: `Current season for ${game.name}: \`\`${season.name}\`\` \nStart date: \`\`${season.start_date}\`\` \nEnd date: \`\`${season.end_date}\`\``,
 			});
