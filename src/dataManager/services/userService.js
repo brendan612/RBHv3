@@ -267,6 +267,9 @@ class UserService {
 		});
 
 		await getRankByRiotID(game_name, tag_line).then((summoner) => {
+			if (Array.isArray(summoner)) {
+				summoner = summoner[0];
+			}
 			const tier = summoner.tier ?? LeagueTier.UNRANKED;
 			const rank = summoner.rank;
 			console.log(game_name, tag_line, tier, rank);
