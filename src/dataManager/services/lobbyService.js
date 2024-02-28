@@ -354,7 +354,7 @@ class LobbyService {
 				break;
 			case "draft":
 				const canUse =
-					interaction.user.id !== this.lobby.host_id ||
+					interaction.user.id == this.lobby.host_id ||
 					hasRequiredRoleOrHigher(interaction.member, "moderator");
 
 				if (!canUse) {
