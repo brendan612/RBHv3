@@ -270,6 +270,7 @@ class UserService {
 			if (Array.isArray(summoner)) {
 				summoner = summoner[0];
 			}
+			if (!summoner) return;
 			const tier = summoner.tier ?? LeagueTier.UNRANKED;
 			const rank = summoner.rank;
 			validRank = ![
