@@ -72,9 +72,7 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 					if (message) {
 						await message.delete();
 					}
-				} catch (err) {
-					console.log(err);
-				}
+				} catch (err) {}
 			}
 
 			const message = await channel.send({
