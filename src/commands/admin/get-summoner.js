@@ -22,13 +22,13 @@ module.exports = {
 			interaction.options.getString("tag-line")
 		);
 		await interaction.reply({
-			content: `Summoner Name: ${summoner.data.name}
-			\r\nSummoner Level: ${summoner.data.summonerLevel}
-			\r\nSummoner ID: ${summoner.data.id}
-			\r\nAccount ID: ${summoner.data.accountId}
-			\r\nPUUID: ${summoner.data.puuid}
-			\r\nRevision Date: ${summoner.data.revisionDate}
-			\r\nProfile Icon ID: ${summoner.data.profileIconId}\r\n`,
+			content: `Summoner Name: ${summoner.name}
+			\r\nSummoner Level: ${summoner.summonerLevel}
+			\r\nSummoner ID: ${summoner.id}
+			\r\nAccount ID: ${summoner.accountId}
+			\r\nPUUID: ${summoner.puuid}
+			\r\nRevision Date: ${summoner.revisionDate}
+			\r\nProfile Icon ID: ${summoner.profileIconId}\r\n`,
 			ephemeral: false,
 		});
 	},
