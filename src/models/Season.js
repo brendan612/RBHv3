@@ -1,5 +1,4 @@
 const { DataTypes, Model, Op } = require("sequelize");
-
 module.exports = (sequelize) => {
 	class Season extends Model {
 		/**
@@ -67,13 +66,20 @@ module.exports = (sequelize) => {
 			let season = await Season.findOne({
 				where: { end_date: { [Op.gt]: new Date() }, game_id: game_id },
 			});
-			if (season == null) {
-				season = await Season.findOne({
-					where: { game_id: game_id },
-					order: [["end_date", "DESC"]],
-				});
-			}
 			return season;
+		}
+
+		static async endSeason(game_id = 1, season_id) {
+			let season = await Season.findOne({
+				where: { season_id: season_id, game_id: game_id },
+			});
+			if (season) {
+				const now = new Date();
+				if (season.end_date > now) {
+					season.end_date = now;
+					await season.save();
+				}
+			}
 		}
 	}
 	Season.init(

@@ -17,6 +17,10 @@ const {
 } = require("../../utilities/utility-functions.js");
 const { channels } = require(`../../../${process.env.CONFIG_FILE}`);
 
+const {
+	generateSeasonEndEmbed,
+} = require("../../dataManager/messages/seasonEndEmbed.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("season")
@@ -82,9 +86,9 @@ module.exports = {
 
 			const currentSeason = await Season.getCurrentSeason(game.game_id);
 
-			if (currentSeason.end_date > now) {
-				currentSeason.end_date = now;
-				await currentSeason.save();
+			if (currentSeason && currentSeason.end_date > now) {
+				await Season.endSeason(game.game_id, currentSeason.season_id);
+				await generateSeasonEndEmbed(game.game_id, currentSeason.season_id);
 			}
 
 			const newSeason = await Season.createSeason(
@@ -110,12 +114,18 @@ module.exports = {
 				content: `Created season \`\`${newSeason.name}\`\` for ${game.name}`,
 			});
 		} else if (interaction.options.getSubcommand() === "end") {
-			const season = await Season.getCurrentSeason(game.game_id);
-			season.end_date = now;
-			await season.save();
+			let currentSeason = await Season.getCurrentSeason(game.game_id);
+			if (!currentSeason) {
+				currentSeason = await Season.findOne({
+					where: { game_id: game.game_id },
+					order: [["end_date", "DESC"]],
+				});
+			}
+			await Season.endSeason(game.game_id, currentSeason.season_id);
+			await generateSeasonEndEmbed(game.game_id, currentSeason.season_id);
 
 			await interaction.editReply({
-				content: `Ended season \`\`${season.name}\`\` for ${game.name}`,
+				content: `Ended season \`\`${currentSeason.name}\`\` for ${game.name}`,
 			});
 		} else if (interaction.options.getSubcommand() === "view") {
 			const season_id = interaction.options.getString("season") ?? "current";
