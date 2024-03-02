@@ -172,13 +172,18 @@ class UserService {
 	 * @returns
 	 */
 	async updateMemberNickname(user_id, reason) {
-		const member = await client.guild.members.fetch(user_id);
 		const user = await User.findByPk(user_id);
 		if (!user.verified) {
 			return;
 		}
-		await member.setNickname(user.summoner_name + "#" + user.tag_line, reason);
-		return true;
+		const guild = await client.guilds.fetch(client.guildID);
+		await guild.members.fetch(user.user_id.toString()).then(async (member) => {
+			await member.setNickname(
+				user.summoner_name + "#" + user.tag_line,
+				reason
+			);
+			return true;
+		});
 	}
 
 	/**
