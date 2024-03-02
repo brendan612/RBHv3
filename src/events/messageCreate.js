@@ -32,7 +32,7 @@ module.exports = {
 
 		const lastTimestamp = messageCache.get(user_id);
 
-		if (!lastTimestamp || currentTimestamp - lastTimestamp > 300) {
+		if (!lastTimestamp || currentTimestamp - lastTimestamp > 360) {
 			messageCache.set(user_id, currentTimestamp);
 			const userService = await UserService.createUserService(user_id);
 			await userService.addExperience(35);
