@@ -119,6 +119,7 @@ async function generateLevelUpEmbed(user_id, level, awardMoney, roleTitle) {
 async function generateProfileEmbed(interaction, user_id) {
 	const user = await User.findByPk(user_id);
 	const guild = await client.guilds.fetch(client.guildID);
+	const guildMember = guild.members.cache.get(user_id);
 
 	const UserService = require("../services/userService.js");
 	const userService = await UserService.createUserService(user_id);
@@ -129,7 +130,7 @@ async function generateProfileEmbed(interaction, user_id) {
 	const donorRole = await userService.getDonorRole(user_id);
 	const isBooster = await userService.isBooster(user_id);
 
-	const staff = hasRequiredRoleOrHigher(interaction.member, "owner");
+	const staff = hasRequiredRoleOrHigher(guildMember, "owner");
 
 	const currentSeason = await Season.getCurrentSeason(1);
 	const stats = await getStatsForUser(user.user_id, 1, currentSeason.season_id);
