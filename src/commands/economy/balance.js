@@ -75,6 +75,13 @@ module.exports = {
 
 			const isAdmin = hasRequiredRoleOrHigher(interaction.member, "admin");
 
+			if (!isAdmin) {
+				return interaction.reply({
+					content: "You do not have permission to use this command.",
+					ephemeral: true,
+				});
+			}
+
 			if (amount > BigInt(user.server_money) && !isAdmin) {
 				return interaction.reply({
 					content: "You do not have enough money to give that amount.",
