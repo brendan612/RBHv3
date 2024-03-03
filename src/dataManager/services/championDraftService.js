@@ -84,14 +84,10 @@ class ChampionDraftService {
 		const draftManager = client.managers.draftManagerFactory.getDraftManager(
 			this.draft.draft_id
 		);
-		const playerDraftManager =
-			client.managers.playerDraftManagerFactory.getPlayerDraftManager(
-				this.draft.draft_id
-			);
 
-		const isCaptain = playerDraftManager.captains.some(
-			(captain) => captain.user_id === user_id
-		);
+		const captains = [this.draft.red_captain_id, this.draft.blue_captain_id];
+
+		const isCaptain = captains.includes(user_id);
 
 		const member = interaction.member;
 		const canPick = isCaptain || hasRequiredRoleOrHigher(member, "admin");

@@ -1,4 +1,3 @@
-const PlayerDraftManager = require("../dataManager/managers/playerDraftManager.js");
 const { LeagueRankEmojis, LeagueRoleEmojis } = require("../assets/emojis.js");
 const { User } = require("../models");
 const { GuildMember } = require("discord.js");
@@ -6,7 +5,6 @@ const { GuildMember } = require("discord.js");
 const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
 const roleHierarchy = require("../utilities/role-hierarchy.js");
-const { re } = require("mathjs");
 
 const sharp = require("sharp");
 const { loadImage } = require("@napi-rs/canvas");
