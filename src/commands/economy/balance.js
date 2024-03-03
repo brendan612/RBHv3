@@ -4,6 +4,9 @@ const { calculateDailyBoostMoney } = require("../../utilities/economy.js");
 const { baseEmbed } = require("../../components/embed.js");
 const { userOption } = require("../../components/commandOptions.js");
 const ms = require("ms");
+const {
+	hasRequiredRoleOrHigher,
+} = require("../../utilities/utility-functions.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -25,7 +28,6 @@ module.exports = {
 						.setName("amount")
 						.setDescription("Amount of money to give")
 						.setRequired(true)
-						.setAutocomplete(true)
 				)
 		)
 		.addSubcommand((subcommand) =>
@@ -71,7 +73,9 @@ module.exports = {
 			const target = interaction.options.getUser("target");
 			const amount = parseInt(interaction.options.getString("amount"));
 
-			if (amount > BigInt(user.server_money)) {
+			const isAdmin = hasRequiredRoleOrHigher(interaction.member, "admin");
+
+			if (amount > BigInt(user.server_money) && !isAdmin) {
 				return interaction.reply({
 					content: "You do not have enough money to give that amount.",
 					ephemeral: true,
@@ -80,10 +84,26 @@ module.exports = {
 
 			const targetUser = await User.findByPk(target.id);
 
-			user.server_money -= amount;
-			targetUser.server_money += amount;
+			if (targetUser.user_id === user.user_id && !isAdmin) {
+				return interaction.reply({
+					content: "You cannot give money to yourself.",
+					ephemeral: true,
+				});
+			}
 
-			await user.save();
+			if (amount < 1 && !isAdmin) {
+				return interaction.reply({
+					content: "You cannot give less than 1 :pound:",
+					ephemeral: true,
+				});
+			}
+
+			if (!isAdmin) {
+				user.server_money -= amount;
+				await user.save();
+			}
+
+			targetUser.server_money += amount;
 			await targetUser.save();
 
 			const embed = baseEmbed(
@@ -121,18 +141,6 @@ module.exports = {
 			return interaction.reply({
 				embeds: [embed],
 			});
-		}
-	},
-	async autocomplete(interaction) {
-		const focusedValue = interaction.options.getFocused(true);
-		if (focusedValue.name === "amount") {
-			const user = await User.findByPk(interaction.user.id);
-			if (BigInt(focusedValue.value) > BigInt(user.server_money)) {
-				return interaction.reply({
-					content: "You do not have enough money to give that amount.",
-					ephemeral: true,
-				});
-			}
 		}
 	},
 };
