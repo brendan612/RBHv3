@@ -29,7 +29,7 @@ module.exports = {
 			\r\nPUUID: ${summoner.puuid}
 			\r\nRevision Date: ${summoner.revisionDate}
 			\r\nProfile Icon ID: ${summoner.profileIconId}\r\n`,
-			ephemeral: false,
+			ephemeral: true,
 		});
 	},
 };
