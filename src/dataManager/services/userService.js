@@ -404,33 +404,41 @@ class UserService {
 	}
 
 	async handleLeagueRoleSelectMenu(interaction, values) {
-		const guild = interaction.guild;
-		const member = interaction.member;
-		const guildRoles = guild.roles.cache;
-		// Roles to add (selected by the user)
-		const selectedRoles = values.map((roleId) => guildRoles.get(roleId));
+		try {
+			const guild = interaction.guild;
+			const member = interaction.member;
+			const guildRoles = guild.roles.cache;
+			// Roles to add (selected by the user)
+			const selectedRoles = values.map((roleId) => guildRoles.get(roleId));
 
-		// Roles to remove (all configurable roles that were not selected)
-		const rolesToRemove = Object.values(roles)
-			.filter((roleId) => !values.includes(roleId))
-			.map((roleId) => guildRoles.get(roleId))
-			.filter((role) => member.roles.cache.has(role.id)); // Only include roles the member currently has
+			// Roles to remove (all configurable roles that were not selected)
+			const rolesToRemove = Object.values(roles)
+				.filter((roleId) => !values.includes(roleId))
+				.map((roleId) => guildRoles.get(roleId))
+				.filter((role) => member.roles.cache.has(role.id)); // Only include roles the member currently has
 
-		// Adding selected roles
-		await Promise.all(selectedRoles.map((role) => member.roles.add(role)));
+			// Adding selected roles
+			await Promise.all(selectedRoles.map((role) => member.roles.add(role)));
 
-		// Removing unselected roles
-		await Promise.all(rolesToRemove.map((role) => member.roles.remove(role)));
+			// Removing unselected roles
+			await Promise.all(rolesToRemove.map((role) => member.roles.remove(role)));
 
-		await this.setPrimarySecondaryRoles(
-			selectedRoles[0].name,
-			selectedRoles[1].name
-		);
+			await this.setPrimarySecondaryRoles(
+				selectedRoles[0].name,
+				selectedRoles[1].name
+			);
 
-		await interaction.reply({
-			content: `Your roles have been updated.\nPrimary Role: <@&${selectedRoles[0].id}>\nSecondary Role: <@&${selectedRoles[1].id}>`,
-			ephemeral: true,
-		});
+			await interaction.reply({
+				content: `Your roles have been updated.\nPrimary Role: <@&${selectedRoles[0].id}>\nSecondary Role: <@&${selectedRoles[1].id}>`,
+				ephemeral: true,
+			});
+		} catch (error) {
+			console.error(error);
+			await interaction.reply({
+				content: "There was an error while updating your roles.",
+				ephemeral: true,
+			});
+		}
 	}
 
 	async setPrimarySecondaryRoles(primaryRole, secondaryRole) {
