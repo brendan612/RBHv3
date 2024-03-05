@@ -409,11 +409,8 @@ class UserService {
 			const member = interaction.member;
 			const guildRoles = guild.roles.cache;
 
-			console.log(values);
 			// Roles to add (selected by the user)
 			const selectedRoles = values.map((roleId) => guildRoles.get(roleId));
-
-			console.log(selectedRoles.map((role) => role.name));
 
 			// Roles to remove (all configurable roles that were not selected)
 			const rolesToRemove = Object.values(roles)

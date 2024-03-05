@@ -4,38 +4,12 @@ const {
 	gameAutocomplete,
 	gameOption,
 	handleGameOption,
-	Lobby,
-	User,
-	Game,
 	Season,
-	MatchPlayer,
-	Match,
-	baseEmbed,
-	Sequelize,
 } = require("./index.js");
-
-const { AttachmentBuilder } = require("discord.js");
-const { Op } = require("sequelize");
-const { createCanvas, loadImage, GlobalFonts } = require("@napi-rs/canvas");
-const Canvas = require("@napi-rs/canvas");
-const sharp = require("sharp");
-const path = require("path");
-const { prepareImage } = require("../../utilities/utility-functions.js");
 
 const {
 	generateVeteransImage,
 } = require("../../dataManager/messages/veteransImage.js");
-
-const veteransBackground = path.join(
-	__dirname,
-	"../../assets/images/veterans/veterans.jpg"
-);
-const canvasWidth = 1380;
-const canvasHeight = 776;
-
-const borderOffset = 8;
-const textSectionWidth = 750;
-const textSectionHeight = 760;
 
 module.exports = {
 	data: new SlashCommandBuilder()
