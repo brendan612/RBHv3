@@ -417,6 +417,7 @@ class UserService {
 				.map((roleId) => guildRoles.get(roleId))
 				.filter((role) => member.roles.cache.has(role.id)); // Only include roles the member currently has
 
+			console.log(selectedRoles);
 			// Adding selected roles
 			await Promise.all(selectedRoles.map((role) => member.roles.add(role)));
 
