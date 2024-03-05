@@ -411,13 +411,15 @@ class UserService {
 			// Roles to add (selected by the user)
 			const selectedRoles = values.map((roleId) => guildRoles.get(roleId));
 
+			console.log(selectedRoles.map((role) => role.name));
+			console.log(values);
+
 			// Roles to remove (all configurable roles that were not selected)
 			const rolesToRemove = Object.values(roles)
 				.filter((roleId) => !values.includes(roleId))
 				.map((roleId) => guildRoles.get(roleId))
 				.filter((role) => member.roles.cache.has(role.id)); // Only include roles the member currently has
 
-			console.log(selectedRoles);
 			// Adding selected roles
 			await Promise.all(selectedRoles.map((role) => member.roles.add(role)));
 
