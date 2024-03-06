@@ -45,6 +45,12 @@ module.exports = (sequelize) => {
 			return `${this.summoner_name}#${this.tag_line}`;
 		};
 
+		guildMember = async () => {
+			const guild = await client.guilds.fetch(client.guildID);
+			const member = await guild.members.fetch(this.user_id);
+			return member;
+		};
+
 		/**
 		 *
 		 * @param {JSON} vote

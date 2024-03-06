@@ -4,7 +4,7 @@ module.exports = (sequelize) => {
 	class MatchPlayer extends Model {
 		/**
 		 *
-		 * @param {int} match_id
+		 * @param {number} match_id
 		 * @param {BigInt} user_id
 		 * @param {String} team
 		 * @param {Number} elo_change
@@ -14,7 +14,7 @@ module.exports = (sequelize) => {
 			return await MatchPlayer.create({
 				match_id: match_id,
 				user_id: user_id,
-				team: "blue",
+				team: team,
 				elo_change: elo_change,
 			});
 		}
