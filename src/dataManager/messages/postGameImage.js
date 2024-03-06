@@ -99,6 +99,9 @@ async function drawPlayers(ctx, players, winningTeam) {
 	const blueTeam = players.filter((p) => p.team === "blue");
 	const redTeam = players.filter((p) => p.team === "red");
 
+	console.log(blueTeam);
+	console.log(redTeam);
+
 	const blueTeamY = 150;
 	const redTeamY = 650;
 
