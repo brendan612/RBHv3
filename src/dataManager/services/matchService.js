@@ -213,9 +213,9 @@ class MatchService {
 
 			client.cache.clear("lobby_id_" + lobby.lobby_id);
 		} catch (error) {
-			await transaction.rollback();
 			console.error("Error submitting win for match: " + this.match.match_id);
 			console.error(error);
+			await transaction.rollback();
 		}
 	}
 
