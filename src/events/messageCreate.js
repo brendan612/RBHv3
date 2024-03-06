@@ -54,10 +54,6 @@ async function handleMessageExperience(message) {
 	const currentTimestamp = Date.now();
 	const lastMessageTimestamp = user.last_message_date || 0;
 
-	console.log("lastMessageTimestamp", lastMessageTimestamp);
-	console.log("currentTimestamp", currentTimestamp);
-	console.log(user.server_experience, user.server_level);
-
 	const allowExperience =
 		currentTimestamp - lastMessageTimestamp > EXPERIENCE_TIMEOUT;
 
