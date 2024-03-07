@@ -203,7 +203,7 @@ class MatchService {
 				include: [{ model: MatchPlayer }],
 			});
 
-			if (generatePostGameImage) {
+			if (generateImage) {
 				try {
 					await generatePostGameImage(this.match);
 				} catch (error) {
