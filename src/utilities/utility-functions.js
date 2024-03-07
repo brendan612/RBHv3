@@ -104,6 +104,54 @@ async function prepareImage(imagePath, width, height) {
 	return img;
 }
 
+function identifyScript(char) {
+	const codePoint = char.charCodeAt(0); // For simplicity, checking only the first character
+
+	// Korean (Hangul)
+	if (
+		(codePoint >= 0xac00 && codePoint <= 0xd7af) ||
+		(codePoint >= 0x1100 && codePoint <= 0x11ff)
+	) {
+		return "Korean";
+	}
+	// Chinese (simplified check, includes Kanji)
+	else if (codePoint >= 0x4e00 && codePoint <= 0x9fff) {
+		return "Chinese/Japanese Kanji";
+	}
+	// Japanese Hiragana
+	else if (codePoint >= 0x3040 && codePoint <= 0x309f) {
+		return "Japanese Hiragana";
+	}
+	// Japanese Katakana
+	else if (codePoint >= 0x30a0 && codePoint <= 0x30ff) {
+		return "Japanese Katakana";
+	}
+	// Arabic
+	else if (
+		(codePoint >= 0x0600 && codePoint <= 0x06ff) ||
+		(codePoint >= 0x0750 && codePoint <= 0x077f)
+	) {
+		return "Arabic";
+	}
+	// If not any specific language
+	else {
+		return "Other";
+	}
+}
+
+function countScriptCharacters(text) {
+	let count = 0;
+
+	for (let i = 0; i < text.length; i++) {
+		const script = identifyScript(text[i]);
+		if (script !== "Other") {
+			count++;
+		}
+	}
+
+	return count;
+}
+
 module.exports = {
 	hasRequiredRole,
 	hasRequiredRoleOrHigher,
@@ -111,4 +159,6 @@ module.exports = {
 	formatDateToMMDDYYYY,
 	calculateEloChange,
 	prepareImage,
+	identifyScript,
+	countScriptCharacters,
 };

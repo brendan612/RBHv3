@@ -16,6 +16,10 @@ const {
 } = require("./index.js");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
+const {
+	countScriptCharacters,
+} = require("../../utilities/utility-functions.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
@@ -121,11 +125,8 @@ async function fetchLeaderboardData(leaderboard, season, game, offset) {
 		const losses = matches.filter((match) => match.elo_change < 0).length;
 
 		let defaultNamePadding = 20;
-		// let language = franc(userModel.summoner_name);
-		// console.log(language);
-		// if (language != "eng") {
-		// 	defaultNamePadding = 10;
-		// }
+		const scriptCharacters = countScriptCharacters(userModel.summoner_name);
+		defaultNamePadding -= scriptCharacters * 2;
 
 		return {
 			rank: `${i + 1 + offset}.`.padEnd(7, " "),
