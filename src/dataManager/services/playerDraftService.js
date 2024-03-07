@@ -103,7 +103,7 @@ class PlayerDraftService {
 	async addPlayerToTeamByUserID(user_id, team, round) {
 		const playerDraftRound = await PlayerDraftRound.create({
 			draft_id: this.draft.draft_id,
-			user_id: BigInt(user_id),
+			user_id: user_id.toString(),
 			team: team,
 			round_number: round,
 		});
