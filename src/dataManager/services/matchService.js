@@ -127,7 +127,7 @@ class MatchService {
 					eloBefore = eloRating.elo_rating;
 				}
 
-				return MatchPlayer.create({
+				return await MatchPlayer.create({
 					match_id: match.match_id,
 					user_id: playerDraftRound.user_id,
 					team: playerDraftRound.team,
