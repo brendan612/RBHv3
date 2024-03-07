@@ -18,9 +18,10 @@
   },
   "homepage": "https://github.com/brendan612/RBH-Bot#readme",
   "dependencies": {
-    "@img/sharp-win32-x64": "^0.33.1",
+    "@img/sharp-win32-x64": "^0.33.2",
     "@napi-rs/canvas": "^0.1.44",
     "@top-gg/sdk": "^3.1.6",
+    "async-mutex": "^0.4.1",
     "axios": "^1.6.2",
     "config": "^3.3.9",
     "discord.js": "^14.13.0",
