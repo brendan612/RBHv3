@@ -281,7 +281,6 @@ class MatchService {
 					winLoss
 				);
 				if (player.user_id === "708492853730607104") {
-					console.log(player);
 					console.log(eloChange, player.elo_before, enemyAverageElo, winLoss);
 				}
 
@@ -292,6 +291,37 @@ class MatchService {
 					},
 					{ transaction }
 				);
+
+				const playersNextMatches = await Match.findAll({
+					where: {
+						game_id: match.game_id,
+						season_id: match.season_id,
+						match_id: {
+							[Op.gt]: match.match_id,
+						},
+					},
+					include: [
+						{
+							model: MatchPlayer,
+							where: {
+								user_id: player.user_id,
+							},
+						},
+					],
+					order: [["end_time", "ASC"]],
+				});
+
+				if (playersNextMatches.length > 0) {
+					const nextMatch = playersNextMatches[0];
+					const nextMatchPlayer = nextMatch.MatchPlayers.find(
+						(p) => p.user_id === player.user_id
+					);
+					if (nextMatchPlayer) {
+						nextMatchPlayer.elo_before = player.elo_after;
+						await nextMatchPlayer.save({ transaction });
+					}
+				}
+
 				await player.save({ transaction });
 
 				if (i + 1 < matchesToUpdate.length) {
