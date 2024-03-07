@@ -123,7 +123,9 @@ async function fetchLeaderboardData(leaderboard, season, game, offset) {
 		const losses = matches.filter((match) => match.elo_change < 0).length;
 
 		let defaultNamePadding = 20;
-		if (franc(userModel.summoner_name) != "eng") {
+		let language = franc(userModel.summoner_name);
+		console.log(language);
+		if (language != "eng") {
 			defaultNamePadding = 10;
 		}
 
