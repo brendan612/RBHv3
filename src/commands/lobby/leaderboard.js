@@ -208,9 +208,13 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 				LEFT JOIN
 					(SELECT
 						user_id,
-						COUNT(DISTINCT match_id) AS matches_played
+						COUNT(DISTINCT MatchPlayers.match_id) AS matches_played
 					FROM
 						MatchPlayers
+					JOIN
+						Matches m ON MatchPlayers.match_id = m.match_id
+					WHERE m.game_id = :game_id
+					${season_id ? "AND m.season_id = :season_id" : ""}
 					GROUP BY
 						user_id) mp ON u.user_id = mp.user_id
 				WHERE uer.user_id > 20
