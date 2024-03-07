@@ -1,27 +1,22 @@
-const e = require("express");
-const { UserEloRating, MatchPlayer, Match } = require("../../models/index.js");
+const { MatchPlayer, Match } = require("../../models/index.js");
 const {
 	SlashCommandBuilder,
 	Interaction,
 	gameAutocomplete,
-	lobbyAutocomplete,
 	seasonAutocomplete,
 	gameOption,
-	lobbyOption,
 	User,
 	Season,
 	Game,
 	handleGameOption,
-	handleLobbyOption,
 	handleSeasonOption,
 	seasonOption,
-	Sequelize,
 	sequelize,
 	baseEmbed,
 } = require("./index.js");
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { random } = require("mathjs");
-const { Op } = require("sequelize");
+
+const franc = require("franc");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -127,9 +122,14 @@ async function fetchLeaderboardData(leaderboard, season, game, offset) {
 		const wins = matches.filter((match) => match.elo_change > 0).length;
 		const losses = matches.filter((match) => match.elo_change < 0).length;
 
+		let defaultNamePadding = 20;
+		if (franc(userModel.summoner_name) != "eng") {
+			defaultNamePadding = 10;
+		}
+
 		return {
 			rank: `${i + 1 + offset}.`.padEnd(7, " "),
-			name: `${userModel.summoner_name}`.padEnd(20, " "),
+			name: `${userModel.summoner_name}`.padEnd(defaultNamePadding, " "),
 			elo: `${parseInt(user.average_elo)}`.padEnd(8, " "),
 			winsString: `${wins}`.padEnd(5, " "),
 			lossesString: `${losses}`.padEnd(5, " "),
