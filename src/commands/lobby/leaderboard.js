@@ -269,6 +269,8 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 	embed.setDescription(message + "```");
 
 	const totalPages = Math.ceil(leaderboardCount / limit);
+	console.log(totalPages);
+	console.log(leaderboardCount);
 	embed.setFooter({ text: `Page ${page} of ${totalPages}` });
 
 	const components = createComponents(page, totalPages);
