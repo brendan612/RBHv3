@@ -106,6 +106,7 @@ module.exports = {
 
 		if (randomTeams) {
 			const players = lobbyDTO.players;
+			console.log(players.map((p) => p.user_id));
 			const shuffledPlayers = players.sort(() => 0.5 - Math.random());
 
 			const availablePlayers = shuffledPlayers.filter((p) => {
