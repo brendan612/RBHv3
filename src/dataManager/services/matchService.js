@@ -201,7 +201,14 @@ class MatchService {
 			await this.match.reload({
 				include: [{ model: MatchPlayer }],
 			});
-			await generatePostGameImage(this.match);
+			try {
+				await generatePostGameImage(this.match);
+			} catch (error) {
+				console.error(
+					"Error generating post game image for match: " + this.match.match_id
+				);
+				console.error(error);
+			}
 
 			const draft = await Draft.findByPk(lobby.draft_id);
 			if (draft.thread_id) {
