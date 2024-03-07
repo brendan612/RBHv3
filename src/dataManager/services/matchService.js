@@ -129,7 +129,7 @@ class MatchService {
 
 				return await MatchPlayer.create({
 					match_id: match.match_id,
-					user_id: playerDraftRound.user_id,
+					user_id: playerDraftRound.user_id.toString(),
 					team: playerDraftRound.team,
 					elo_before: eloBefore,
 				});
