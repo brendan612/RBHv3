@@ -141,7 +141,8 @@ async function generateProfileEmbed(interaction, user_id) {
 			userLevelManager.expForNextLevel(level),
 			remainingExp,
 			stats.wins,
-			stats.losses
+			stats.losses,
+			stats.elo_rating
 		);
 
 		const message = await interaction.reply({
@@ -165,7 +166,7 @@ async function generateProfileEmbed(interaction, user_id) {
 
 		drawNameAndTitle(context, user.summoner_name + " #" + user.tag_line, title);
 
-		drawWinLoss(context, stats.wins, stats.losses);
+		drawWinLoss(context, stats.wins, stats.losses, stats.elo_rating);
 
 		const maxExp = userLevelManager.expForNextLevel(level);
 		drawExperienceBar(context, maxExp - remainingExp, maxExp, 300, 50, level);
@@ -244,9 +245,9 @@ function drawExperienceBar(ctx, currentExp, maxExp, width, height, level) {
 	ctx.fillText(`Level: ${level}`, x, y - offset);
 }
 
-function drawWinLoss(ctx, wins, losses) {
+function drawWinLoss(ctx, wins, losses, elo_rating) {
 	const x = 800;
-	const y = 250;
+	const y = 225;
 	const offset = 5;
 
 	ctx.font = "bold 30px Arial";
@@ -255,10 +256,12 @@ function drawWinLoss(ctx, wins, losses) {
 	ctx.lineWidth = 3;
 	ctx.strokeText(`Wins: ${wins}`, x, y);
 	ctx.strokeText(`Losses: ${losses}`, x, y + 50);
+	ctx.strokeText(`Elo: ${elo_rating}`, x, y + 100);
 
 	ctx.fillStyle = "#fff";
 	ctx.fillText(`Wins: ${wins}`, x, y);
 	ctx.fillText(`Losses: ${losses}`, x, y + 50);
+	ctx.fillText(`Elo: ${elo_rating}`, x, y + 100);
 }
 
 /**
@@ -317,7 +320,14 @@ async function drawBackgroundImage(
 	}
 }
 
-async function generateBasicEmbed(user, exp, remainingExp, wins, losses) {
+async function generateBasicEmbed(
+	user,
+	exp,
+	remainingExp,
+	wins,
+	losses,
+	elo_rating
+) {
 	const guild = await client.guilds.fetch(client.guildID);
 	let guildMember = guild.members.cache.get(user.user_id);
 
@@ -346,8 +356,8 @@ async function generateBasicEmbed(user, exp, remainingExp, wins, losses) {
 			inline: true,
 		},
 		{
-			name: "Win/Loss (Season)",
-			value: wins + "/" + losses,
+			name: "Season Record",
+			value: `${wins}W - ${losses}L | ${elo_rating}`,
 			inline: true,
 		}
 	);
