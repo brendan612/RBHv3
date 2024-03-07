@@ -162,8 +162,9 @@ class MatchService {
 	/**
 	 *
 	 * @param {string} winning_team
+	 * @param {boolean} generateImage
 	 */
-	async submitWin(winning_team) {
+	async submitWin(winning_team, generateImage = true) {
 		const transaction = await sequelize.transaction({
 			isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED, // or another level that suits your needs
 		});
@@ -201,13 +202,16 @@ class MatchService {
 			await this.match.reload({
 				include: [{ model: MatchPlayer }],
 			});
-			try {
-				await generatePostGameImage(this.match);
-			} catch (error) {
-				console.error(
-					"Error generating post game image for match: " + this.match.match_id
-				);
-				console.error(error);
+
+			if (generatePostGameImage) {
+				try {
+					await generatePostGameImage(this.match);
+				} catch (error) {
+					console.error(
+						"Error generating post game image for match: " + this.match.match_id
+					);
+					console.error(error);
+				}
 			}
 
 			const draft = await Draft.findByPk(lobby.draft_id);

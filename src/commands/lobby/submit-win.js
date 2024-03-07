@@ -37,6 +37,12 @@ module.exports = {
 					}
 				)
 				.setRequired(true)
+		)
+		.addBooleanOption((option) =>
+			option
+				.setName("generate-post-game-image")
+				.setDescription("Generate a post game image for this match.")
+				.setRequired(false)
 		),
 	/**
 	 *
@@ -49,10 +55,15 @@ module.exports = {
 		const lobby = await handleLobbyOption(interaction);
 		const winningTeam = interaction.options.getString("winning_team");
 
+		const generatePostGameImage =
+			interaction.options.getBoolean("generate-post-game-image") ?? true;
+
+		console.log("generatePostGameImage", generatePostGameImage);
+
 		const draft = await Draft.findByPk(lobby.draft_id);
 
 		const matchService = await MatchService.createMatchService(draft.match_id);
-		await matchService.submitWin(winningTeam);
+		await matchService.submitWin(winningTeam, generatePostGameImage);
 
 		await interaction.editReply({
 			content: `This match win has been submitted for #${lobby.lobby_id}.\n Winning team: ${winningTeam}`,
