@@ -250,6 +250,8 @@ class MatchService {
 			{ transaction }
 		);
 
+		console.log(matchesToUpdate.map((m) => m.match_id));
+
 		for (let i = 0; i < matchesToUpdate.length; i++) {
 			const match = matchesToUpdate[i];
 			if (match.match_id === match_id) {
