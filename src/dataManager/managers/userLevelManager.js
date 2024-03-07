@@ -1,11 +1,11 @@
-const c = require("config");
 const client = require("../../client.js");
 const level_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.level_roles;
-const { generateLevelUpEmbed } = require("../messages/userEmbed.js");
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
+
+const { User } = require("../../models");
 
 //prettier-ignore
 const cardNumbers = ["Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"];
@@ -13,8 +13,16 @@ const cardNumbers = ["Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "N
 const suitNames = ["spades", "clubs", "diamonds", "hearts", "bandersnatch", "dodo", "jabberwock"];
 
 class UserLevelManager {
-	constructor() {}
+	constructor() {
+		this.exp_gain = 35;
+		this.exp_timeout = 6 * 60 * 1000; //6 minutes
+	}
 
+	/**
+	 *
+	 * @param {number} level
+	 * @returns {number}
+	 */
 	expForNextLevel(level) {
 		level = level < 1 ? 1 : level;
 		return Math.floor(500 * Math.pow(level + 1, 0.425));
@@ -22,6 +30,29 @@ class UserLevelManager {
 
 	expToNextLevel(level, totalExp) {
 		return this.expForNextLevel(level) - totalExp;
+	}
+
+	async updateUserExperience(user_id) {
+		const user = await User.findByPk(user_id);
+		const currentTimestamp = Date.now();
+		const lastMessageTimestamp = user.last_message_date || 0;
+
+		const allowExperience =
+			currentTimestamp - lastMessageTimestamp > this.exp_timeout;
+
+		if (allowExperience) {
+			const { level, remainingExp } = this.calculateLevelAndRemainingExp(
+				user.server_experience
+			);
+
+			user.server_experience += this.exp_gain;
+			user.last_message_date = currentTimestamp;
+			await user.save();
+
+			if (remainingExp + this.exp_gain >= this.expForNextLevel(level)) {
+				await this.assignLevelRole(user_id, level + 1, true);
+			}
+		}
 	}
 
 	//remainingExp is the amount of exp into the current level
@@ -40,7 +71,8 @@ class UserLevelManager {
 	}
 
 	calculateLevelReward(level) {
-		return 1500 * 1.1 ** level;
+		//limit the max reward to 10 million
+		return Math.min(1500 * 1.1 ** level, 10000000);
 	}
 
 	calculateMatchReward(level, isWin) {
@@ -109,24 +141,13 @@ class UserLevelManager {
 		const roleId = level_roles[suitName];
 
 		const role = guild.roles.cache.find((r) => r.id === roleId);
-		const rolesToRemove = Object.values(level_roles)
-			.map((roleId) => {
-				const role = guild.roles.cache.find((r) => r.id === roleId);
-				if (!role) {
-					console.error(`Role not found for ID: ${roleId}`);
-				}
-				return role;
-			})
-			.filter((role) => role); // This will remove undefined roles
 
-		try {
-			await member.roles.add(role);
-			await member.roles.remove(
-				rolesToRemove.filter((r) => r && r.id !== role.id)
-			);
-		} catch (err) {
-			console.log(err);
-		}
+		const rolesToRemove = member.roles.cache.filter((r) =>
+			Object.values(level_roles).includes(r.id)
+		);
+
+		await member.roles.remove(rolesToRemove);
+		await member.roles.add(role);
 
 		let title = "";
 		switch (suitNumber) {

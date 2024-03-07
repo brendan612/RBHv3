@@ -1,12 +1,4 @@
-const {
-	GuildMember,
-	Client,
-	ButtonBuilder,
-	ButtonStyle,
-	ActionRowBuilder,
-	Interaction,
-	ButtonInteraction,
-} = require("discord.js");
+const { Interaction } = require("discord.js");
 
 const {
 	Lobby,
@@ -14,6 +6,8 @@ const {
 	Season,
 	Game,
 	Draft,
+	MatchPlayer,
+	Match,
 	PlayerDraftRound,
 	DraftRound,
 	Sequelize,
@@ -30,6 +24,9 @@ const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
+
+const { Mutex } = require("async-mutex");
+const lobbyMutex = new Mutex();
 
 class LobbyService {
 	/**
@@ -125,9 +122,9 @@ class LobbyService {
 	}
 
 	/**
-	 *
+	 * @param {boolean} force
 	 */
-	async destroyLobby() {
+	async destroyLobby(force = false) {
 		const channel = await client.guild.channels.fetch(
 			channels.games["League of Legends"]
 		);
@@ -146,6 +143,14 @@ class LobbyService {
 						await message.delete();
 					}
 				} catch (err) {}
+			}
+			if (force) {
+				await draft.destroy();
+
+				if (this.lobby.match_id) {
+					const match = await Match.findByPk(this.lobby.match_id);
+					await match.destroy();
+				}
 			}
 		} else {
 			try {
@@ -168,7 +173,6 @@ class LobbyService {
 		}
 
 		await this.lobby.destroy();
-		await this.lobby.save();
 		return true;
 	}
 
@@ -258,6 +262,11 @@ class LobbyService {
 	 */
 	async isJoinable(user_id = "") {
 		const lobbyUsers = await this.lobby.getUsers();
+
+		if (this.lobby.draft_id) {
+			return { isJoinable: false, reason: "Draft has already started" };
+		}
+
 		if (user_id) {
 			const userInLobby = lobbyUsers.find(
 				(lobbyUser) => lobbyUser.user_id === user_id
@@ -285,6 +294,10 @@ class LobbyService {
 	 */
 	async isDroppable(user_id = "") {
 		const lobbyUsers = await this.lobby.getUsers();
+
+		if (this.lobby.draft_id) {
+			return { isJoinable: false, reason: "Draft has already started" };
+		}
 
 		if (user_id) {
 			const userInLobby = lobbyUsers.find(
@@ -376,15 +389,22 @@ class LobbyService {
 	 * @returns {Promise<{isJoinable: boolean, reason: string}>}
 	 */
 	async join(user_id) {
-		const user = await User.findOne({ where: { user_id: user_id } });
-		const joinable = await this.isJoinable(user_id);
-		if (joinable.isJoinable) {
-			await this.addUser(user_id);
-			const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
-			const message = await generateLobbyEmbed(lobbyDTO, true);
-			await this.setMessage(message.id);
+		let joinable = null;
+		const release = await lobbyMutex.acquire();
+		try {
+			joinable = await this.isJoinable(user_id);
+			if (joinable.isJoinable) {
+				await this.addUser(user_id);
+				const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
+				const message = await generateLobbyEmbed(lobbyDTO, true);
+				await this.setMessage(message.id);
+			}
+		} catch (err) {
+			joinable = { isJoinable: false, reason: err.message };
+		} finally {
+			release();
+			return joinable;
 		}
-		return joinable;
 	}
 
 	/**

@@ -47,8 +47,15 @@ module.exports = {
 		}
 
 		const lobbyService = new LobbyService(lobby);
-		await lobbyService.drop(user.user_id);
+		const { isDroppable, reason } = await lobbyService.drop(user.user_id);
 
+		if (!isDroppable) {
+			await interaction.reply({
+				content: reason,
+				ephemeral: true,
+			});
+			return;
+		}
 		await interaction.deferReply({ ephemeral: true });
 		await interaction.deleteReply();
 		return;

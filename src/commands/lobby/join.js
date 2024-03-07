@@ -30,7 +30,17 @@ module.exports = {
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
 		const lobbyService = new LobbyService(lobby);
-		await lobbyService.join(interaction.member.id);
+		const { isJoinable, reason } = await lobbyService.join(
+			interaction.member.id
+		);
+
+		if (!isJoinable) {
+			await interaction.reply({
+				content: reason,
+				ephemeral: true,
+			});
+			return;
+		}
 
 		await interaction.deferReply({ ephemeral: true });
 		await interaction.deleteReply();
