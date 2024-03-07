@@ -127,6 +127,9 @@ async function fetchLeaderboardData(leaderboard, season, game, offset) {
 		let defaultNamePadding = 20;
 		const scriptCharacters = countScriptCharacters(userModel.summoner_name);
 		defaultNamePadding -= scriptCharacters * 2;
+		if (scriptCharacters > 0) {
+			defaultNamePadding += 5;
+		}
 
 		return {
 			rank: `${i + 1 + offset}.`.padEnd(7, " "),
