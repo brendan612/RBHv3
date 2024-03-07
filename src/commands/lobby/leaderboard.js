@@ -261,10 +261,10 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 		offset
 	);
 
-	message += "```diff\n";
+	message += "```asciidoc\n";
 	leaderboardData.forEach((user, i) => {
 		if (i === 3 && page === 1) {
-			message += "``````";
+			message += "``````asciidoc";
 		}
 
 		message += `${user.rank}${user.name}${user.elo}${user.winsString}${user.lossesString}\n`;
@@ -273,8 +273,6 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 	embed.setDescription(message + "```");
 
 	const totalPages = Math.ceil(leaderboardCount / limit);
-	console.log(totalPages);
-	console.log(leaderboardCount);
 	embed.setFooter({ text: `Page ${page} of ${totalPages}` });
 
 	const components = createComponents(page, totalPages);
