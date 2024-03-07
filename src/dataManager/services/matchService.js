@@ -262,9 +262,6 @@ class MatchService {
 
 			const players = match.MatchPlayers;
 			for (let player of players) {
-				if (player.user_id === "708492853730607104") {
-					console.log(player);
-				}
 				await player.reload({ transaction });
 				const winLoss = player.team === match.winning_team ? 1 : 0;
 				const enemyTeam = player.team === "blue" ? "red" : "blue";
@@ -283,8 +280,10 @@ class MatchService {
 					enemyAverageElo,
 					winLoss
 				);
-
-				console.log(eloChange, player.elo_before, enemyAverageElo, winLoss);
+				if (player.user_id === "708492853730607104") {
+					console.log(player);
+					console.log(eloChange, player.elo_before, enemyAverageElo, winLoss);
+				}
 
 				await player.update(
 					{
