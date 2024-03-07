@@ -250,8 +250,6 @@ class MatchService {
 			{ transaction }
 		);
 
-		console.log(matchesToUpdate.map((m) => m.match_id));
-
 		for (let i = 0; i < matchesToUpdate.length; i++) {
 			const match = matchesToUpdate[i];
 			if (match.match_id === match_id) {
@@ -280,9 +278,6 @@ class MatchService {
 					enemyAverageElo,
 					winLoss
 				);
-				if (player.user_id === "708492853730607104") {
-					console.log(eloChange, player.elo_before, enemyAverageElo, winLoss);
-				}
 
 				await player.update(
 					{
@@ -291,6 +286,9 @@ class MatchService {
 					},
 					{ transaction }
 				);
+
+				await player.save({ transaction });
+				await player.reload({ transaction });
 
 				const playersNextMatches = await Match.findAll({
 					where: {
@@ -313,19 +311,6 @@ class MatchService {
 
 				if (playersNextMatches.length > 0) {
 					const nextMatch = playersNextMatches[0];
-					const nextMatchPlayer = nextMatch.MatchPlayers.find(
-						(p) => p.user_id === player.user_id
-					);
-					if (nextMatchPlayer) {
-						nextMatchPlayer.elo_before = player.elo_after;
-						await nextMatchPlayer.save({ transaction });
-					}
-				}
-
-				await player.save({ transaction });
-
-				if (i + 1 < matchesToUpdate.length) {
-					const nextMatch = matchesToUpdate[i + 1];
 					const nextMatchPlayer = nextMatch.MatchPlayers.find(
 						(p) => p.user_id === player.user_id
 					);
