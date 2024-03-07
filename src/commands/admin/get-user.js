@@ -44,6 +44,8 @@ module.exports = {
 			});
 		}
 
+		dbUser.puuid = dbUser.puuid.slice(0, 4) + "..." + dbUser.puuid.slice(-4);
+
 		await interaction.reply({
 			content: "```" + JSON.stringify(dbUser, null, 2) + "```",
 		});
