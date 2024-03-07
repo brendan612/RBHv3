@@ -57,4 +57,5 @@ module.exports = {
 	seasonOption,
 	championOption,
 	handleGameOption,
+	handleLobbyOption,
 };
