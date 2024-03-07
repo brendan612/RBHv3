@@ -264,7 +264,7 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 	message += "```asciidoc\n";
 	leaderboardData.forEach((user, i) => {
 		if (i === 3 && page === 1) {
-			message += "``````asciidoc";
+			message += "``````asciidoc\n";
 		}
 
 		message += `${user.rank}${user.name}${user.elo}${user.winsString}${user.lossesString}\n`;
