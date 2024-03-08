@@ -123,31 +123,25 @@ async function getStatsForUser(user_id, game_id, season_id) {
  */
 async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
 	try {
-		let whereClause = {};
-		if (season_id) {
-			console.log("season_id", season_id);
-			whereClause.season_id = season_id;
-		}
+		const seasonClause = season_id ? `AND m.season_id = ${season_id}` : "";
 
-		const matches = await Match.findAll({
-			where: {
-				end_time: { [Op.ne]: null },
-				game_id: game_id,
-				...whereClause,
-			},
-			include: [
-				{
-					model: MatchPlayer,
-					attributes: ["match_id", "team", "elo_change"],
-					required: true,
-					where: {
-						user_id: {
-							[Op.in]: [user1_id, user2_id],
-						},
-					},
-				},
-			],
+		const rawQuery = `
+			SELECT m.match_id, m.winning_team, mp.team as p1_team, mp2.team as p2_team FROM Matches m 
+			JOIN MatchPlayers mp ON m.match_id = mp.match_id 
+			JOIN MatchPlayers mp2 ON m.match_id = mp2.match_id 
+			WHERE m.game_id = 1
+			AND m.end_time IS NOT NULL
+			${seasonClause}
+			AND mp.user_id = '${user1_id}'
+			AND mp2.user_id = '${user2_id}'
+			AND mp.user_id != mp2.user_id;
+		`;
+
+		const matches = await sequelize.query(rawQuery, {
+			type: sequelize.QueryTypes.SELECT,
 		});
+
+		console.log(matches);
 
 		let winsWith = 0;
 		let winsAgainst = 0;
@@ -155,26 +149,17 @@ async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
 		let lossesAgainst = 0;
 
 		matches.forEach((match) => {
-			const player1 = match.MatchPlayers.find((p) => p.user_id === user1_id);
-			const player2 = match.MatchPlayers.find((p) => p.user_id === user2_id);
-
-			if (player1 && player2) {
-				if (player1.team === player2.team) {
-					// Together
-					if (player1.elo_change > 0) {
-						// Assuming positive elo_change means a win
-						winsWith++;
-					} else {
-						lossesWith++;
-					}
+			if (match.p1_team === match.p2_team) {
+				if (match.p1_team === match.winning_team) {
+					winsWith++;
 				} else {
-					// Against each other
-					if (player1.elo_change > 0) {
-						// Assuming player1 won
-						winsAgainst++;
-					} else {
-						lossesAgainst++;
-					}
+					lossesWith++;
+				}
+			} else {
+				if (match.p1_team === match.winning_team) {
+					winsAgainst++;
+				} else {
+					lossesAgainst++;
 				}
 			}
 		});
@@ -185,7 +170,10 @@ async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
 			lossesWith,
 			lossesAgainst,
 		};
-	} catch {}
+	} catch (err) {
+		console.error(err);
+		return null;
+	}
 }
 
 module.exports = {
