@@ -3,6 +3,8 @@ const { SlashCommandBuilder, Interaction } = require("./index.js");
 const { User, userOption } = require("../admin/index.js");
 const { getSummonerByRiotID } = require("../../api/riot/riotApiHandler");
 
+const client = require("../../client.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("get-guildmember")
@@ -22,6 +24,9 @@ module.exports = {
 		let user = interaction.options.getUser("target");
 
 		if (!user) {
+			const guild = client.guilds.cache.get(interaction.guildId);
+			console.log(guild.members.cache.get(interaction.options.getString("id")));
+
 			user = await interaction.guild.members.fetch(
 				interaction.options.getString("id")
 			);

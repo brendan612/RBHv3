@@ -1,9 +1,7 @@
-const { Client, Events, GatewayIntentBits, Collection } = require("discord.js");
+const { Collection } = require("discord.js");
 const fs = require("fs");
 const { join } = require("node:path");
-const { sequelize, User, Lobby, Game, Season } = require("./models");
-const { register } = require("module");
-const { generateTournamentCode } = require("./api/riot/riotApiHandler.js");
+const { sequelize } = require("./models");
 const GlobalCacheManager = require("./dataManager/managers/cacheManager.js");
 const client = require("./client.js");
 client.cache = new GlobalCacheManager();
