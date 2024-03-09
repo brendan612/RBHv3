@@ -24,9 +24,6 @@ module.exports = {
 		let user = interaction.options.getUser("target");
 
 		if (!user) {
-			const guild = client.guilds.cache.get(interaction.guildId);
-			console.log(guild.members.cache.get(interaction.options.getString("id")));
-
 			user = await interaction.guild.members.fetch(
 				interaction.options.getString("id")
 			);

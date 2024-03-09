@@ -87,6 +87,7 @@ class DraftService {
 		let ratings = [];
 		for (const player of lobby.players) {
 			const userService = new UserService(player);
+			console.log(player.user_id);
 			let elo = await userService.getEloRating(lobby.game_id, lobby.season_id);
 			if (elo) {
 				ratings.push(elo);

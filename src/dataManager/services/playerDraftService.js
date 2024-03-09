@@ -135,9 +135,9 @@ class PlayerDraftService {
 		const allowedUsers = [];
 		const currentTeam = this.playerDraftManager.currentTeam;
 		if (currentTeam === "red") {
-			allowedUsers.push(this.playerDraftManager.red_captain.user_id);
+			allowedUsers.push(this.draft.red_captain_id);
 		} else {
-			allowedUsers.push(this.playerDraftManager.blue_captain.user_id);
+			allowedUsers.push(this.draft.blue_captain_id);
 		}
 
 		const canPick =
