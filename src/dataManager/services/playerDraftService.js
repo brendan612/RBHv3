@@ -64,8 +64,12 @@ class PlayerDraftService {
 		}
 
 		if (side === "blue") {
-			await this.draft.update({ blue_captain_id: pickingCaptain.user_id });
-			await this.draft.update({ red_captain_id: otherCaptain.user_id });
+			await this.draft.update({
+				blue_captain_id: pickingCaptain.user_id.toString(),
+			});
+			await this.draft.update({
+				red_captain_id: otherCaptain.user_id.toString(),
+			});
 
 			this.addPlayerToTeam(pickingCaptain, "blue", 1);
 			this.addPlayerToTeam(otherCaptain, "red", 1);
@@ -73,8 +77,12 @@ class PlayerDraftService {
 			this.playerDraftManager.blue_captain = pickingCaptain;
 			this.playerDraftManager.red_captain = otherCaptain;
 		} else {
-			await this.draft.update({ red_captain_id: pickingCaptain.user_id });
-			await this.draft.update({ blue_captain_id: otherCaptain.user_id });
+			await this.draft.update({
+				red_captain_id: pickingCaptain.user_id.toString(),
+			});
+			await this.draft.update({
+				blue_captain_id: otherCaptain.user_id.toString(),
+			});
 
 			this.addPlayerToTeam(pickingCaptain, "red", 1);
 			this.addPlayerToTeam(otherCaptain, "blue", 1);

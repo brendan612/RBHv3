@@ -394,7 +394,7 @@ class LobbyService {
 		try {
 			joinable = await this.isJoinable(user_id);
 			if (joinable.isJoinable) {
-				await this.addUser(user_id);
+				await this.addUser(user_id.toString());
 				const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
 				const message = await generateLobbyEmbed(lobbyDTO, true);
 				await this.setMessage(message.id);
