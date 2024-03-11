@@ -425,9 +425,9 @@ class LobbyService {
 	}
 
 	async draft() {
-		const { draftable, reason } = await this.lobby.isDraftable();
+		const { isDraftable, reason } = await this.isDraftable();
 		if (!draftable) {
-			return { draftable, reason };
+			return { isDraftable, reason };
 		}
 
 		const draft = await DraftService.createDraft(this.lobby.lobby_id);
