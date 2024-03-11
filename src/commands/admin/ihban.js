@@ -41,7 +41,8 @@ module.exports = {
 		const current_date = new Date();
 		const expiration_date = new Date(current_date.getTime() + duration);
 
-		if (await targeted_user.isIHBanned()) {
+		const isBanned = await targeted_user.isIHBanned();
+		if (isBanned) {
 			const ihban = await ModerationLog.findOne({
 				where: {
 					user_id: targeted_user.user_id,

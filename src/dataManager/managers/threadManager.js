@@ -26,22 +26,12 @@ class ThreadManager {
 		});
 
 		const users = await lobby.getUsers();
-		const guild = client.guilds.cache.get(client.guildID);
-		for (const user of users) {
-			if (!user.user_id > 20) continue;
 
-			try {
-				let guildMember = guild.members.cache.get(user.user_id);
+		const addUserPromises = users.map(async (user) => {
+			return await ThreadManager.addUserToThread(thread, user.user_id);
+		});
 
-				if (!guildMember && user.user_id > 20) {
-					await guild.members.fetch(user.user_id.toString()).then((member) => {
-						guildMember = member;
-					});
-				}
-
-				await thread.members.add(guildMember);
-			} catch {}
-		}
+		await Promise.all(addUserPromises);
 
 		draft.thread_id = thread.id;
 		await draft.save();
@@ -58,6 +48,30 @@ class ThreadManager {
 			}
 		} catch (error) {
 			console.log("Thread does not exist");
+		}
+	}
+
+	/**
+	 *
+	 * @param {ThreadChannel} thread
+	 * @param {string} user_id
+	 * @returns {Promise<void>}
+	 */
+	static async addUserToThread(thread, user_id) {
+		if (user_id.length < 5) return;
+
+		try {
+			let guildMember = client.guild.members.cache.get(user_id);
+
+			if (!guildMember) {
+				await client.guild.members.fetch(user_id).then((member) => {
+					guildMember = member;
+				});
+			}
+
+			await thread.members.add(guildMember);
+		} catch (error) {
+			console.error(error);
 		}
 	}
 }
