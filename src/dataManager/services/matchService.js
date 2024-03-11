@@ -318,33 +318,34 @@ class MatchService {
 						nextMatchPlayer.elo_before = player.elo_after;
 						await nextMatchPlayer.save({ transaction });
 					}
+					console.log(
+						"next match found, updating elo_before",
+						nextMatch.match_id,
+						player.user_id,
+						player.elo_after,
+						nextMatchPlayer.elo_before
+					);
 				}
 
-				const userEloRating = await UserEloRating.findOne(
+				await UserEloRating.findOrCreate(
 					{
 						where: {
 							user_id: player.user_id,
 							game_id: match.game_id,
 							season_id: match.season_id,
 						},
+						defaults: {
+							elo_rating: player.elo_after,
+						},
 					},
 					{ transaction }
-				);
-
-				if (userEloRating) {
-					userEloRating.elo_rating = player.elo_before + eloChange;
-					await userEloRating.save({ transaction });
-				} else {
-					await UserEloRating.create(
-						{
-							user_id: player.user_id,
-							game_id: match.game_id,
-							season_id: match.season_id,
-							elo_rating: player.elo_before + eloChange,
-						},
-						{ transaction }
-					);
-				}
+				).then(async ([eloRating, created]) => {
+					console.log("eloRating", eloRating.elo_rating, player.elo_after);
+					if (!created) {
+						eloRating.elo_rating = player.elo_after;
+						return await eloRating.save({ transaction });
+					}
+				});
 			}
 		}
 	}
