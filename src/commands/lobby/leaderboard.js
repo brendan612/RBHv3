@@ -92,7 +92,7 @@ function createComponents(page, totalPages) {
 			.setCustomId(`leaderboard_${parseInt(page + 1)}`);
 		components.addComponents(button);
 	}
-	if (page < totalPages - 2) {
+	if (page <= totalPages - 2) {
 		const button = new ButtonBuilder()
 			.setStyle(ButtonStyle.Secondary)
 			.setLabel(">>")
