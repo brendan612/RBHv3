@@ -33,6 +33,7 @@ const Referral = require("./Referral.js")(sequelize);
 const Champion = require("./Champion.js")(sequelize);
 const AutoResponse = require("./AutoResponse.js")(sequelize);
 const FeatureToggle = require("./FeatureToggle.js")(sequelize);
+const GameMode = require("./GameMode.js")(sequelize);
 
 // Setting up many-to-many relationship
 User.belongsToMany(Lobby, { through: "LobbyUsers", ...cascadeOptions });
@@ -45,6 +46,15 @@ Game.hasMany(Lobby, {
 });
 Lobby.belongsTo(Game, { foreignKey: "game_id", ...cascadeOptions });
 Game.hasMany(Season, {
+	foreignKey: "game_id",
+	...cascadeOptions,
+});
+
+Game.hasMany(GameMode, {
+	foreignKey: "game_id",
+	...cascadeOptions,
+});
+GameMode.belongsTo(Game, {
 	foreignKey: "game_id",
 	...cascadeOptions,
 });
@@ -175,4 +185,5 @@ module.exports = {
 	Champion,
 	AutoResponse,
 	FeatureToggle,
+	GameMode,
 };
