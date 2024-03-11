@@ -35,13 +35,19 @@ module.exports = {
 		await interaction.deferReply();
 		const game = await handleGameOption(interaction);
 		const season = await handleSeasonOption(interaction, game.game_id);
-		const player1 = await handleUserOption(interaction, "player1");
-		const player2 = await handleUserOption(interaction, "player2");
+		let player1 = await handleUserOption(interaction, "player1");
+		let player2 = await handleUserOption(interaction, "player2");
 
 		if (player1.user_id === player2.user_id) {
 			return await interaction.editReply({
 				content: "Why did you try this?",
 			});
+		}
+
+		if (player2.user_id === interaction.user.id) {
+			let temp = player1;
+			player1 = player2;
+			player2 = temp;
 		}
 
 		const { winsWith, winsAgainst, lossesWith, lossesAgainst } =
