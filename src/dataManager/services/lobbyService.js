@@ -452,7 +452,7 @@ class LobbyService {
 			await userService.addRole(permission_roles.lobby_participant);
 		}
 
-		return { draftable, reason };
+		return { isDraftable, reason };
 	}
 
 	/**
