@@ -192,7 +192,7 @@ class LobbyService {
 
 	/**
 	 *
-	 * @param {bigint} user_id
+	 * @param {string} user_id
 	 * @returns {Promise<boolean>}
 	 */
 	async setHost(user_id) {
@@ -214,7 +214,7 @@ class LobbyService {
 
 	/**
 	 *
-	 * @param {bigint} message_id - Discord message ID
+	 * @param {string} message_id - Discord message ID
 	 */
 	async setMessage(message_id) {
 		this.lobby.message_id = message_id;
@@ -223,7 +223,7 @@ class LobbyService {
 
 	/**
 	 *
-	 * @param {bigint} user_id
+	 * @param {string} user_id
 	 * @returns string
 	 */
 	async addUser(user_id) {
@@ -240,7 +240,7 @@ class LobbyService {
 
 	/**
 	 *
-	 * @param {bigint} user_id
+	 * @param {string} user_id
 	 * @returns string
 	 */
 	async dropUser(user_id) {
@@ -394,7 +394,7 @@ class LobbyService {
 		try {
 			joinable = await this.isJoinable(user_id);
 			if (joinable.isJoinable) {
-				await this.addUser(user_id.toString());
+				await this.addUser(user_id);
 				const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
 				const message = await generateLobbyEmbed(lobbyDTO, true);
 				await this.setMessage(message.id);

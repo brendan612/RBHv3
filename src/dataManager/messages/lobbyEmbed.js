@@ -36,6 +36,8 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 			lobby.game_name + " In-House Lobby"
 		);
 
+		console.log(lobby);
+
 		embed
 			.setFooter({
 				text: `Hosted by ${host.nickname ?? host.user.globalName} • Lobby ID: ${
@@ -89,14 +91,10 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 /**
  *
  * @param {User[]} players
- * @returns {string}
+ * @returns {Promise<string>}
  */
 async function generatePlayerListForEmbed(players) {
 	if (players.length === 0) return "\u0020";
-
-	const longestNameLength = Math.max(
-		...players.map((player) => player.summoner_name.length)
-	);
 
 	const PlayerDraftManager = require("../managers/playerDraftManager.js");
 	const ranks = await PlayerDraftManager.getRanks(players);
