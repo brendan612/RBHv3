@@ -327,19 +327,17 @@ class MatchService {
 					);
 				}
 
-				await UserEloRating.findOrCreate(
-					{
-						where: {
-							user_id: player.user_id,
-							game_id: match.game_id,
-							season_id: match.season_id,
-						},
-						defaults: {
-							elo_rating: player.elo_after,
-						},
+				await UserEloRating.findOrCreate({
+					where: {
+						user_id: player.user_id,
+						game_id: match.game_id,
+						season_id: match.season_id,
 					},
-					{ transaction }
-				).then(async ([eloRating, created]) => {
+					defaults: {
+						elo_rating: player.elo_after,
+					},
+					transaction,
+				}).then(async ([eloRating, created]) => {
 					console.log("eloRating", eloRating.elo_rating, player.elo_after);
 					if (!created) {
 						eloRating.elo_rating = player.elo_after;
