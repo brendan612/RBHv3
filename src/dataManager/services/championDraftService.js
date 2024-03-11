@@ -90,7 +90,7 @@ class ChampionDraftService {
 		const isCaptain = captains.includes(user_id);
 
 		const member = interaction.member;
-		const canPick = isCaptain || hasRequiredRoleOrHigher(member, "admin");
+		const canPick = isCaptain || hasRequiredRoleOrHigher(member, "moderator");
 		if (!canPick) {
 			return interaction.editReply({
 				content: "You are not a captain",
