@@ -65,7 +65,7 @@ module.exports = {
 		);
 
 		if (season) {
-			embed.setDescription("Stats for Season #" + season.season_game_id);
+			embed.setDescription("Stats for " + season.name);
 		} else {
 			embed.setDescription("All-Time Stats");
 		}
