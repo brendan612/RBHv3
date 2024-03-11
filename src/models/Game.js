@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
 		/**
 		 *
 		 * @param {string} name
-		 * @returns {Game}
+		 * @returns {Promise<Game>}
 		 */
 		static async createGame(name) {
 			return await Game.create({
@@ -33,6 +33,11 @@ module.exports = (sequelize) => {
 			emote: {
 				type: DataTypes.STRING,
 				allowNull: true,
+			},
+			enabled: {
+				type: DataTypes.BOOLEAN,
+				allowNull: false,
+				defaultValue: true,
 			},
 		},
 		{

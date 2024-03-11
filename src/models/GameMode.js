@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
 				unique: true,
 				autoIncrement: true,
 			},
-			game_mode_id: {
+			game_id: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
@@ -37,6 +37,11 @@ module.exports = (sequelize) => {
 			emote: {
 				type: DataTypes.STRING,
 				allowNull: true,
+			},
+			enabled: {
+				type: DataTypes.BOOLEAN,
+				allowNull: false,
+				defaultValue: true,
 			},
 		},
 		{
