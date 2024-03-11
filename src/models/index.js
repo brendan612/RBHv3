@@ -8,7 +8,7 @@ const sequelize = new Sequelize(
 		host: process.env.DBHOST,
 		port: process.env.DBPORT,
 		dialect: "mysql",
-		logging: false,
+		logging: console.log,
 	}
 );
 
@@ -32,32 +32,46 @@ const MatchPlayer = require("./MatchPlayer.js")(sequelize);
 const Referral = require("./Referral.js")(sequelize);
 const Champion = require("./Champion.js")(sequelize);
 const AutoResponse = require("./AutoResponse.js")(sequelize);
+const FeatureToggle = require("./FeatureToggle.js")(sequelize);
 
 // Setting up many-to-many relationship
-User.belongsToMany(Lobby, { through: "LobbyUsers" });
-Lobby.belongsToMany(User, { through: "LobbyUsers" });
-Lobby.belongsTo(User, { as: "Host", foreignKey: "host_id" });
+User.belongsToMany(Lobby, { through: "LobbyUsers", ...cascadeOptions });
+Lobby.belongsToMany(User, { through: "LobbyUsers", ...cascadeOptions });
+Lobby.belongsTo(User, { as: "Host", foreignKey: "host_id", ...cascadeOptions });
 User.hasMany(Lobby, { foreignKey: "host_id" });
 Game.hasMany(Lobby, {
 	foreignKey: "game_id",
 	...cascadeOptions,
 });
-Lobby.belongsTo(Game, { foreignKey: "game_id" });
+Lobby.belongsTo(Game, { foreignKey: "game_id", ...cascadeOptions });
 Game.hasMany(Season, {
 	foreignKey: "game_id",
 	...cascadeOptions,
 });
 
 // User model associations
-User.hasMany(Referral, { as: "Referrals", foreignKey: "referrer_id" });
+User.hasMany(Referral, {
+	as: "Referrals",
+	foreignKey: "referrer_id",
+	...cascadeOptions,
+});
 
 // Referral model associations
-Referral.belongsTo(User, { as: "Referrer", foreignKey: "referrer_id" });
+Referral.belongsTo(User, {
+	as: "Referrer",
+	foreignKey: "referrer_id",
+	...cascadeOptions,
+});
 
-User.hasMany(ModerationLog, { foreignKey: "user_id", as: "ModerationLogs" });
+User.hasMany(ModerationLog, {
+	foreignKey: "user_id",
+	as: "ModerationLogs",
+	...cascadeOptions,
+});
 User.hasMany(ModerationLog, {
 	foreignKey: "targeted_user_id",
 	as: "TargetedModerationLogs",
+	...cascadeOptions,
 });
 
 User.hasMany(UserEloRating, {
@@ -81,34 +95,43 @@ UserEloRating.belongsTo(Season, {
 	...cascadeOptions,
 });
 
-ModerationLog.belongsTo(User, { foreignKey: "user_id", as: "User" });
+ModerationLog.belongsTo(User, {
+	foreignKey: "user_id",
+	as: "User",
+	...cascadeOptions,
+});
 ModerationLog.belongsTo(User, {
 	foreignKey: "targeted_user_id",
 	as: "TargetedUser",
+	...cascadeOptions,
 });
 Lobby.hasOne(Draft, {
 	foreignKey: "lobby_id",
 	...cascadeOptions,
 });
-Draft.belongsTo(Lobby, { foreignKey: "lobby_id" });
+Draft.belongsTo(Lobby, { foreignKey: "lobby_id", ...cascadeOptions });
 Draft.hasMany(PlayerDraftRound, {
 	foreignKey: "draft_id",
 	...cascadeOptions,
 });
-PlayerDraftRound.belongsTo(Draft, { foreignKey: "draft_id" });
-PlayerDraftRound.belongsTo(User, { foreignKey: "user_id" });
-User.hasMany(PlayerDraftRound, { foreignKey: "user_id" });
+PlayerDraftRound.belongsTo(Draft, {
+	foreignKey: "draft_id",
+	...cascadeOptions,
+});
+PlayerDraftRound.belongsTo(User, { foreignKey: "user_id", ...cascadeOptions });
+User.hasMany(PlayerDraftRound, { foreignKey: "user_id", ...cascadeOptions });
 Draft.hasMany(DraftRound, {
 	foreignKey: "draft_id",
 	...cascadeOptions,
 });
-DraftRound.belongsTo(Draft, { foreignKey: "draft_id" });
+DraftRound.belongsTo(Draft, { foreignKey: "draft_id", ...cascadeOptions });
 Lobby.hasOne(Match, {
 	foreignKey: "lobby_id",
 	...cascadeOptions,
 });
 Match.belongsTo(Lobby, {
 	foreignKey: "lobby_id",
+	...cascadeOptions,
 });
 Game.hasMany(Match, {
 	foreignKey: "game_id",
@@ -118,17 +141,17 @@ Season.hasMany(Match, {
 	foreignKey: "season_game_id",
 	...cascadeOptions,
 });
-Season.belongsTo(Game, { foreignKey: "game_id" });
-Match.belongsTo(Draft, { foreignKey: "draft_id" });
+Season.belongsTo(Game, { foreignKey: "game_id", ...cascadeOptions });
+Match.belongsTo(Draft, { foreignKey: "draft_id", ...cascadeOptions });
 Match.hasMany(MatchPlayer, {
 	foreignKey: "match_id",
 	...cascadeOptions,
 });
-MatchPlayer.belongsTo(User, { foreignKey: "user_id" });
-MatchPlayer.belongsTo(Match, { foreignKey: "match_id" });
-User.hasMany(MatchPlayer, { foreignKey: "user_id" });
+MatchPlayer.belongsTo(User, { foreignKey: "user_id", ...cascadeOptions });
+MatchPlayer.belongsTo(Match, { foreignKey: "match_id", ...cascadeOptions });
+User.hasMany(MatchPlayer, { foreignKey: "user_id", ...cascadeOptions });
 
-AutoResponse.belongsTo(User, { foreignKey: "created_by" });
+AutoResponse.belongsTo(User, { foreignKey: "created_by", ...cascadeOptions });
 
 module.exports = {
 	sequelize,
@@ -151,4 +174,5 @@ module.exports = {
 	DraftRound,
 	Champion,
 	AutoResponse,
+	FeatureToggle,
 };
