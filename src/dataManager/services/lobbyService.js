@@ -426,7 +426,7 @@ class LobbyService {
 
 	async draft() {
 		const { isDraftable, reason } = await this.isDraftable();
-		if (!draftable) {
+		if (!isDraftable) {
 			return { isDraftable, reason };
 		}
 
