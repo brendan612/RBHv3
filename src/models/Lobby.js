@@ -383,7 +383,7 @@ module.exports = (sequelize) => {
 				allowNull: true,
 			},
 			host_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			draft_id: {
@@ -399,11 +399,11 @@ module.exports = (sequelize) => {
 				allowNull: false,
 			},
 			message_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 			thread_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 		},

@@ -35,9 +35,6 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 			lobby.lobby_name,
 			lobby.game_name + " In-House Lobby"
 		);
-
-		console.log(lobby);
-
 		embed
 			.setFooter({
 				text: `Hosted by ${host.nickname ?? host.user.globalName} • Lobby ID: ${
