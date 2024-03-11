@@ -18,6 +18,7 @@ const {
 	handleBlueWinConfirmButton,
 	handleCancelWinButton,
 } = require("../handlers/buttonHandler.js");
+const client = require("../client.js");
 const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
 const roleHierarchy = require("../utilities/role-hierarchy.js");
@@ -36,6 +37,10 @@ const buttonHandlers = {
 	cancelwin: handleCancelWinButton,
 };
 
+const {
+	hasRequiredRoleOrHigher,
+} = require("../utilities/utility-functions.js");
+
 module.exports = {
 	name: Events.InteractionCreate,
 	/**
@@ -45,6 +50,14 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			if (interaction.isChatInputCommand()) {
+				const enabled = client.features.get("SlashCommands");
+				if (!enabled && !hasRequiredRoleOrHigher(interaction.member, "admin")) {
+					return interaction.reply({
+						content: "Bot commands are currently disabled",
+						ephemeral: true,
+					});
+				}
+
 				/** @type {CommandInteraction} */
 				const command = interaction.client.commands.get(
 					interaction.commandName
@@ -151,10 +164,3 @@ module.exports = {
 		}
 	},
 };
-async function verifyInteractionPermission(interaction) {}
-function hasRequiredRoleOrHigher(member, requiredRole) {
-	const memberRoles = member.roles.cache.map((role) => role.id);
-
-	const allowedRoles = [requiredRole, ...roleHierarchy[requiredRole]];
-	return memberRoles.some((role) => allowedRoles.includes(role));
-}
