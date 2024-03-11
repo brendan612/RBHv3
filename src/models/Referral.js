@@ -25,11 +25,11 @@ module.exports = (sequelize) => {
 				autoIncrement: true,
 			},
 			user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			referrer_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			season_id: {

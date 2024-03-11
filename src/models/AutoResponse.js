@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
 				allowNull: false,
 			},
 			created_by: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 		},

@@ -33,7 +33,7 @@ module.exports = (sequelize) => {
 				allowNull: false,
 			},
 			user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			team: {

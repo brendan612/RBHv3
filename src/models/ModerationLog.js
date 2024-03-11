@@ -34,11 +34,11 @@ module.exports = (sequelize) => {
 				autoIncrement: true,
 			},
 			user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			targeted_user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			duration: {

@@ -1,8 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 
 module.exports = (sequelize) => {
-	class PlayerDraftRound extends Model {
-	}
+	class PlayerDraftRound extends Model {}
 	PlayerDraftRound.init(
 		{
 			player_draft_round_id: {
@@ -26,7 +25,7 @@ module.exports = (sequelize) => {
 				allowNull: false,
 			},
 			user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 		},

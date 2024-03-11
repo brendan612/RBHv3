@@ -331,7 +331,7 @@ async function generateBasicEmbed(
 	const guild = await client.guilds.fetch(client.guildID);
 	let guildMember = guild.members.cache.get(user.user_id);
 
-	if (!guildMember && BigInt(user.user_id) > 20) {
+	if (!guildMember && user.user_id > 20) {
 		await guild.members.fetch(user.user_id.toString()).then((member) => {
 			guildMember = member;
 		});

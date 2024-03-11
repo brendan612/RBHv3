@@ -71,7 +71,7 @@ module.exports = {
 		} else if (interaction.options.getSubcommand() === "give") {
 			const user = await User.findByPk(interaction.user.id);
 			const target = interaction.options.getUser("target");
-			const amount = parseInt(interaction.options.getString("amount"));
+			const amount = BigInt(interaction.options.getString("amount"));
 
 			const isAdmin = hasRequiredRoleOrHigher(interaction.member, "admin");
 

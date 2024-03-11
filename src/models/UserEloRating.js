@@ -46,7 +46,7 @@ module.exports = (sequelize) => {
 				autoIncrement: true,
 			},
 			user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			game_id: {

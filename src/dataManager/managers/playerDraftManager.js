@@ -83,7 +83,7 @@ class PlayerDraftManager {
 	static async getRanks(players) {
 		const defaultRank = "UNRANKED";
 		for (const player of players) {
-			const user_id = BigInt(player.user_id);
+			const user_id = player.user_id;
 			let rank = PlayerDraftManager.ranks.get(user_id);
 			if (!rank && user_id > 20) {
 				try {
@@ -106,8 +106,8 @@ class PlayerDraftManager {
 		}
 		return new Map(
 			players.map((player) => [
-				BigInt(player.user_id),
-				PlayerDraftManager.ranks.get(BigInt(player.user_id)),
+				player.user_id,
+				PlayerDraftManager.ranks.get(player.user_id),
 			])
 		);
 	}

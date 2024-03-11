@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
 				autoIncrement: true,
 			},
 			role_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			role_name: {

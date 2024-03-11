@@ -242,7 +242,7 @@ class UserService {
 
 		await interaction.deferUpdate();
 
-		if (BigInt(user_id) !== BigInt(member.id)) {
+		if (user_id !== member.id) {
 			return await interaction.followUp({
 				content: "This is not your verification button.",
 				ephemeral: true,

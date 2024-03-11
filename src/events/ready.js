@@ -23,6 +23,7 @@ const {
 	Game,
 	UserEloRating,
 	Referral,
+	FeatureToggle,
 	sequelize,
 } = require("../models");
 
@@ -55,6 +56,13 @@ module.exports = {
 			await createReferrals(db);
 		}
 
+		const features = await FeatureToggle.findAll();
+
+
+		for (const feature of features) {
+			client.features.set(feature.name, feature.enabled);
+		}
+
 		webhookServer.start();
 
 		await checkAndUpdateServerMessages();
@@ -73,7 +81,7 @@ const createUsers = async (db) => {
 			const users = [];
 			for (const row of rows) {
 				const translatedData = {
-					user_id: BigInt(row.pid),
+					user_id: row.pid,
 					summoner_name: row.verifiedSummonerName?.toString()?.trim(),
 					verified: 0,
 					server_money: row.money,
@@ -275,18 +283,18 @@ const createReferrals = async (db) => {
 
 			const data = [];
 			for (const row of rows) {
-				const userExists = await User.findByPk(BigInt(row.user_id));
-				const referrerExists = await User.findByPk(BigInt(row.referrer_id));
+				const userExists = await User.findByPk(row.user_id);
+				const referrerExists = await User.findByPk(row.referrer_id);
 
 				if (userExists && !referrerExists) {
 					data.push({
-						user_id: BigInt(row.user_id),
-						referrer_id: BigInt(row.user_id),
+						user_id: row.user_id,
+						referrer_id: row.user_id,
 					});
 				} else if (userExists && referrerExists) {
 					data.push({
-						user_id: BigInt(row.user_id),
-						referrer_id: BigInt(row.referrer_id),
+						user_id: row.user_id,
+						referrer_id: row.referrer_id,
 					});
 				}
 			}

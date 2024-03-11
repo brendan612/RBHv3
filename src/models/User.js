@@ -264,7 +264,7 @@ module.exports = (sequelize) => {
 	User.init(
 		{
 			user_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 				primaryKey: true,
 				unique: true,

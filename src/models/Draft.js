@@ -31,19 +31,19 @@ module.exports = (sequelize) => {
 				allowNull: false,
 			},
 			host_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 			red_captain_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 			blue_captain_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 			message_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 			closed_at: {
@@ -51,7 +51,7 @@ module.exports = (sequelize) => {
 				allowNull: true,
 			},
 			thread_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: true,
 			},
 		},

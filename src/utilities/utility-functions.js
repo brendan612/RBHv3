@@ -56,7 +56,7 @@ async function generateTeamPlayerList(players) {
 			);
 			const emojis =
 				`${LeagueRoleEmojis[player.primary_role]}${
-					LeagueRankEmojis[ranks.get(BigInt(player.user_id)).toUpperCase()]
+					LeagueRankEmojis[ranks.get(player.user_id).toUpperCase()]
 				}` || "";
 			// Return the combined string, padded as necessary
 			//prettier-ignore

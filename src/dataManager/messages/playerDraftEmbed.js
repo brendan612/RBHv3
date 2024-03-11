@@ -147,7 +147,7 @@ async function generatePlayerDraftEmbed(draft, sendMessage = true) {
 		// if (availablePlayers.length === 1) {
 		// 	const playerDraftRound = await PlayerDraftRound.create({
 		// 		draft_id: this.draft.draft_id,
-		// 		user_id: BigInt(availablePlayers[0].user_id),
+		// 		user_id: availablePlayers[0].user_id,
 		// 		team: team,
 		// 		round_number: 5,
 		// 	});
@@ -212,7 +212,7 @@ async function generateTeamPlayerList(players) {
 			const paddedName = player.summoner_name.padEnd(32, "\u0020");
 			const emojis =
 				`${LeagueRoleEmojis[player.primary_role]}${
-					LeagueRankEmojis[ranks.get(BigInt(player.user_id)).toUpperCase()]
+					LeagueRankEmojis[ranks.get(player.user_id).toUpperCase()]
 				}` || "";
 			// Return the combined string, padded as necessary
 			//prettier-ignore
@@ -236,7 +236,7 @@ async function generateRemainingPlayersList(players) {
 			const paddedName = player.summoner_name.padEnd(32, "\u0020");
 			const emojis =
 				`${LeagueRoleEmojis[player.primary_role]}${
-					LeagueRankEmojis[ranks.get(BigInt(player.user_id)).toUpperCase()]
+					LeagueRankEmojis[ranks.get(player.user_id).toUpperCase()]
 				}` || "";
 			// Return the combined string, padded as necessary
 			//prettier-ignore
@@ -264,9 +264,7 @@ async function generatePlayerDraftComponents(players, draft_id) {
 			new StringSelectMenuOptionBuilder()
 				.setLabel(player.summoner_name)
 				.setDescription(
-					`${player.primary_role} | ${ranks
-						.get(BigInt(player.user_id))
-						.toUpperCase()}`
+					`${player.primary_role} | ${ranks.get(player.user_id).toUpperCase()}`
 				)
 				.setValue(player.user_id.toString())
 		);

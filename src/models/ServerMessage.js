@@ -22,11 +22,11 @@ module.exports = (sequelize) => {
 				allowNull: false,
 			},
 			message_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			channel_id: {
-				type: DataTypes.BIGINT,
+				type: DataTypes.STRING,
 				allowNull: false,
 			},
 			type: {
