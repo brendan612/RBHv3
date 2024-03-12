@@ -10,6 +10,8 @@ const {
 	handleLobbyOption,
 } = require("./index.js");
 
+const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("ping")
@@ -26,9 +28,11 @@ module.exports = {
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
-		const users = await lobby.getUsers();
+		const lobbyDTO = new LobbyDTO(lobby);
 
-		const userString = users.map((user) => `<@${user.user_id}>`).join("\n");
+		const userString = lobbyDTO.players
+			.map((user) => `<@${user.user_id}>`)
+			.join("\n");
 		await interaction.reply({
 			content: userString,
 		});
