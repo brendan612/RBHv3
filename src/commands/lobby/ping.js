@@ -11,6 +11,7 @@ const {
 } = require("./index.js");
 
 const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
+const LobbyService = require("../../dataManager/services/lobbyService.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,7 +29,7 @@ module.exports = {
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
-		const lobbyDTO = new LobbyDTO(lobby);
+		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
 
 		const userString = lobbyDTO.players
 			.map((user) => `<@${user.user_id}>`)
