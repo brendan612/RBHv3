@@ -306,7 +306,7 @@ async function collectButtonInteractions(
 
 	const collector = interaction.channel.createMessageComponentCollector({
 		filter,
-		time: 60000,
+		time: 300_000,
 	});
 
 	collector.on("collect", async (i) => {
