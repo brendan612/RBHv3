@@ -20,7 +20,6 @@ module.exports = (sequelize) => {
 				primaryKey: true,
 				autoIncrement: true,
 				allowNull: false,
-				defaultValue: 0,
 			},
 			type: {
 				type: DataTypes.STRING,
