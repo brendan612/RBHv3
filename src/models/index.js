@@ -34,6 +34,11 @@ const Champion = require("./Champion.js")(sequelize);
 const AutoResponse = require("./AutoResponse.js")(sequelize);
 const FeatureToggle = require("./FeatureToggle.js")(sequelize);
 const GameMode = require("./GameMode.js")(sequelize);
+const ServerChannel = require("./ServerChannel.js")(sequelize);
+const ServerRole = require("./ServerRole.js")(sequelize);
+const ServerSetting = require("./ServerSetting.js")(sequelize);
+const ServerEmoji = require("./ServerEmoji.js")(sequelize);
+const InteractionLog = require("./InteractionLog.js")(sequelize);
 
 // Setting up many-to-many relationship
 User.belongsToMany(Lobby, { through: "LobbyUsers", ...cascadeOptions });
@@ -163,6 +168,31 @@ User.hasMany(MatchPlayer, { foreignKey: "user_id", ...cascadeOptions });
 
 AutoResponse.belongsTo(User, { foreignKey: "created_by", ...cascadeOptions });
 
+Game.hasOne(ServerChannel, {
+	foreignKey: "game_id",
+	...cascadeOptions,
+});
+
+Game.hasMany(ServerEmoji, {
+	foreignKey: "game_id",
+	...cascadeOptions,
+});
+
+Game.hasMany(ServerRole, {
+	foreignKey: "game_id",
+	...cascadeOptions,
+});
+
+Game.hasMany(ServerSetting, {
+	foreignKey: "game_id",
+	...cascadeOptions,
+});
+
+User.hasMany(InteractionLog, {
+	foreignKey: "user_id",
+	...cascadeOptions,
+});
+
 module.exports = {
 	sequelize,
 	Sequelize,
@@ -186,4 +216,9 @@ module.exports = {
 	AutoResponse,
 	FeatureToggle,
 	GameMode,
+	ServerChannel,
+	ServerRole,
+	ServerSetting,
+	ServerEmoji,
+	InteractionLog,
 };

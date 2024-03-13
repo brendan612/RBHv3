@@ -1,5 +1,5 @@
 const { Events, Interaction, CommandInteraction } = require("discord.js");
-const { sequelize, Lobby, User, Draft } = require("../models");
+const { sequelize, Lobby, User, Draft, InteractionLog } = require("../models");
 const LobbyService = require("../dataManager/services/lobbyService.js");
 const PlayerDraftService = require("../dataManager/services/playerDraftService.js");
 const ChampionDraftService = require("../dataManager/services/championDraftService.js");
@@ -49,15 +49,17 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		try {
-			if (interaction.isChatInputCommand()) {
-				const enabled = client.features.get("SlashCommands");
-				if (!enabled && !hasRequiredRoleOrHigher(interaction.member, "admin")) {
-					return interaction.reply({
-						content: "Bot commands are currently disabled",
-						ephemeral: true,
-					});
-				}
+			const enabled = client.features.get("SlashCommands");
+			if (!enabled && !hasRequiredRoleOrHigher(interaction.member, "admin")) {
+				return interaction.reply({
+					content: "Bot commands are currently disabled",
+					ephemeral: true,
+				});
+			}
 
+			const start = new Date();
+
+			if (interaction.isChatInputCommand()) {
 				/** @type {CommandInteraction} */
 				const command = interaction.client.commands.get(
 					interaction.commandName
@@ -152,6 +154,11 @@ module.exports = {
 
 				command.execute(interaction);
 			}
+
+			const end = new Date();
+
+			const elapsed_time = end - start;
+			await InteractionLog.createLog(interaction, elapsed_time);
 		} catch (error) {
 			console.error(interaction);
 			console.error(error);

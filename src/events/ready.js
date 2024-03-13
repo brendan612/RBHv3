@@ -58,7 +58,6 @@ module.exports = {
 
 		const features = await FeatureToggle.findAll();
 
-
 		for (const feature of features) {
 			client.features.set(feature.name, feature.enabled);
 		}
