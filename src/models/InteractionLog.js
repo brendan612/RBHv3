@@ -4,14 +4,27 @@ module.exports = (sequelize) => {
 	class InteractionLog extends Model {
 		static createLog(interaction, elapsed_time) {
 			let options = null;
-			if (interaction.options) {
-				options = interaction.options.data.reduce((acc, option) => {
-					acc[option.name] = option.value;
-					return acc;
-				}, {});
+			let name = null;
+			if (interaction.isChatInputCommand()) {
+				name = interaction.commandName;
+				if (interaction.options) {
+					options = interaction.options.data.reduce((acc, option) => {
+						acc[option.name] = option.value;
+						return acc;
+					}, {});
+				}
+			} else {
+				name = interaction.customId;
+				if (interaction.values) {
+					options = interaction.values.reduce((acc, value) => {
+						acc[value] = true;
+						return acc;
+					}, {});
+				}
 			}
+
 			return InteractionLog.create({
-				interaction: interaction.commandName,
+				interaction: name,
 				parameters: options,
 				user_id: interaction.user.id,
 				channel_id: interaction.channel.id,
