@@ -3,12 +3,16 @@ const { DataTypes, Model } = require("sequelize");
 module.exports = (sequelize) => {
 	class InteractionLog extends Model {
 		static createLog(interaction, elapsed_time) {
-			return InteractionLog.create({
-				interaction: interaction.commandName,
-				parameters: interaction.options.data.reduce((acc, option) => {
+			let options = null;
+			if (interaction.options) {
+				options = interaction.options.data.reduce((acc, option) => {
 					acc[option.name] = option.value;
 					return acc;
-				}, {}),
+				}, {});
+			}
+			return InteractionLog.create({
+				interaction: interaction.commandName,
+				parameters: options,
 				user_id: interaction.user.id,
 				channel_id: interaction.channel.id,
 				elapsed_time,
