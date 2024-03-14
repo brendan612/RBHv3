@@ -32,7 +32,7 @@ module.exports = {
 
 		if (!isBanned) {
 			await interaction.reply({
-				content: `<@${targeted_user.user_id}> is not banned from inhouses`,
+				content: `<@${userService.user_id}> is not banned from inhouses`,
 				ephemeral: true,
 			});
 			return;
@@ -44,7 +44,7 @@ module.exports = {
 		);
 
 		await interaction.reply({
-			content: `<@${targeted_user.user_id}> has been unbanned from inhouses`,
+			content: `<@${userService.user_id}> has been unbanned from inhouses`,
 			ephemeral: false,
 		});
 	},
