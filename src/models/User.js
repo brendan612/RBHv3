@@ -115,39 +115,6 @@ module.exports = (sequelize) => {
 				.send({ embeds: [embed], components: [actionRow] });
 		};
 
-		/**
-		 *
-		 * @param {BigInt} moderator_id
-		 * @param {Date} bannedUntil
-		 * @param {String} reason
-		 */
-		ihban = async (moderator_id, bannedUntil, reason) => {
-			const { ModerationLog } = require("../models");
-			const log = await ModerationLog.createModerationLog(
-				moderator_id,
-				this.user_id,
-				bannedUntil,
-				ActionType.IHBAN,
-				reason
-			);
-		};
-
-		/**
-		 *
-		 * @param {BigInt} moderator_id
-		 * @param {String} reason
-		 */
-		ihunban = async (moderator_id, reason) => {
-			const { ModerationLog } = require("../models");
-			const log = await ModerationLog.createModerationLog(
-				moderator_id,
-				this.user_id,
-				null,
-				ActionType.IHUNBAN,
-				reason
-			);
-		};
-
 		mute = async (moderator_id, duration, reason) => {
 			const { ModerationLog } = require("../models");
 			const log = await ModerationLog.createModerationLog(
@@ -201,37 +168,6 @@ module.exports = (sequelize) => {
 				},
 			});
 			return logs;
-		};
-
-		/**
-		 *
-		 * @returns {boolean} isBanned
-		 */
-		isIHBanned = async () => {
-			const { ModerationLog } = require("../models");
-			const latestLog = await ModerationLog.findOne({
-				where: {
-					targeted_user_id: this.user_id,
-					type: {
-						[Op.in]: [ActionType.IHBAN, ActionType.IHUNBAN],
-					},
-				},
-				order: [["created_at", "DESC"]],
-			});
-
-			if (!latestLog) return false;
-			if (latestLog.type === ActionType.IHUNBAN) {
-				return false;
-			} else if (latestLog.type === ActionType.IHBAN) {
-				const currentDate = new Date();
-				if (latestLog.duration !== null && latestLog.duration > currentDate) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-
-			return false;
 		};
 
 		isMuted = async () => {

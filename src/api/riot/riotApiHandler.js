@@ -1,6 +1,4 @@
 const axios = require("axios");
-const UserDTO = require("../../dataManager/DTOs/userDTO");
-
 require("dotenv").config();
 
 const REGIONS = {

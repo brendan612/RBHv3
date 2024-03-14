@@ -6,6 +6,8 @@ const {
 } = require("./index.js");
 const { userOption } = require("../lobby/index.js");
 
+const UserService = require("../../dataManager/services/userService.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("ihunban")
@@ -23,9 +25,12 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		const user_id = interaction.options.getUser("target").id;
-		const targeted_user = await User.findOne({ where: { user_id: user_id } });
 
-		if (!targeted_user.isIHBanned()) {
+		const userService = await UserService.createUserService(user_id);
+
+		const { isBanned, remaining, reason } = await userService.isIHBanned();
+
+		if (!isBanned) {
 			await interaction.reply({
 				content: `<@${targeted_user.user_id}> is not banned from inhouses`,
 				ephemeral: true,
@@ -33,8 +38,8 @@ module.exports = {
 			return;
 		}
 
-		await targeted_user.ihunban(
-			interaction.member.id,
+		await userService.ihunban(
+			interaction.user.id,
 			interaction.options.getString("reason")
 		);
 

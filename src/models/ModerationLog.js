@@ -8,15 +8,15 @@ module.exports = (sequelize) => {
 		 * @returns {Promise<ModerationLog>}
 		 */
 		static async createModerationLog(
-			user_id,
+			moderator_id,
 			targeted_user_id,
 			duration,
 			type,
 			reason
 		) {
-			console.log(user_id, targeted_user_id, duration, type, reason);
+			console.log(moderator_id, targeted_user_id, duration, type, reason);
 			return await ModerationLog.create({
-				user_id: user_id,
+				user_id: moderator_id,
 				targeted_user_id: targeted_user_id,
 				duration: duration,
 				type: type,

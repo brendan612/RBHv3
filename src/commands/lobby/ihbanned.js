@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, Interaction, User } = require("../admin/index.js");
 const ms = require("ms");
-const { ModerationLog } = require("../admin/index.js");
-const { Op } = require("sequelize");
+const { ModerationLog, sequelize } = require("../admin/index.js");
+const { Op, literal } = require("sequelize");
 const { baseEmbed } = require("../../components/embed.js");
 
 module.exports = {
@@ -13,13 +13,27 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
-		const banned_users = await ModerationLog.findAll({
-			where: {
-				type: "IHBAN",
-				duration: {
-					[Op.gt]: new Date(),
-				},
-			},
+		const [users, results] = await sequelize.query(`
+			SELECT DISTINCT bans.targeted_user_id, bans.ban_end
+			FROM (
+				SELECT targeted_user_id, created_at, duration as ban_end
+				FROM ModerationLogs
+				WHERE type = 'IHBAN'
+				AND duration > NOW() -- Adjust based on your SQL dialect
+			) AS bans
+			LEFT JOIN (
+				SELECT targeted_user_id, created_at AS unban_created_at
+				FROM ModerationLogs
+				WHERE type = 'IHUNBAN'
+			) AS unbans ON bans.targeted_user_id = unbans.targeted_user_id AND unbans.unban_created_at < bans.ban_end
+			WHERE unbans.targeted_user_id IS NULL;
+		`);
+
+		const banned_users = users.map((user) => {
+			return {
+				user_id: user.targeted_user_id,
+				duration: user.ban_end,
+			};
 		});
 
 		if (!banned_users.length) {

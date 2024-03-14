@@ -141,8 +141,6 @@ async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
 			type: sequelize.QueryTypes.SELECT,
 		});
 
-		console.log(matches);
-
 		let winsWith = 0;
 		let winsAgainst = 0;
 		let lossesWith = 0;

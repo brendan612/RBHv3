@@ -4,9 +4,8 @@ const { User, Lobby, AutoResponse, Sequelize } = require("../models");
 const {
 	hasRequiredRoleOrHigher,
 } = require("../utilities/utility-functions.js");
-const { all } = require("axios");
 
-const EXPERIENCE_TIMEOUT = 360; //6 minutes
+const EXPERIENCE_TIMEOUT = 60 * 1000 * 6; //6 minutes
 
 module.exports = {
 	name: Events.MessageCreate,
@@ -57,10 +56,9 @@ async function handleMessageExperience(message) {
 	const allowExperience =
 		currentTimestamp - lastMessageTimestamp > EXPERIENCE_TIMEOUT;
 
-	if (allowExperience || hasRequiredRoleOrHigher(message.member, "developer")) {
+	if (allowExperience) {
 		const userService = await UserService.createUserService(user_id);
 		await userService.addExperience(35);
-
 		user.last_message_date = currentTimestamp;
 		await user.save();
 	}

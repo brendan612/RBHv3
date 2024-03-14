@@ -53,6 +53,7 @@ class UserService {
 	 */
 	constructor(user) {
 		this.user = user;
+		this.user_id = user.user_id;
 	}
 
 	static async createUserService(user_id) {
@@ -517,11 +518,20 @@ class UserService {
 	 */
 	async isIHBanned() {
 		const latestLog = await ModerationLog.findOne({
-			where: { user_id: this.user.user_id },
+			where: {
+				targeted_user_id: this.user_id,
+				type: {
+					[Op.in]: [ActionType.IHBAN, ActionType.IHUNBAN],
+				},
+				duration: {
+					[Op.gt]: new Date(),
+				},
+			},
 			order: [["created_at", "DESC"]],
 		});
 
 		if (!latestLog) return { isBanned: false, remaining: 0 };
+
 		if (latestLog.type === ActionType.IHUNBAN) {
 			return { isBanned: false, remaining: 0, reason: "" };
 		} else if (latestLog.type === ActionType.IHBAN) {
@@ -535,7 +545,7 @@ class UserService {
 			if (latestLog.duration > currentDate) {
 				return {
 					isBanned: true,
-					remaining: latestLog.duration,
+					remaining: new Date(latestLog.duration),
 					reason: latestLog.reason,
 				};
 			} else {
@@ -544,6 +554,37 @@ class UserService {
 		}
 
 		return { isBanned: false, remaining: 0, reason: "" };
+	}
+
+	/**
+	 *
+	 * @param {string} moderator_id
+	 * @param {Date} bannedUntil
+	 * @param {string} reason
+	 */
+	async ihban(moderator_id, bannedUntil, reason) {
+		const log = await ModerationLog.createModerationLog(
+			moderator_id,
+			this.user_id,
+			bannedUntil,
+			ActionType.IHBAN,
+			reason
+		);
+	}
+
+	/**
+	 *
+	 * @param {string} moderator_id
+	 * @param {string} reason
+	 */
+	async ihunban(moderator_id, reason) {
+		const log = await ModerationLog.createModerationLog(
+			moderator_id,
+			this.user_id,
+			null,
+			ActionType.IHUNBAN,
+			reason
+		);
 	}
 
 	/**
