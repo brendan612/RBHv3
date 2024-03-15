@@ -162,7 +162,13 @@ module.exports = {
 					name: "+ / -",
 					value: results
 						.map((result) => {
-							return result.MatchPlayers[0].elo_change;
+							let resultString = "";
+							if (result.MatchPlayers[0].team == result.match.winning_team) {
+								resultString = ":white_check_mark:";
+							} else {
+								resultString = ":x:";
+							}
+							return resultString + " " + result.MatchPlayers[0].elo_change;
 						})
 						.join("\n"),
 					inline: true,
