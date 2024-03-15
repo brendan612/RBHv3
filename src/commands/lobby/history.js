@@ -159,7 +159,7 @@ module.exports = {
 					user.id
 				);
 				embed.addFields({
-					name: "+ / -",
+					name: "Win/Loss",
 					value: results
 						.map((result) => {
 							let resultString = "";
