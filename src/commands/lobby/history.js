@@ -163,7 +163,7 @@ module.exports = {
 					value: results
 						.map((result) => {
 							let resultString = "";
-							if (result.MatchPlayers[0].team == result.match.winning_team) {
+							if (result.MatchPlayers[0].elo_change > 0) {
 								resultString = ":white_check_mark:";
 							} else {
 								resultString = ":x:";
