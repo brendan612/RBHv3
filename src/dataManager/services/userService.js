@@ -523,9 +523,10 @@ class UserService {
 				type: {
 					[Op.in]: [ActionType.IHBAN, ActionType.IHUNBAN],
 				},
-				duration: {
-					[Op.gt]: new Date(),
-				},
+				[Op.or]: [
+					{ duration: { [Op.gte]: new Date() } }, // duration is greater or equal to now
+					{ duration: null }, // or duration is null
+				],
 			},
 			order: [["created_at", "DESC"]],
 		});
