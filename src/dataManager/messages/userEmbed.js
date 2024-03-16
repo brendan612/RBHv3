@@ -171,7 +171,6 @@ async function generateProfileEmbed(interaction, user_id) {
 		const maxExp = userLevelManager.expForNextLevel(level);
 		drawExperienceBar(context, maxExp - remainingExp, maxExp, 300, 50, level);
 
-		
 		const attachment = new AttachmentBuilder(canvas.toBuffer("image/png"), {
 			name: "profile.png",
 		});
@@ -358,9 +357,10 @@ async function generateBasicEmbed(
 		},
 		{
 			name: "Season Record",
-			value: `${wins}W - ${losses}L (${
-				Math.round(wins / (wins + losses), 2) * 100
-			}%) | ${elo_rating}`,
+			value: `${wins}W - ${losses}L (${Math.round(
+				(wins / (wins + losses)) * 100,
+				2
+			)}%) | ${elo_rating}`,
 			inline: true,
 		}
 	);
