@@ -106,11 +106,11 @@ module.exports = {
 			}
 
 			if (!isAdmin) {
-				user.server_money -= amount;
+				user.server_money = BigInt(user.server_money) - amount;
 				await user.save();
 			}
 
-			targetUser.server_money += amount;
+			targetUser.server_money = BigInt(targetUser.server_money) + amount;
 			await targetUser.save();
 
 			const embed = baseEmbed(
