@@ -291,19 +291,19 @@ function generateChampionDraftComponents(draft_id) {
  * @returns {ActionRowBuilder}
  */
 function generateSideSelectionButtons(draft) {
-	const redButton = new ButtonBuilder()
-		.setCustomId(`pick_${draft.draft_id}_red`)
-		.setLabel("Red")
-		.setStyle(ButtonStyle.Danger);
-
 	const blueButton = new ButtonBuilder()
 		.setCustomId(`pick_${draft.draft_id}_blue`)
 		.setLabel("Blue")
 		.setStyle(ButtonStyle.Primary);
 
+	const redButton = new ButtonBuilder()
+		.setCustomId(`pick_${draft.draft_id}_red`)
+		.setLabel("Red")
+		.setStyle(ButtonStyle.Danger);
+
 	const actionRow = new ActionRowBuilder().addComponents([
-		redButton,
 		blueButton,
+		redButton,
 	]);
 
 	return actionRow;
