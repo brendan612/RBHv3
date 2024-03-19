@@ -158,7 +158,10 @@ module.exports = {
 			const end = new Date();
 
 			const elapsed_time = end - start;
-			await InteractionLog.createLog(interaction, elapsed_time);
+
+			if (!interaction.isAutocomplete() && !interaction.isContextMenu()) {
+				await InteractionLog.createLog(interaction, elapsed_time);
+			}
 		} catch (error) {
 			console.error(interaction);
 			console.error(error);

@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
 		static createLog(interaction, elapsed_time) {
 			let options = null;
 			let name = null;
-			if (interaction.isChatInputCommand()) {
+			if (interaction.commandName) {
 				name = interaction.commandName;
 				if (interaction.options) {
 					options = interaction.options.data.reduce((acc, option) => {
