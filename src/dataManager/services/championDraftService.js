@@ -85,22 +85,24 @@ class ChampionDraftService {
 			this.draft.draft_id
 		);
 
-		const captains = [this.draft.red_captain_id, this.draft.blue_captain_id];
-
-		const isCaptain = captains.includes(user_id);
-
-		const member = interaction.member;
-		const canPick = isCaptain || hasRequiredRoleOrHigher(member, "moderator");
-		if (!canPick) {
-			return interaction.editReply({
-				content: "You are not a captain",
-				ephemeral: true,
-			});
-		}
-
 		const roundInfo = draftManager.roundSequence[draftManager.currentRound - 1];
 		const team = roundInfo.team;
 		const roundType = roundInfo.action;
+
+		const isPickingCaptain =
+			(team === "blue" && this.draft.blue_captain_id === user_id) ||
+			(team === "red" && this.draft.red_captain_id === user_id);
+
+		const member = interaction.member;
+
+		const canPick =
+			isPickingCaptain || hasRequiredRoleOrHigher(member, "moderator");
+		if (!canPick) {
+			return interaction.editReply({
+				content: "You are not a captain or staff",
+				ephemeral: true,
+			});
+		}
 
 		if (roundType !== commandRoundType) {
 			return interaction.editReply({
@@ -109,16 +111,7 @@ class ChampionDraftService {
 			});
 		}
 
-		if (this.draft.red_captain_id === user_id && team === "blue" && !canPick) {
-			return interaction.editReply({
-				content: "You cannot pick for the other team",
-				ephemeral: true,
-			});
-		} else if (
-			this.draft.blue_captain_id === user_id &&
-			team === "red" &&
-			!canPick
-		) {
+		if (!isPickingCaptain && !canPick) {
 			return interaction.editReply({
 				content: "You cannot pick for the other team",
 				ephemeral: true,
