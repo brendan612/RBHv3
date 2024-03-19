@@ -12,6 +12,7 @@ const {
 
 const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
 const LobbyService = require("../../dataManager/services/lobbyService.js");
+const { baseEmbed } = require("../../components/embed.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -31,11 +32,9 @@ module.exports = {
 
 		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
 
-		let userString = "";
-
-		for (const user of lobbyDTO.players) {
-			userString += `${user.summoner_name}#${user.tag_line}\n`;
-		}
+		const userString = lobbyDTO.players
+			.map((user) => `\n${user.summoner_name}#${user.tag_line}`)
+			.join("\r");
 
 		await interaction.reply({
 			content: "```" + userString + "```",
