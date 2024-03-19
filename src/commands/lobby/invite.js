@@ -34,7 +34,7 @@ module.exports = {
 		let userString = "";
 
 		for (const user of lobbyDTO.players) {
-			userString += `${user.user_id}\n`;
+			userString += `${user.summoner_name}#${user.tag_line}\n`;
 		}
 
 		await interaction.reply({
