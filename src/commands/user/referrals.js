@@ -108,13 +108,11 @@ module.exports = {
 				message = await interaction.reply({
 					embeds: [embed],
 					components: [row],
-					ephemeral: true,
 				});
 			} else {
 				message = await commandInteraction.editReply({
 					embeds: [embed],
 					components: [row],
-					ephemeral: true,
 				});
 			}
 
@@ -130,12 +128,11 @@ module.exports = {
 					message.edit({
 						embeds: [embed],
 						components: [],
-						ephemeral: true,
 					});
 				} catch {}
 			}
 		} else {
-			await interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed] });
 		}
 	},
 };
