@@ -6,6 +6,7 @@ const GlobalCacheManager = require("./dataManager/managers/cacheManager.js");
 const client = require("./client.js");
 client.cache = new GlobalCacheManager();
 client.features = new Map();
+client.invites = new Map();
 
 const playerDraftManagerFactory = require("../src/dataManager/managers/factories/playerDraftManagerFactory.js");
 const draftManagerFactory = require("../src/dataManager/managers/factories/draftManagerFactory.js");

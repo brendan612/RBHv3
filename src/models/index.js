@@ -30,6 +30,7 @@ const DraftRound = require("./DraftRound.js")(sequelize);
 const Match = require("./Match.js")(sequelize);
 const MatchPlayer = require("./MatchPlayer.js")(sequelize);
 const Referral = require("./Referral.js")(sequelize);
+const ReferralCode = require("./ReferralCode.js")(sequelize);
 const Champion = require("./Champion.js")(sequelize);
 const AutoResponse = require("./AutoResponse.js")(sequelize);
 const FeatureToggle = require("./FeatureToggle.js")(sequelize);
@@ -75,6 +76,18 @@ User.hasMany(Referral, {
 Referral.belongsTo(User, {
 	as: "Referrer",
 	foreignKey: "referrer_id",
+	...cascadeOptions,
+});
+
+User.hasMany(ReferralCode, {
+	foreignKey: "user_id",
+	as: "ReferralCodes",
+	...cascadeOptions,
+});
+
+ReferralCode.belongsTo(User, {
+	foreignKey: "user_id",
+	as: "User",
 	...cascadeOptions,
 });
 
@@ -206,6 +219,7 @@ module.exports = {
 	Game,
 	Season,
 	Referral,
+	ReferralCode,
 	ModerationLog,
 	Match,
 	MatchPlayer,

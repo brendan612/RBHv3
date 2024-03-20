@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, Interaction } = require("discord.js");
-const { sequelize, User, Referral } = require("../../models");
+const { sequelize, User, Referral, ReferralCode } = require("../../models");
 const { userOption } = require("../../components/commandOptions");
 
 module.exports = {
@@ -8,5 +8,6 @@ module.exports = {
 	sequelize,
 	User,
 	Referral,
+	ReferralCode,
 	userOption,
 };

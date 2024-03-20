@@ -68,6 +68,11 @@ module.exports = {
 
 		const championService = new ChampionService();
 		await championService.cacheAutocompleteChampionData();
+
+		const invites = await client.guild.invites.fetch();
+		invites.forEach((invite) => {
+			client.invites.set(invite.code, invite.uses);
+		});
 	},
 };
 

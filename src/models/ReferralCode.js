@@ -1,23 +1,21 @@
 const { DataTypes, Model } = require("sequelize");
 
 module.exports = (sequelize) => {
-	class Referral extends Model {
+	class ReferralCode extends Model {
 		/**
 		 *
-		 * @param {bigint} user_id
-		 * @param {bigint} referrer_id
-		 * @returns
+		 * @param {string} user_id
+		 * @returns {Promise<ReferralCode>}
 		 */
-		static async createReferral(user_id, referrer_id) {
-			return await Referral.create({
+		static async createReferralCode(user_id) {
+			return await ReferralCode.create({
 				user_id: user_id,
-				referrer_id: referrer_id,
 			});
 		}
 	}
-	Referral.init(
+	ReferralCode.init(
 		{
-			referral_id: {
+			referral_code_id: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 				primaryKey: true,
@@ -28,22 +26,23 @@ module.exports = (sequelize) => {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
-			referrer_id: {
+			code: {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
-			invite_code: {
-				type: DataTypes.STRING,
-				allowNull: true,
+			uses: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+				defaultValue: 0,
 			},
 		},
 		{
 			sequelize,
-			modelName: "Referral",
+			modelName: "ReferralCode",
 			createdAt: "created_at",
 			updatedAt: "updated_at",
 		}
 	);
 
-	return Referral;
+	return ReferralCode;
 };
