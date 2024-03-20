@@ -159,7 +159,7 @@ module.exports = {
 
 			const elapsed_time = end - start;
 
-			if (!interaction.isAutocomplete() && !interaction.isContextMenu()) {
+			if (!interaction.isAutocomplete()) {
 				await InteractionLog.createLog(interaction, elapsed_time);
 			}
 		} catch (error) {
