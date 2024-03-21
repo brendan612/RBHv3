@@ -6,6 +6,7 @@ const {
 	PermissionsBitField,
 	ThreadAutoArchiveDuration,
 } = require("discord.js");
+
 const client = require("../../client.js");
 
 class ThreadManager {
@@ -25,9 +26,10 @@ class ThreadManager {
 			reason: "Draft Thread",
 		});
 
-		const users = await lobby.getUsers();
+		const LobbyService = require("../services/lobbyService.js");
+		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
 
-		const addUserPromises = users.map(async (user) => {
+		const addUserPromises = lobbyDTO.players.map(async (user) => {
 			return await ThreadManager.addUserToThread(thread, user.user_id);
 		});
 
