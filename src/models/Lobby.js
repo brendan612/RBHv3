@@ -118,6 +118,11 @@ module.exports = (sequelize) => {
 				allowNull: false,
 				defaultValue: 1,
 			},
+			region: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				defaultValue: "NA",
+			},
 		},
 		{
 			sequelize,
