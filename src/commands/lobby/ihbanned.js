@@ -14,19 +14,22 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		const [users, results] = await sequelize.query(`
-			SELECT DISTINCT bans.targeted_user_id, bans.ban_end
+			SELECT bans.targeted_user_id, MAX(bans.ban_end) as ban_end
 			FROM (
 				SELECT targeted_user_id, created_at, duration as ban_end
 				FROM ModerationLogs
 				WHERE type = 'IHBAN'
-				AND duration > NOW() -- Adjust based on your SQL dialect
+				AND duration > NOW() -- Ensures the ban is still active
 			) AS bans
 			LEFT JOIN (
-				SELECT targeted_user_id, created_at AS unban_created_at
+				SELECT targeted_user_id, MAX(created_at) AS unban_created_at
 				FROM ModerationLogs
 				WHERE type = 'IHUNBAN'
-			) AS unbans ON bans.targeted_user_id = unbans.targeted_user_id AND unbans.unban_created_at < bans.ban_end
-			WHERE unbans.targeted_user_id IS NULL;
+				GROUP BY targeted_user_id
+			) AS unbans ON bans.targeted_user_id = unbans.targeted_user_id AND unbans.unban_created_at > bans.created_at
+			GROUP BY bans.targeted_user_id
+			HAVING MAX(bans.ban_end) > MAX(unbans.unban_created_at)
+			ORDER BY ban_end DESC;
 		`);
 
 		const banned_users = users.map((user) => {
