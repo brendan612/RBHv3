@@ -73,6 +73,8 @@ async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 		"leaderboard"
 	);
 
+	console.log("Leaderboard cache set", client.cache);
+
 	return results;
 }
 
