@@ -42,11 +42,14 @@ module.exports = {
 			const game = await handleGameOption(interaction);
 			const season = await handleSeasonOption(interaction, game.game_id);
 
+			const user = await User.findByPk(interaction.user.id);
+
 			const message = await updateLeaderboard(
 				interaction,
 				page,
 				game.game_id,
-				season?.season_id
+				season?.season_id,
+				user.region
 			);
 
 			await collectButtonInteractions(
