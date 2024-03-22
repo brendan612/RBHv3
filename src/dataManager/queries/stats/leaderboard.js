@@ -30,7 +30,8 @@ async function getLeaderboard(
 		attributes: {
 			include: [
 				"user_id",
-				"UserEloRatings.elo_rating",
+				// Direct attribute inclusion here should match how it's included in the 'include' section
+				[sequelize.col("UserEloRatings.elo_rating"), "elo_rating"], // Correct reference if using alias
 				[
 					sequelize.literal(`
                     (SELECT COUNT(*)
@@ -64,12 +65,9 @@ async function getLeaderboard(
 					{
 						model: Match,
 						attributes: [],
-						required: true,
 						where: {
-							...(season_id && { season_id: season_id }), // Only include season_id in the where clause if it's provided
-							end_time: {
-								[Op.ne]: null, // Ensures the match has concluded
-							},
+							...(season_id && { season_id: season_id }),
+							end_time: { [Op.ne]: null },
 							game_id: game_id,
 							region: region,
 						},
@@ -78,20 +76,21 @@ async function getLeaderboard(
 			},
 			{
 				model: UserEloRating,
-				as: "UserEloRatings",
+				as: "UserEloRatings", // Ensure this alias matches the association alias
+				attributes: [], // You may not need to explicitly include attributes if they're being used outside the attributes array
 				required: true,
 			},
 		],
 		group: ["User.user_id", "UserEloRatings.elo_rating"],
 		//prettier-ignore
 		having: sequelize.literal(`(SELECT COUNT(*)
-                                  FROM MatchPlayers mp
-                                  INNER JOIN Matches m ON mp.match_id = m.match_id
-                                  WHERE mp.user_id = User.user_id
-                                  AND (${season_id ? `m.season_id = ${season_id}` : "true" })
-                                  AND m.end_time > NOW() - INTERVAL 7 DAY 
-                                  ) >= ${minimumMatches}`),
-		order: [[sequelize.literal(`"UserEloRatings".elo_rating`), "DESC"]],
+                                FROM MatchPlayers mp
+                                INNER JOIN Matches m ON mp.match_id = m.match_id
+                                WHERE mp.user_id = User.user_id
+                                AND (${season_id ? `m.season_id = ${season_id}`: "true"})
+                                AND m.end_time > NOW() - INTERVAL 7 DAY 
+                                ) >= ${minimumMatches}`),
+		order: [[sequelize.col("UserEloRatings.elo_rating"), "DESC"]], // Corrected order reference
 		limit: limit,
 		offset: offset,
 	});
