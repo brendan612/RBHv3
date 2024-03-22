@@ -182,12 +182,7 @@ async function updateLeaderboard(
 		"WINS".padEnd(5, "") +
 		" LOSSES```";
 
-	const leaderboardData = await fetchLeaderboardData(
-		leaderboard,
-		season,
-		game,
-		offset
-	);
+	const leaderboardData = await fetchLeaderboardData(leaderboard, offset);
 
 	message += "```asciidoc\n";
 	leaderboardData.forEach((user, i) => {
