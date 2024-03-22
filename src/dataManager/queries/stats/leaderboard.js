@@ -22,7 +22,7 @@ async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 	}
 
 	const [results, metadata] = await sequelize.query(
-		`SELECT 
+		`SELECT DISTINCT
 			U.user_id,
 			U.summoner_name,
 			U.tag_line,
