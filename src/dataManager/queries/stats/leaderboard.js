@@ -29,9 +29,14 @@ async function getLeaderboard(
 	const leaderboard = await User.findAll({
 		attributes: {
 			include: [
-				"user_id",
-				// Direct attribute inclusion here should match how it's included in the 'include' section
-				[sequelize.col("UserEloRatings.elo_rating"), "elo_rating"], // Correct reference if using alias
+				"user_id", // Direct attribute from User
+				// Include 'elo_rating' from 'UserEloRatings' through subquery or direct association
+				[
+					sequelize.literal(
+						`(SELECT elo_rating FROM UserEloRatings WHERE UserEloRatings.user_id = User.user_id ORDER BY UserEloRatings.created_at DESC LIMIT 1)`
+					),
+					"elo_rating",
+				],
 				[
 					sequelize.literal(`
                     (SELECT COUNT(*)
