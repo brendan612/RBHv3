@@ -12,7 +12,8 @@ const client = require("../../../client.js");
  */
 async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 	const cachedLeaderboard = client.cache.get(
-		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}`
+		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}`,
+		"leaderboard"
 	);
 
 	if (cachedLeaderboard) {
