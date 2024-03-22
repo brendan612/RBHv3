@@ -34,8 +34,8 @@ async function getLeaderboard(
 				[
 					sequelize.literal(`
                     (SELECT COUNT(*)
-                     FROM "MatchPlayers" AS mp
-                     INNER JOIN "Matches" AS m ON mp.match_id = m.match_id
+                     FROM MatchPlayers mp
+                     INNER JOIN Matches m ON mp.match_id = m.match_id
                      WHERE mp.user_id = User.user_id
                      AND (${season_id ? `m.season_id = ${season_id}` : "true"}) 
                      AND mp.elo_change > 0
@@ -45,8 +45,8 @@ async function getLeaderboard(
 				[
 					sequelize.literal(`
                     (SELECT COUNT(*)
-                     FROM "MatchPlayers" AS mp
-                     INNER JOIN "Matches" AS m ON mp.match_id = m.match_id
+                     FROM MatchPlayers mp
+                     INNER JOIN Matches m ON mp.match_id = m.match_id
                      WHERE mp.user_id = User.user_id
                      AND (${season_id ? `m.season_id = ${season_id}` : "true"}) 
                      AND mp.elo_change < 0
