@@ -30,7 +30,7 @@ async function getLeaderboard(
 		attributes: {
 			include: [
 				"user_id",
-				[sequelize.literal(`"UserEloRatings".elo_rating`), "elo_rating"],
+				"UserEloRatings.elo_rating",
 				[
 					sequelize.literal(`
                     (SELECT COUNT(*)
