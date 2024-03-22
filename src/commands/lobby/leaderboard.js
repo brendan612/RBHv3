@@ -160,6 +160,7 @@ async function updateLeaderboard(
 	console.log("offset", offset, "limit", limit);
 	let leaderboard = await getLeaderboard(game_id, season_id, region);
 
+	console.log("leaderboard", leaderboard);
 	if (leaderboard.length === 0) {
 		return await interaction.editReply({
 			content: "No leaderboards found",
@@ -179,11 +180,11 @@ async function updateLeaderboard(
 
 	let message =
 		"```diff\n" +
-		"+RANK".padEnd(7, " ") +
+		"RANK".padEnd(6, " ") +
 		"NAME".padEnd(26, " ") +
 		"ELO".padEnd(8, " ") +
-		"WINS".padEnd(5, "") +
-		" LOSSES```";
+		"W".padEnd(5, "") +
+		"L```";
 
 	const leaderboardData = await fetchLeaderboardData(leaderboard, offset);
 
