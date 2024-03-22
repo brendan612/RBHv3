@@ -112,22 +112,21 @@ function createComponents(page, totalPages) {
 
 async function fetchLeaderboardData(leaderboard, offset) {
 	// Create an array of promises
-	const promises = leaderboard.map(async (user, i) => {
-		const userModel = await User.findByPk(user.user_id);
-
+	const promises = leaderboard.map((user, i) => {
 		let defaultNamePadding = 20;
-		const scriptCharacters = countScriptCharacters(userModel.summoner_name);
+		const scriptCharacters = countScriptCharacters(user.summoner_name);
 		defaultNamePadding -= scriptCharacters * 2;
 		if (scriptCharacters > 0) {
 			defaultNamePadding += 5;
 		}
 
+		//prettier-ignore
 		return {
 			rank: `${i + 1 + offset}.`.padEnd(7, " "),
-			name: `${userModel.summoner_name}`.padEnd(defaultNamePadding, " "),
-			elo: `${parseInt(user.dataValues.elo_rating)}`.padEnd(8, " "),
-			winsString: `${user.dataValues.wins}`.padEnd(5, " "),
-			lossesString: `${user.dataValues.losses}`.padEnd(5, " "),
+			name: `${user.summoner_name}#${user.tag_line}`.padEnd(defaultNamePadding, " "),
+			elo: `${parseInt(user.elo_rating)}`.padEnd(8, " "),
+			winsString: `${user.wins}`.padEnd(5, " "),
+			lossesString: `${user.losses}`.padEnd(5, " "),
 		};
 	});
 

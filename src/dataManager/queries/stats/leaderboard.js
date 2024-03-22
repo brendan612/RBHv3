@@ -30,6 +30,7 @@ async function getLeaderboard(
 		`SELECT 
 			U.user_id,
 			U.summoner_name,
+			U.tag_line,
 			E.elo_rating,
 			(SELECT COUNT(*) 
 			FROM MatchPlayers MP
