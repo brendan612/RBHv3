@@ -92,8 +92,8 @@ async function getLeaderboard(
                                   AND m.end_time > NOW() - INTERVAL 7 DAY 
                                   ) >= ${minimumMatches}`),
 		order: [[sequelize.literal(`"UserEloRatings".elo_rating`), "DESC"]],
-		limit,
-		offset,
+		limit: limit,
+		offset: offset,
 	});
 
 	return leaderboard;
