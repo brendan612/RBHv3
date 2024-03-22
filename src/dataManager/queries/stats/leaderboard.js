@@ -39,7 +39,7 @@ async function getLeaderboard(
                      WHERE mp.user_id = User.user_id
                      AND (${season_id ? `m.season_id = ${season_id}` : "true"}) 
                      AND mp.elo_change > 0
-                     AND m.end_time > NOW() - INTERVAL '7 days' )`),
+                     AND m.end_time > NOW() - INTERVAL 7 DAY )`),
 					"wins",
 				],
 				[
@@ -50,7 +50,7 @@ async function getLeaderboard(
                      WHERE mp.user_id = User.user_id
                      AND (${season_id ? `m.season_id = ${season_id}` : "true"}) 
                      AND mp.elo_change < 0
-                     AND m.end_time > NOW() - INTERVAL '7 days' )`),
+                     AND m.end_time > NOW() - INTERVAL 7 DAY )`),
 					"losses",
 				],
 			],
