@@ -181,11 +181,12 @@ async function updateLeaderboard(
 
 	let message =
 		"```diff\n" +
-		"+RANK".padEnd(6, " ") +
+		"+RANK".padEnd(7, " ") +
 		"NAME".padEnd(26, " ") +
 		"ELO".padEnd(8, " ") +
 		"W".padEnd(5, " ") +
-		"L```";
+		"L".padEnd(5, " ") +
+		"```";
 
 	const leaderboardData = await fetchLeaderboardData(leaderboard, offset);
 
