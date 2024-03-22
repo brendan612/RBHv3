@@ -16,6 +16,8 @@ async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 	);
 
 	if (cachedLeaderboard) {
+		console.log("Using cached leaderboard");
+		console.log(cachedLeaderboard.length);
 		return cachedLeaderboard;
 	}
 

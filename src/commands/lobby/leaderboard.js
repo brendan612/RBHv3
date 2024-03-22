@@ -113,7 +113,7 @@ function createComponents(page, totalPages) {
 async function fetchLeaderboardData(leaderboard, offset) {
 	// Create an array of promises
 	const promises = leaderboard.map((user, i) => {
-		let defaultNamePadding = 20;
+		let defaultNamePadding = 26;
 		const scriptCharacters = countScriptCharacters(user.summoner_name);
 		defaultNamePadding -= scriptCharacters * 2;
 		if (scriptCharacters > 0) {
@@ -167,6 +167,8 @@ async function updateLeaderboard(
 	}
 
 	const leaderboardCount = leaderboard.length;
+
+	console.log("leaderboardCount", leaderboardCount);
 
 	leaderboard = leaderboard.slice(offset, offset + limit);
 
