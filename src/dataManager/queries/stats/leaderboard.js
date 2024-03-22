@@ -63,6 +63,8 @@ async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 				GROUP BY MP.user_id
 				HAVING COUNT(MP.match_id) >= ${minimumMatches}
 			)
+			AND E.game_id = 1
+			AND E.season_id = 28	
 		ORDER BY 
 			E.elo_rating DESC
 	`
