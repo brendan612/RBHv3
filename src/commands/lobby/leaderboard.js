@@ -157,6 +157,7 @@ async function updateLeaderboard(
 	const limit = 30;
 	const offset = (page - 1) * limit;
 
+	console.log("offset", offset, "limit", limit);
 	let leaderboard = await getLeaderboard(game_id, season_id, region);
 
 	if (leaderboard.length === 0) {
@@ -179,7 +180,7 @@ async function updateLeaderboard(
 	let message =
 		"```diff\n" +
 		"+RANK".padEnd(7, " ") +
-		"NAME".padEnd(20, " ") +
+		"NAME".padEnd(26, " ") +
 		"ELO".padEnd(8, " ") +
 		"WINS".padEnd(5, "") +
 		" LOSSES```";
