@@ -72,6 +72,7 @@ class MatchService {
 			season_id: lobby.season_id,
 			draft_id: draft.draft_id,
 			start_time: new Date(),
+			region: lobby.region,
 		});
 
 		await this.createMatchPlayers(lobby, draft, match);
@@ -223,6 +224,8 @@ class MatchService {
 			}
 
 			client.cache.clear("lobby_id_" + lobby.lobby_id);
+
+			client.cache.clear("leaderboard");
 		} catch (error) {
 			console.error("Error submitting win for match: " + this.match.match_id);
 			console.error(error);
@@ -239,6 +242,7 @@ class MatchService {
 					match_id: {
 						[Op.gte]: this.match.match_id,
 					},
+					region: this.match.region,
 				},
 				include: [
 					{

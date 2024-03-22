@@ -157,13 +157,7 @@ async function updateLeaderboard(
 	const limit = 30;
 	const offset = (page - 1) * limit;
 
-	const leaderboard = await getLeaderboard(
-		game_id,
-		season_id,
-		limit,
-		offset,
-		region
-	);
+	let leaderboard = await getLeaderboard(game_id, season_id, region);
 
 	if (leaderboard.length === 0) {
 		return await interaction.editReply({
@@ -171,6 +165,10 @@ async function updateLeaderboard(
 			ephemeral: true,
 		});
 	}
+
+	const leaderboardCount = leaderboard.length;
+
+	leaderboard = leaderboard.slice(offset, offset + limit);
 
 	const title = (season ? season.name : "All-Time") + " Leaderboard";
 

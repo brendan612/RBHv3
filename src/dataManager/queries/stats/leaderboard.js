@@ -1,31 +1,24 @@
-const {
-	User,
-	MatchPlayer,
-	Match,
-	UserEloRating,
-	sequelize,
-} = require("../../../models");
+const { sequelize } = require("../../../models");
 
-const { Op, literal } = require("sequelize");
+const client = require("../../../client.js");
 
 /**
  *
  * @param {number} game_id
  * @param {number} season_id
- * @param {number} limit
- * @param {number} offset
  * @param {string} region
  * @param {number} minimumMatches
  * @returns {<Promise<Any[]>} An array of users.
  */
-async function getLeaderboard(
-	game_id,
-	season_id,
-	limit,
-	offset,
-	region,
-	minimumMatches = 3
-) {
+async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
+	const cachedLeaderboard = client.cache.get(
+		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}`
+	);
+
+	if (cachedLeaderboard) {
+		return cachedLeaderboard;
+	}
+
 	const [results, metadata] = await sequelize.query(
 		`SELECT 
 			U.user_id,
@@ -69,12 +62,14 @@ async function getLeaderboard(
 			)
 		ORDER BY 
 			E.elo_rating DESC
-		LIMIT 
-			${offset}, ${limit};
 	`
 	);
 
-	console.log(results);
+	client.cache.set(
+		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}`,
+		results,
+		"leaderboard"
+	);
 
 	return results;
 }
