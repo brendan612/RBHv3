@@ -20,6 +20,10 @@ const {
 	countScriptCharacters,
 } = require("../../utilities/utility-functions.js");
 
+const {
+	getLeaderboard,
+} = require("../../dataManager/queries/stats/leaderboard.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
@@ -103,26 +107,10 @@ function createComponents(page, totalPages) {
 	return components;
 }
 
-async function fetchLeaderboardData(leaderboard, season, game, offset) {
+async function fetchLeaderboardData(leaderboard, offset) {
 	// Create an array of promises
 	const promises = leaderboard.map(async (user, i) => {
-		const whereClause = {
-			...(season ? { season_id: season.season_id } : {}),
-			game_id: game.game_id,
-		};
-
-		// Fetch matches for the user
-		const matches = await MatchPlayer.findAll({
-			where: { user_id: user.user_id },
-			include: [
-				{ model: Match, as: "Match", required: true, where: whereClause },
-			],
-		});
-
 		const userModel = await User.findByPk(user.user_id);
-
-		const wins = matches.filter((match) => match.elo_change > 0).length;
-		const losses = matches.filter((match) => match.elo_change < 0).length;
 
 		let defaultNamePadding = 20;
 		const scriptCharacters = countScriptCharacters(userModel.summoner_name);
@@ -134,9 +122,9 @@ async function fetchLeaderboardData(leaderboard, season, game, offset) {
 		return {
 			rank: `${i + 1 + offset}.`.padEnd(7, " "),
 			name: `${userModel.summoner_name}`.padEnd(defaultNamePadding, " "),
-			elo: `${parseInt(user.average_elo)}`.padEnd(8, " "),
-			winsString: `${wins}`.padEnd(5, " "),
-			lossesString: `${losses}`.padEnd(5, " "),
+			elo: `${parseInt(user.dataValues.elo_rating)}`.padEnd(8, " "),
+			winsString: `${user.dataValues.wins}`.padEnd(5, " "),
+			lossesString: `${user.dataValues.losses}`.padEnd(5, " "),
 		};
 	});
 
@@ -144,7 +132,13 @@ async function fetchLeaderboardData(leaderboard, season, game, offset) {
 	return Promise.all(promises);
 }
 
-async function updateLeaderboard(interaction, page, game_id, season_id) {
+async function updateLeaderboard(
+	interaction,
+	page,
+	game_id,
+	season_id,
+	region
+) {
 	let game = null;
 	let season = null;
 
@@ -161,83 +155,13 @@ async function updateLeaderboard(interaction, page, game_id, season_id) {
 	const limit = 30;
 	const offset = (page - 1) * limit;
 
-	const [results, leaderboardCountResults] = await Promise.all([
-		sequelize.query(
-			`
-				SELECT
-					uer.user_id,
-					AVG(uer.elo_rating) AS average_elo,
-					mp.matches_played
-				FROM
-					UserEloRatings uer
-				JOIN
-					Users u ON uer.user_id = u.user_id
-				LEFT JOIN
-					(SELECT
-						user_id,
-						COUNT(DISTINCT MatchPlayers.match_id) AS matches_played
-					FROM
-						MatchPlayers
-					JOIN
-						Matches m ON MatchPlayers.match_id = m.match_id
-					WHERE m.game_id = :game_id
-					${season_id ? "AND m.season_id = :season_id" : ""}
-					GROUP BY
-						user_id) mp ON u.user_id = mp.user_id
-				WHERE uer.user_id > 20
-				AND uer.game_id = :game_id
-				${season_id ? "AND uer.season_id = :season_id" : ""}
-				GROUP BY
-					uer.user_id, mp.matches_played
-				HAVING
-					mp.matches_played >= 3
-				ORDER BY
-					average_elo DESC
-				LIMIT :limit OFFSET :offset;`,
-			{
-				replacements: { limit, offset, game_id, season_id },
-				type: sequelize.QueryTypes.SELECT,
-			}
-		),
-		sequelize.query(
-			`
-				SELECT
-					uer.user_id,
-					AVG(uer.elo_rating) AS average_elo,
-					mp.matches_played
-				FROM
-					UserEloRatings uer
-				JOIN
-					Users u ON uer.user_id = u.user_id
-				LEFT JOIN
-					(SELECT
-						user_id,
-						COUNT(DISTINCT MatchPlayers.match_id) AS matches_played
-					FROM
-						MatchPlayers
-					JOIN
-						Matches m ON MatchPlayers.match_id = m.match_id
-					WHERE m.game_id = :game_id
-					${season_id ? "AND m.season_id = :season_id" : ""}
-					GROUP BY
-						user_id) mp ON u.user_id = mp.user_id
-				WHERE uer.user_id > 20
-				AND uer.game_id = :game_id
-				${season_id ? "AND uer.season_id = :season_id" : ""}
-				GROUP BY
-					uer.user_id, mp.matches_played
-				HAVING
-					mp.matches_played >= 3`,
-			{
-				replacements: { limit, offset, game_id, season_id },
-				type: sequelize.QueryTypes.SELECT,
-			}
-		),
-	]);
-
-	const leaderboard = results;
-
-	const leaderboardCount = leaderboardCountResults.length;
+	const leaderboard = await getLeaderboard(
+		game_id,
+		season_id,
+		limit,
+		offset,
+		region
+	);
 
 	if (leaderboard.length === 0) {
 		return await interaction.editReply({
