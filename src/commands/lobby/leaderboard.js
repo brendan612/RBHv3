@@ -56,7 +56,8 @@ module.exports = {
 				interaction,
 				message,
 				game.game_id,
-				season?.season_id
+				season?.season_id,
+				user.region
 			);
 		} catch (e) {
 			console.log(e);
@@ -180,10 +181,10 @@ async function updateLeaderboard(
 
 	let message =
 		"```diff\n" +
-		"RANK".padEnd(6, " ") +
+		"+RANK".padEnd(6, " ") +
 		"NAME".padEnd(26, " ") +
 		"ELO".padEnd(8, " ") +
-		"W".padEnd(5, "") +
+		"W".padEnd(5, " ") +
 		"L```";
 
 	const leaderboardData = await fetchLeaderboardData(leaderboard, offset);
@@ -218,7 +219,8 @@ async function collectButtonInteractions(
 	interaction,
 	discordMessage,
 	game_id,
-	season_id
+	season_id,
+	region
 ) {
 	const filter = (i) => {
 		i.deferUpdate();
@@ -236,7 +238,7 @@ async function collectButtonInteractions(
 		const customId = i.customId;
 		const split = customId.split("_");
 		const page = parseInt(split[1], 10);
-		await updateLeaderboard(interaction, page, game_id, season_id);
+		await updateLeaderboard(interaction, page, game_id, season_id, region);
 	});
 
 	collector.on("end", async (i) => {
