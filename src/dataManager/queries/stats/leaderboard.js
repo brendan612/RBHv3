@@ -78,6 +78,7 @@ async function getLeaderboard(
 			},
 			{
 				model: UserEloRating,
+				as: "UserEloRatings",
 				attributes: [],
 				required: true,
 			},
