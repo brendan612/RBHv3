@@ -122,7 +122,10 @@ module.exports = {
 				});
 			}
 
-			if (!hasRequiredRoleOrHigher(interaction.member, "moderator")) {
+			if (
+				user.id !== interaction.member.id &&
+				!hasRequiredRoleOrHigher(interaction.member, "moderator")
+			) {
 				return await interaction.reply({
 					content: "You do not have permission to update this player",
 					ephemeral: true,
