@@ -37,6 +37,15 @@ async function getStatsForUser(user_id, game_id, season_id) {
 
 		const leaderboardUser = leaderboard.find((u) => u.user_id === user_id);
 
+		if (!leaderboardUser) {
+			return {
+				wins: 0,
+				losses: 0,
+				rank: -1,
+				elo_rating: 800,
+			};
+		}
+
 		const showRank =
 			parseInt(leaderboardUser.wins) + parseInt(leaderboardUser.losses) >= 3;
 
