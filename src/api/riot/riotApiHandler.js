@@ -3,6 +3,12 @@ require("dotenv").config();
 
 const REGIONS = {
 	NA: "americas",
+	EUW: "europe",
+};
+
+const SUB_REGIONS = {
+	americas: "na1",
+	europe: "euw1",
 };
 
 /**
@@ -16,7 +22,7 @@ async function getSummoner(user) {
 		return await getSummonerByRiotID(
 			user.summoner_name,
 			user.tag_line,
-			REGIONS[user.region]
+			user.region
 		);
 	}
 }
@@ -32,11 +38,14 @@ async function getSummonerByRiotID(gameName, tagLine, region = "NA") {
 	});
 
 	if (user?.puuid) {
-		return await getSummonerByPuuid(user.puuid);
+		return await getSummonerByPuuid(user.puuid, region);
 	}
 
+	const apiRegion = REGIONS[region];
+
 	const riotAccount = await axios.get(
-		`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
+		//prettier-ignore
+		`https://${apiRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
 		{
 			headers: {
 				"X-Riot-Token": process.env.RIOTAPIKEY,
@@ -45,12 +54,13 @@ async function getSummonerByRiotID(gameName, tagLine, region = "NA") {
 		}
 	);
 
-	return await getSummonerByPuuid(riotAccount.data.puuid);
+	return await getSummonerByPuuid(riotAccount.data.puuid, region);
 }
 
-async function getSummonerByPuuid(puuid) {
+async function getSummonerByPuuid(puuid, region = "NA") {
+	const apiRegion = SUB_REGIONS[REGIONS[region]];
 	const summoner = await axios.get(
-		`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
+		`https://${apiRegion}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`,
 		{
 			headers: {
 				"X-Riot-Token": process.env.RIOTAPIKEY,
@@ -63,9 +73,11 @@ async function getSummonerByPuuid(puuid) {
 }
 
 async function getRankByRiotID(gameName, tagLine, region = "NA") {
+	const apiRegion = SUB_REGIONS[REGIONS[region]];
 	const summoner = await getSummonerByRiotID(gameName, tagLine, region);
+
 	const rank = await axios.get(
-		`https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summoner.id}`,
+		`https://${apiRegion}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summoner.id}`,
 		{
 			headers: {
 				"X-Riot-Token": process.env.RIOTAPIKEY,
@@ -77,9 +89,10 @@ async function getRankByRiotID(gameName, tagLine, region = "NA") {
 	return rank.data;
 }
 
-async function getRiotAccountByPuuid(puuid) {
+async function getRiotAccountByPuuid(puuid, region = "NA") {
+	const apiRegion = REGIONS[region];
 	const riotAccount = await axios.get(
-		`https://americas.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`,
+		`https://${apiRegion}.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`,
 		{
 			headers: {
 				"X-Riot-Token": process.env.RIOTAPIKEY,

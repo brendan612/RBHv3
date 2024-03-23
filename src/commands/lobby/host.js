@@ -30,6 +30,7 @@ module.exports = {
 
 		await interaction.deferReply();
 		const game = await handleGameOption(interaction);
+
 		const lobby = await LobbyService.createLobby(
 			interaction.member.id,
 			game.game_id

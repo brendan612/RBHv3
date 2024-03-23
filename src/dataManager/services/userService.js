@@ -3,6 +3,7 @@ const {
 	UserEloRating,
 	Referral,
 	ModerationLog,
+	sequelize,
 } = require("../../models/index.js");
 const UserDTO = require("../DTOs/userDTO.js");
 const {
@@ -69,14 +70,22 @@ class UserService {
 	 *
 	 * @param {bigint} user_id
 	 * @param {Date} join_date
+	 * @param {string} region
 	 * @returns {Promise<User>}
 	 */
-	static async createUser(user_id, join_date) {
-		const user = await User.create({
-			user_id: user_id,
-			join_date: join_date,
+	static async createUser(user_id, join_date, region = "NA") {
+		const user = await User.findOrCreate({
+			where: {
+				user_id: user_id,
+			},
+			defaults: {
+				user_id: user_id,
+				join_date: join_date,
+				region: region,
+			},
 		});
-		return user;
+
+		return user[0];
 	}
 
 	/**

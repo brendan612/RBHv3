@@ -26,9 +26,10 @@ const textSectionHeight = 760;
  *
  * @param {Game} game
  * @param {Season} season
+ * @param {string} region
  * @returns
  */
-async function generateVeteransImage(game, season) {
+async function generateVeteransImage(game, season, region = "NA") {
 	const matchPlayers = await MatchPlayer.findAll({
 		attributes: [
 			"user_id",
@@ -58,6 +59,7 @@ async function generateVeteransImage(game, season) {
 				where: {
 					game_id: game.game_id,
 					season_id: season.season_id,
+					region: region,
 				},
 			},
 		],

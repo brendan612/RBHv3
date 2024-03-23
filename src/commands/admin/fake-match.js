@@ -32,13 +32,6 @@ module.exports = {
 		const lobby = await Lobby.findByPk(lobbyDTO.lobby_id);
 
 		const lobbyService = new LobbyService(lobby);
-
-		const draftDTO = await DraftService.createDraft(lobby.lobby_id);
-		const draft = await Draft.findByPk(draftDTO.draft_id);
-		lobby.draft_id = draft.draft_id;
-
-		await lobby.save();
-
 		const lobbyUsers = await lobby.getUsers();
 
 		let dummies = await User.findAll({
@@ -48,11 +41,18 @@ module.exports = {
 				},
 			},
 		});
+
 		for (const dummy of dummies) {
 			await lobbyService.addUser(dummy.user_id);
 		}
 
 		lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
+
+		const draftDTO = await DraftService.createDraft(lobby.lobby_id);
+		const draft = await Draft.findByPk(draftDTO.draft_id);
+		lobby.draft_id = draft.draft_id;
+
+		await lobby.save();
 
 		const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 		const playerDraftManager =
@@ -155,7 +155,7 @@ module.exports = {
 		}
 
 		await championDraftService.generateChampionDraftEmbed(draft);
-		await MatchService.createMatch(this.draft);
+		await MatchService.createMatch(draft);
 		await interaction.editReply("Fake match created");
 	},
 };

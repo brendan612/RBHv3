@@ -60,7 +60,7 @@ class LobbyService {
 
 	/**
 	 *
-	 * @param {bigint} host_id
+	 * @param {string} host_id
 	 * @param {number} game_id
 	 * @returns {Promise<LobbyDTO>}
 	 */
@@ -72,11 +72,14 @@ class LobbyService {
 		});
 		const season_lobby_id = seasonLobbyCount + 1;
 
+		const host = await User.findByPk(host_id);
+
 		const lobby = await Lobby.create({
 			host_id: host_id,
 			game_id: game_id,
 			season_id: season_id,
 			season_lobby_id: season_lobby_id,
+			region: host.region,
 		});
 
 		lobby.lobby_name = `Lobby #${lobby.lobby_id}`;
@@ -265,6 +268,12 @@ class LobbyService {
 
 		if (this.lobby.draft_id) {
 			return { isJoinable: false, reason: "Draft has already started" };
+		}
+
+		const user = await User.findByPk(user_id);
+
+		if (user.region !== this.lobby.region) {
+			return { isJoinable: false, reason: "User is not in the same region" };
 		}
 
 		if (user_id) {

@@ -37,6 +37,8 @@ module.exports = {
 		const lobby = await handleLobbyOption(interaction);
 		const user = await handleUserOption(interaction, "target");
 
+		const host = await User.findByPk(lobby.host_id);
+
 		const canSetHost =
 			interaction.member.id === lobby.host_id ||
 			hasRequiredRoleOrHigher(interaction.member, "trainee");
@@ -51,6 +53,13 @@ module.exports = {
 		if (lobby.host_id === user.user_id) {
 			return await interaction.reply({
 				content: "User is already the host of the lobby",
+				ephemeral: true,
+			});
+		}
+
+		if (host.region !== user.region) {
+			return await interaction.reply({
+				content: "User is not in the same region as the lobby",
 				ephemeral: true,
 			});
 		}

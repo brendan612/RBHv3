@@ -47,17 +47,32 @@ module.exports = {
 		const referrer = interaction.options.getUser("referrer") ?? null;
 		let user = await User.findByPk(interaction.member.id);
 
+		const guildMember = await client.guild.members.fetch(interaction.member.id);
+
+		const guildMemberRoles = guildMember.roles.cache;
+
+		let region = "NA";
+
+		if (guildMemberRoles.some((role) => role.name === "EUW")) {
+			region = "EUW";
+		}
+
 		if (!user) {
 			user = UserService.createUser(
 				interaction.member.id,
-				interaction.member.joinedAt
+				interaction.member.joinedAt,
+				region
 			);
+		} else {
+			user.region = region;
+			await user.save();
 		}
 
 		const duplicateCheck = await User.findOne({
 			where: {
 				summoner_name: game_name,
 				tag_line: tag_line,
+				region: region,
 			},
 		});
 
@@ -93,7 +108,7 @@ module.exports = {
 				content:
 					"An error occurred while trying to verify your account.\n" +
 					"Please check the entered Riot ID and try again. \n" +
-					"Also, we are currently only playing on NA servers, so you must have an NA account to verify.",
+					"Also, we are currently only playing on NA and EUW servers.",
 				ephemeral: true,
 			});
 		}

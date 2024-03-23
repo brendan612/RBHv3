@@ -32,7 +32,8 @@ const userLevelManager = new UserLevelManager();
  * @param {GuildMember} referrer
  */
 async function generateVerifyEmbed(user_id, game_name, tag_line, referrer) {
-	const guild = await client.guilds.fetch(client.guildID);
+	const guild = await client.guild;
+	const user = await User.findByPk(user_id);
 	const embed = baseEmbed(
 		`Verify ${game_name}#${tag_line}`,
 		"Verify your account with your Riot ID"
@@ -54,7 +55,7 @@ async function generateVerifyEmbed(user_id, game_name, tag_line, referrer) {
 	});
 
 	let verifyIcon = 0;
-	const summoner = await getSummonerByRiotID(game_name, tag_line);
+	const summoner = await getSummonerByRiotID(game_name, tag_line, user.region);
 	if (!summoner) {
 		return null;
 	}
@@ -341,8 +342,6 @@ async function generateBasicEmbed(
 		`${user.summoner_name}#${user.tag_line}`,
 		"Server Profile"
 	);
-
-	console.log(remainingExp, exp);
 
 	embed.addFields(
 		{
