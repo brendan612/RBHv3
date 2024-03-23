@@ -62,34 +62,51 @@ module.exports = {
 	async execute(interaction) {
 		if (interaction.options.getSubcommand() === "view") {
 			const lobby = await handleLobbyOption(interaction);
-			if (!lobby) return await interaction.reply("Lobby not found");
+			if (!lobby) {
+				return await interaction.reply({
+					content: "Lobby not found",
+					ephemeral: true,
+				});
+			}
 
 			const match = await MatchService.getMatch(lobby.match_id);
-			if (!match)
-				return await interaction.reply(
-					"This lobby has no match associated with it"
-				);
+			if (!match) {
+				return await interaction.reply({
+					content: "This lobby has no match associated with it",
+					ephemeral: true,
+				});
+			}
 
 			const player = interaction.options.getUser("player");
-			if (!match.MatchPlayers.find((mp) => mp.user_id === player.id))
-				return await interaction.reply("Player not found in this match");
 
 			const matchPlayer = match.MatchPlayers.find(
 				(mp) => mp.user_id === player.id
 			);
+			if (!matchPlayer) {
+				return await interaction.reply({
+					content: "Player not found in this match",
+					ephemeral: true,
+				});
+			}
 
 			return await interaction.reply({
 				content: `Player: <@${player.id}>\nTeam: ${matchPlayer.team}\nRole: ${matchPlayer.role}\nChampion: ${matchPlayer.champion_id}`,
 			});
 		} else if (interaction.options.getSubcommand() === "update") {
 			const lobby = await handleLobbyOption(interaction);
-			if (!lobby) return await interaction.reply("Lobby not found");
+			if (!lobby) {
+				return await interaction.reply({
+					content: "Lobby not found",
+					ephemeral: true,
+				});
+			}
 
 			const match = await MatchService.getMatch(lobby.match_id);
 			if (!match) {
-				return await interaction.reply(
-					"This lobby has no match associated with it"
-				);
+				return await interaction.reply({
+					content: "This lobby has no match associated with it",
+					ephemeral: true,
+				});
 			}
 
 			const user = interaction.options.getUser("player") ?? interaction.user;
@@ -99,13 +116,17 @@ module.exports = {
 			);
 
 			if (!matchPlayer) {
-				return await interaction.reply("Player not found in this match");
+				return await interaction.reply({
+					content: "Player not found in this match",
+					ephemeral: true,
+				});
 			}
 
 			if (!hasRequiredRoleOrHigher(interaction.member, "moderator")) {
-				return await interaction.reply(
-					"You do not have permission to update this player's information"
-				);
+				return await interaction.reply({
+					content: "You do not have permission to update this player",
+					ephemeral: true,
+				});
 			}
 
 			const champion = await handleChampionOption(
@@ -122,7 +143,10 @@ module.exports = {
 			});
 
 			if (!draftRound) {
-				return await interaction.reply("Champion not found in this draft");
+				return await interaction.reply({
+					content: "Champion not found in this draft",
+					ephemeral: true,
+				});
 			}
 
 			const takenChamp = match.MatchPlayers.some(
@@ -130,9 +154,11 @@ module.exports = {
 			);
 
 			if (takenChamp) {
-				return await interaction.reply(
-					"Champion already taken. If you need to swap champions, please contact a moderator."
-				);
+				return await interaction.reply({
+					content:
+						"Champion already taken. If you need to swap champions, please contact a moderator.",
+					ephemeral: true,
+				});
 			}
 
 			const role = interaction.options.getString("role");
@@ -142,9 +168,11 @@ module.exports = {
 			);
 
 			if (takenRole) {
-				return await interaction.reply(
-					"Role already taken. If you need to swap roles, please contact a moderator."
-				);
+				return await interaction.reply({
+					content:
+						"Role already taken. If you need to swap roles, please contact a moderator.",
+					ephemeral: true,
+				});
 			}
 
 			await matchPlayer.update({
@@ -154,6 +182,7 @@ module.exports = {
 
 			return await interaction.reply({
 				content: `Player: <@${user.id}>\nTeam: ${matchPlayer.team}\nRole: ${matchPlayer.role}\nChampion: ${matchPlayer.champion_id}`,
+				ephemeral: true,
 			});
 		}
 	},
