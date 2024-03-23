@@ -6,7 +6,8 @@ module.exports = (sequelize) => {
 			let options = null;
 			let name = null;
 			if (interaction.commandName) {
-				name = interaction.commandName;
+				let subcommand = interaction.options.getSubcommand();
+				name = interaction.commandName + subcommand;
 				if (interaction.options) {
 					options = interaction.options.data.reduce((acc, option) => {
 						acc[option.name] = option.value;

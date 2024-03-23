@@ -57,7 +57,12 @@ async function getStatsForUser(user_id, game_id, season_id) {
 		};
 	} catch (err) {
 		console.error(err);
-		return null;
+		return {
+			wins: 0,
+			losses: 0,
+			rank: -1,
+			elo_rating: 800,
+		};
 	}
 }
 
