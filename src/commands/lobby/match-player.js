@@ -181,7 +181,7 @@ module.exports = {
 			});
 
 			return await interaction.reply({
-				content: `Player: <@${user.id}>\nTeam: ${matchPlayer.team}\nRole: ${matchPlayer.role}\nChampion: ${matchPlayer.champion_id}`,
+				content: `Player: <@${user.id}>\nTeam: ${matchPlayer.team}\nRole: ${matchPlayer.role}\nChampion: ${matchPlayer.champion_id}\n\nIf you are using this command intentionally incorrectly, you'll lose your permissions to use it.`,
 				ephemeral: true,
 			});
 		}

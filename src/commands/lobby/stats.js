@@ -60,7 +60,9 @@ module.exports = {
 		const data = `${(rank === -1 ? "UR" : rank.toString()).padEnd(6)} ${elo_rating.toString().padEnd(8)} ${wins.toString().padEnd(6)} ${losses.toString().padEnd(6)}`;
 
 		const embed = baseEmbed(
-			`${season ? season.name : "All-Time"} Stats for ${user.summoner_name}`,
+			`${season ? "Current Season" : "All-Time"} Stats for ${
+				user.summoner_name
+			}`,
 			"```" + header + "``````" + data + "```",
 			false
 		);
