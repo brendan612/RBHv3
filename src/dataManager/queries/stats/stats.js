@@ -3,6 +3,7 @@ const {
 	Lobby,
 	Match,
 	MatchPlayer,
+	Champion,
 	Season,
 	sequelize,
 	Sequelize,
@@ -174,7 +175,32 @@ async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
 	}
 }
 
+async function getRecentMatchStatsForUser(user_id, game_id, season_id) {
+	const matchPlayers = await MatchPlayer.findAll({
+		where: {
+			user_id: user_id,
+		},
+		include: [
+			{
+				model: Match,
+				where: {
+					game_id: game_id,
+					season_id: season_id,
+				},
+			},
+			{
+				model: Champion,
+			},
+		],
+		order: [["created_at", "DESC"]],
+		limit: 5,
+	});
+
+	return matchPlayers;
+}
+
 module.exports = {
 	getStatsForUser,
 	getSynergyStatsForUsers,
+	getRecentMatchStatsForUser,
 };

@@ -179,6 +179,11 @@ MatchPlayer.belongsTo(User, { foreignKey: "user_id", ...cascadeOptions });
 MatchPlayer.belongsTo(Match, { foreignKey: "match_id", ...cascadeOptions });
 User.hasMany(MatchPlayer, { foreignKey: "user_id", ...cascadeOptions });
 
+MatchPlayer.hasOne(Champion, {
+	foreignKey: "champion_id",
+	...cascadeOptions,
+});
+
 AutoResponse.belongsTo(User, { foreignKey: "created_by", ...cascadeOptions });
 
 Game.hasOne(ServerChannel, {

@@ -10,13 +10,18 @@ const {
 	MatchPlayer,
 	Season,
 	User,
+	Champion,
 	handleGameOption,
 	handleUserOption,
 	handleSeasonOption,
 	baseEmbed,
 	sequelize,
 } = require("./index.js");
-const { getStatsForUser } = require("../../dataManager/queries/stats/stats.js");
+const {
+	getStatsForUser,
+	getRecentMatchStatsForUser,
+} = require("../../dataManager/queries/stats/stats.js");
+const { LeagueRoleEmojis } = require("../../assets/emojis.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -43,7 +48,12 @@ module.exports = {
 			season?.season_id
 		);
 
-		console.log(wins, losses, rank, elo_rating);
+		const recent = await getRecentMatchStatsForUser(
+			user.user_id,
+			game.game_id,
+			season?.season_id
+		);
+
 		//prettier-ignore
 		const header = `${"Rank".padEnd(6)} ${"Elo".padEnd(8)} ${"W".padEnd(6)} ${"L".padEnd(6)}`;
 		//prettier-ignore
@@ -59,6 +69,24 @@ module.exports = {
 			//prettier-ignore
 			embed.setFooter({
 				text: `Unranked - Play ${(3 - (wins + losses)) } more game(s) to get a rank`,
+			});
+		}
+
+		if (recent.length > 0) {
+			const recentMatches = await Promise.all(
+				recent.map(async (match) => {
+					const champion = await Champion.findByPk(match.champion_id);
+					const role = LeagueRoleEmojis[match.role] ?? LeagueRoleEmojis["Fill"];
+
+					return `${role} ${champion?.name ?? "Unknown"} | ${
+						match.elo_change > 0 ? ":white_check_mark:" : ":x:"
+					} ${match.elo_change}`;
+				})
+			);
+
+			embed.addFields({
+				name: "Recent Matches",
+				value: recentMatches.join("\n"),
 			});
 		}
 
