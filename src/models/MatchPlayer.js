@@ -40,6 +40,14 @@ module.exports = (sequelize) => {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
+			champion_id: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+			},
+			role: {
+				type: DataTypes.STRING,
+				allowNull: true,
+			},
 			elo_change: {
 				type: DataTypes.INTEGER,
 				allowNull: true,

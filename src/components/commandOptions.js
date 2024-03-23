@@ -77,6 +77,13 @@ function seasonOption(
 		.setAutocomplete(true);
 }
 
+/**
+ *
+ * @param {string} name
+ * @param {string} description
+ * @param {boolean} isRequired
+ * @returns {SlashCommandStringOption}
+ */
 function championOption(
 	name = "champion",
 	description = "Champion",

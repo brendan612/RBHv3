@@ -21,8 +21,12 @@ const { Op } = require("sequelize");
  * @param {Interaction} interaction
  * @returns {Promise<Game>}
  */
-async function handleGameOption(interaction) {
-	const gameName = interaction.options.getString("game") ?? "League of Legends";
+async function handleGameOption(interaction, allowNull = false) {
+	const option = interaction.options.getString("game");
+	if (allowNull && !option) {
+		return null;
+	}
+	const gameName = option ?? "League of Legends";
 	return await Game.findOne({ where: { name: gameName } });
 }
 
@@ -155,10 +159,15 @@ async function handleSeasonOption(interaction, game_id) {
  *
  * @param {Interaction} interaction
  * @param {int} draft_id
+ * @param {boolean} search
  * @returns {Promise<Champion>}
  */
-async function handleChampionOption(interaction, draft_id) {
+async function handleChampionOption(interaction, draft_id, search = false) {
 	const champion_id = interaction.options.getString("champion");
+
+	if (champion_id === "none") {
+	}
+
 	const champion = await Champion.findByPk(champion_id);
 	if (!champion) {
 		await interaction.reply({
@@ -171,7 +180,7 @@ async function handleChampionOption(interaction, draft_id) {
 		where: { draft_id: draft_id, champion_id: champion_id },
 	});
 
-	if (existing) {
+	if (existing && !search) {
 		await interaction.reply({
 			content: "Champion already selected.",
 			ephemeral: true,
