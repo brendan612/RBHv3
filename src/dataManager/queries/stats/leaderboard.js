@@ -8,17 +8,28 @@ const client = require("../../../client.js");
  * @param {number} season_id
  * @param {string} region
  * @param {number} minimumMatches
+ * @param {boolean} includeInactive
  * @returns {<Promise<Any[]>} An array of users.
  */
-async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
+async function getLeaderboard(
+	game_id,
+	season_id,
+	region,
+	minimumMatches = 3,
+	includeInactive = false
+) {
 	const cachedLeaderboard = client.cache.get(
-		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}`,
+		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`,
 		"leaderboard"
 	);
 
 	if (cachedLeaderboard) {
 		return cachedLeaderboard;
 	}
+
+	const includeInactiveClause = includeInactive
+		? ""
+		: "OR (E.elo_rating > 900 AND M.end_time > NOW() - INTERVAL 7 DAY)";
 
 	const [results, metadata] = await sequelize.query(
 		`
@@ -71,7 +82,7 @@ async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 					AND M.game_id = ${game_id}
 					AND (${season_id ? `M.season_id = ${season_id}` : "true"})
 					AND M.region = '${region}'
-					AND (E.elo_rating <= 900 OR (E.elo_rating > 900 AND M.end_time > NOW() - INTERVAL 7 DAY))
+					AND (E.elo_rating <= 900 ${includeInactiveClause})
 					GROUP BY MP.user_id
 					HAVING COUNT(MP.match_id) >= ${minimumMatches}
 				)
@@ -84,7 +95,7 @@ async function getLeaderboard(game_id, season_id, region, minimumMatches = 3) {
 	);
 
 	client.cache.set(
-		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}`,
+		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`,
 		results,
 		"leaderboard"
 	);

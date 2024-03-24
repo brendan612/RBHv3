@@ -32,7 +32,8 @@ async function getStatsForUser(user_id, game_id, season_id) {
 			game_id,
 			season_id,
 			user.region,
-			3
+			3,
+			true
 		);
 
 		const leaderboardUser = leaderboard.find((u) => u.user_id === user_id);
