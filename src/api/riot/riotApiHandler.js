@@ -29,6 +29,7 @@ async function getSummoner(user) {
 
 async function getSummonerByRiotID(gameName, tagLine, region = "NA") {
 	const { User } = require("../../models");
+	console.log("getSummonerByRiotID", gameName, tagLine, region);
 	const user = await User.findOne({
 		where: {
 			summoner_name: gameName,
