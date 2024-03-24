@@ -159,9 +159,8 @@ async function updateLeaderboard(
 	const limit = 30;
 	const offset = (page - 1) * limit;
 
-	console.log("offset", offset, "limit", limit);
+	let leaderboard = await getLeaderboard(game_id, season_id, region);
 
-	console.log("leaderboard", leaderboard);
 	if (leaderboard.length === 0) {
 		return await interaction.editReply({
 			content: "No leaderboards found",
@@ -170,8 +169,6 @@ async function updateLeaderboard(
 	}
 
 	const leaderboardCount = leaderboard.length;
-
-	console.log("leaderboardCount", leaderboardCount);
 
 	leaderboard = leaderboard.slice(offset, offset + limit);
 
