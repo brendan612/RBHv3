@@ -27,7 +27,7 @@ async function getLeaderboard(
 		return cachedLeaderboard;
 	}
 
-	const [results, metadata] = await sequelize.query(
+	let [results, metadata] = await sequelize.query(
 		`
 			WITH RecentMatches AS (
 				SELECT
