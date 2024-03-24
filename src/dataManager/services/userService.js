@@ -252,7 +252,10 @@ class UserService {
 
 		await interaction.deferUpdate();
 
-		if (user_id !== member.id) {
+		if (
+			user_id !== member.id &&
+			!hasRequiredRoleOrHigher(member, "developer")
+		) {
 			return await interaction.followUp({
 				content: "This is not your verification button.",
 				ephemeral: true,

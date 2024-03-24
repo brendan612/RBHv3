@@ -58,7 +58,7 @@ module.exports = {
 		}
 
 		if (!user) {
-			user = UserService.createUser(
+			user = await UserService.createUser(
 				interaction.member.id,
 				interaction.member.joinedAt,
 				region
