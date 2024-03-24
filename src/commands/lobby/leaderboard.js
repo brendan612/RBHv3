@@ -119,7 +119,7 @@ async function fetchLeaderboardData(leaderboard, offset) {
 		console.log("scriptCharacters", scriptCharacters, user.summoner_name);
 		defaultNamePadding -= scriptCharacters * 2;
 		if (scriptCharacters > 0) {
-			defaultNamePadding += 5;
+			defaultNamePadding += 1;
 		}
 
 		//prettier-ignore
@@ -160,7 +160,6 @@ async function updateLeaderboard(
 	const offset = (page - 1) * limit;
 
 	console.log("offset", offset, "limit", limit);
-	let leaderboard = await getLeaderboard(game_id, season_id, region);
 
 	console.log("leaderboard", leaderboard);
 	if (leaderboard.length === 0) {

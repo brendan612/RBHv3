@@ -104,11 +104,11 @@ async function getLeaderboard(
 			wins,
 			losses,
 			IF(elo_rating > 900 AND (last_active < NOW() - INTERVAL 7 DAY OR last_active IS NULL), 'Inactive', 'Active') AS activity_status,
-			RANK() OVER (ORDER BY elo_rating DESC, wins DESC) AS rank
+			RANK() OVER (ORDER BY elo_rating DESC, wins DESC) AS 'rank'
 		FROM
 			UserStats
 		WHERE recent_match_count >= ${minimumMatches}
-		ORDER BY rank;
+		ORDER BY 'rank';
 	`
 	);
 
