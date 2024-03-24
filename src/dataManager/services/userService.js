@@ -276,28 +276,32 @@ class UserService {
 
 		let puuid = null;
 
-		await getSummonerByRiotID(game_name, tag_line).then((summoner) => {
-			const currentIcon = summoner.profileIconId;
-			puuid = summoner.puuid;
-			correctIcon = parseInt(currentIcon) === parseInt(verify_icon);
-			const accountLevel = summoner.summonerLevel;
-			validAccountLevel = accountLevel >= 50;
-		});
-
-		await getRankByRiotID(game_name, tag_line).then((summoner) => {
-			if (Array.isArray(summoner)) {
-				summoner = summoner[0];
+		await getSummonerByRiotID(game_name, tag_line, this.user.region).then(
+			(summoner) => {
+				const currentIcon = summoner.profileIconId;
+				puuid = summoner.puuid;
+				correctIcon = parseInt(currentIcon) === parseInt(verify_icon);
+				const accountLevel = summoner.summonerLevel;
+				validAccountLevel = accountLevel >= 50;
 			}
-			if (!summoner) return;
-			const tier = summoner.tier ?? LeagueTier.UNRANKED;
-			const rank = summoner.rank;
-			validRank = ![
-				LeagueTier.UNRANKED,
-				LeagueTier.IRON,
-				LeagueTier.BRONZE,
-				LeagueTier.SILVER,
-			].includes(tier);
-		});
+		);
+
+		await getRankByRiotID(game_name, tag_line, this.user.region).then(
+			(summoner) => {
+				if (Array.isArray(summoner)) {
+					summoner = summoner[0];
+				}
+				if (!summoner) return;
+				const tier = summoner.tier ?? LeagueTier.UNRANKED;
+				const rank = summoner.rank;
+				validRank = ![
+					LeagueTier.UNRANKED,
+					LeagueTier.IRON,
+					LeagueTier.BRONZE,
+					LeagueTier.SILVER,
+				].includes(tier);
+			}
+		);
 
 		if (!correctIcon) {
 			return await interaction.followUp({
