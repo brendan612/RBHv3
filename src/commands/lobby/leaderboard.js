@@ -115,7 +115,9 @@ async function fetchLeaderboardData(leaderboard, offset) {
 	// Create an array of promises
 	const promises = leaderboard.map((user, i) => {
 		let defaultNamePadding = 26;
-		const scriptCharacters = countScriptCharacters(user.summoner_name);
+		const scriptCharacters = countScriptCharacters(
+			user.summoner_name + user.tag_line
+		);
 		console.log("scriptCharacters", scriptCharacters, user.summoner_name);
 		defaultNamePadding -= scriptCharacters;
 
