@@ -108,8 +108,7 @@ async function getLeaderboard(
 		FROM
 			UserStats
 		WHERE recent_match_count >= ${minimumMatches}
-		ORDER BY
-			rank;
+		ORDER BY rank;
 	`
 	);
 
