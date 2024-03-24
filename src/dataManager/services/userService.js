@@ -276,14 +276,9 @@ class UserService {
 
 		let puuid = null;
 
-		console.log(
-			game_name,
-			tag_line,
-			verify_icon,
-			referrer_id,
-			this.user.region
-		);
-		await getSummonerByRiotID(game_name, tag_line, this.user.region).then(
+		const user = await User.findByPk(user_id);
+		console.log(user);
+		await getSummonerByRiotID(game_name, tag_line, user.region).then(
 			(summoner) => {
 				const currentIcon = summoner.profileIconId;
 				puuid = summoner.puuid;
@@ -293,22 +288,20 @@ class UserService {
 			}
 		);
 
-		await getRankByRiotID(game_name, tag_line, this.user.region).then(
-			(summoner) => {
-				if (Array.isArray(summoner)) {
-					summoner = summoner[0];
-				}
-				if (!summoner) return;
-				const tier = summoner.tier ?? LeagueTier.UNRANKED;
-				const rank = summoner.rank;
-				validRank = ![
-					LeagueTier.UNRANKED,
-					LeagueTier.IRON,
-					LeagueTier.BRONZE,
-					LeagueTier.SILVER,
-				].includes(tier);
+		await getRankByRiotID(game_name, tag_line, user.region).then((summoner) => {
+			if (Array.isArray(summoner)) {
+				summoner = summoner[0];
 			}
-		);
+			if (!summoner) return;
+			const tier = summoner.tier ?? LeagueTier.UNRANKED;
+			const rank = summoner.rank;
+			validRank = ![
+				LeagueTier.UNRANKED,
+				LeagueTier.IRON,
+				LeagueTier.BRONZE,
+				LeagueTier.SILVER,
+			].includes(tier);
+		});
 
 		if (!correctIcon) {
 			return await interaction.followUp({
