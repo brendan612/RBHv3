@@ -28,8 +28,8 @@ async function getLeaderboard(
 	}
 
 	const includeInactiveClause = includeInactive
-		? "AND (E.elo_rating <= 900 OR (E.elo_rating > 900 AND M.end_time > NOW() - INTERVAL 7 DAY))"
-		: "";
+		? ""
+		: "AND (E.elo_rating <= 900 OR (E.elo_rating > 900 AND M.end_time > NOW() - INTERVAL 7 DAY))";
 
 	const [results, metadata] = await sequelize.query(
 		`
