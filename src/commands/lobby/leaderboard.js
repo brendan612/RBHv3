@@ -118,7 +118,6 @@ async function fetchLeaderboardData(leaderboard, offset) {
 		const scriptCharacters = countScriptCharacters(
 			user.summoner_name + user.tag_line
 		);
-		console.log("scriptCharacters", scriptCharacters, user.summoner_name);
 		defaultNamePadding -= scriptCharacters;
 
 		//prettier-ignore
