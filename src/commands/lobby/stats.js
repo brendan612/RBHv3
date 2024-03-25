@@ -20,6 +20,7 @@ const {
 const {
 	getStatsForUser,
 	getRecentMatchStatsForUser,
+	getMostPlayedChampionForUser,
 } = require("../../dataManager/queries/stats/stats.js");
 const { LeagueRoleEmojis } = require("../../assets/emojis.js");
 
@@ -49,6 +50,12 @@ module.exports = {
 		);
 
 		const recent = await getRecentMatchStatsForUser(
+			user.user_id,
+			game.game_id,
+			season?.season_id
+		);
+
+		const mostPlayedChampions = await getMostPlayedChampionForUser(
 			user.user_id,
 			game.game_id,
 			season?.season_id
@@ -89,6 +96,22 @@ module.exports = {
 			embed.addFields({
 				name: "Recent Matches",
 				value: recentMatches.join("\n"),
+				inline: true,
+			});
+		}
+
+		if (mostPlayedChampions) {
+			const mostPlayed = Object.entries(mostPlayedChampions).map((champion) => {
+				const [name, stats] = champion;
+				console.log(name, stats);
+				return `${name.padEnd(15)} | ${stats.wins
+					.toString()
+					.padEnd(6)}W ${stats.losses.toString().padEnd(6)}L`;
+			});
+			embed.addFields({
+				name: "Most Played Champions",
+				value: mostPlayed.join("\n"),
+				inline: true,
 			});
 		}
 

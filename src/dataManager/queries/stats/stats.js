@@ -156,8 +156,72 @@ async function getRecentMatchStatsForUser(user_id, game_id, season_id) {
 	return matchPlayers;
 }
 
+/**
+ *
+ * @param {string} user_id
+ * @param {number} game_id
+ * @param {number} season_id
+ * @returns {Promise<Object>} An object containing champion stats for a user.
+ * @property {number} wins - The number of wins.
+ * @property {number} losses - The number of losses.
+ */
+async function getMostPlayedChampionForUser(user_id, game_id, season_id) {
+	const whereClause = {
+		game_id: game_id,
+	};
+
+	if (season_id) {
+		whereClause.season_id = season_id;
+	}
+
+	const matchPlayers = await MatchPlayer.findAll({
+		where: {
+			user_id: user_id,
+			champion_id: {
+				[Op.ne]: null,
+			},
+		},
+		include: [
+			{
+				model: Match,
+				where: whereClause,
+			},
+		],
+	});
+
+	const championStats = {};
+
+	for (const matchPlayer of matchPlayers) {
+		//i couldn't get matchPlayer.Champion to work so i had to do this
+		const champion = await Champion.findByPk(matchPlayer.champion_id);
+		if (!championStats[champion.name]) {
+			championStats[champion.name] = {
+				wins: 0,
+				losses: 0,
+			};
+		}
+
+		if (matchPlayer.elo_change > 0) {
+			championStats[champion.name].wins++;
+		} else {
+			championStats[champion.name].losses++;
+		}
+	}
+
+	const sortedChampionStats = Object.entries(championStats).sort((a, b) => {
+		const totalMatchesA = a[1].wins + a[1].losses;
+		const totalMatchesB = b[1].wins + b[1].losses;
+		return totalMatchesB - totalMatchesA;
+	});
+
+	const sortedChampionStatsObject = Object.fromEntries(sortedChampionStats);
+
+	return sortedChampionStatsObject;
+}
+
 module.exports = {
 	getStatsForUser,
 	getSynergyStatsForUsers,
 	getRecentMatchStatsForUser,
+	getMostPlayedChampionForUser,
 };
