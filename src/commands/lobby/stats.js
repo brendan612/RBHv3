@@ -101,6 +101,7 @@ module.exports = {
 		}
 
 		if (mostPlayedChampions) {
+			console.log(mostPlayedChampions);
 			const mostPlayed = Object.entries(mostPlayedChampions).map((champion) => {
 				const [name, stats] = champion;
 				return `${name.padEnd(15, " ")} | ${stats.wins}W ${stats.losses}L`;
