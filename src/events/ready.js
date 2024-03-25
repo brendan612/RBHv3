@@ -16,6 +16,7 @@ const {
 	UserEloRating,
 	Referral,
 	FeatureToggle,
+	AutoResponse,
 	sequelize,
 } = require("../models");
 
@@ -50,6 +51,8 @@ module.exports = {
 			await createUserEloRating(db);
 			await createReferrals(db);
 		}
+
+		await createAutoResponses(db);
 
 		const features = await FeatureToggle.findAll();
 
@@ -300,6 +303,36 @@ const createReferrals = async (db) => {
 
 			await Referral.bulkCreate(data);
 			console.log("Referrals synced");
+			resolve();
+		} catch (err) {
+			console.log(err);
+			reject();
+		}
+	});
+};
+
+const createAutoResponses = async (db) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const rows = await new Promise((resolve, reject) => {
+				db.all("SELECT * FROM lcr_commands", [], (err, rows) => {
+					if (err) {
+						reject(err);
+					}
+					resolve(rows);
+				});
+			});
+
+			const data = [];
+			for (const row of rows) {
+				data.push({
+					trigger: row.name,
+					response: row.value,
+				});
+			}
+
+			await AutoResponse.bulkCreate(data);
+			console.log("AutoResponses synced");
 			resolve();
 		} catch (err) {
 			console.log(err);
