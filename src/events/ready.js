@@ -50,9 +50,8 @@ module.exports = {
 			await createMatchPlayers(db);
 			await createUserEloRating(db);
 			await createReferrals(db);
+			await createAutoResponses(db);
 		}
-
-		await createAutoResponses(db);
 
 		const features = await FeatureToggle.findAll();
 
