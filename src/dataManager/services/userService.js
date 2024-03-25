@@ -277,7 +277,6 @@ class UserService {
 		let puuid = null;
 
 		const user = await User.findByPk(user_id);
-		console.log(user);
 		await getSummonerByRiotID(game_name, tag_line, user.region).then(
 			(summoner) => {
 				const currentIcon = summoner.profileIconId;
