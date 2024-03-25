@@ -104,9 +104,9 @@ module.exports = {
 			const mostPlayed = Object.entries(mostPlayedChampions).map((champion) => {
 				const [name, stats] = champion;
 				console.log(name, stats);
-				return `${name.padEnd(15)} | ${stats.wins
+				return `${name.padEnd(15, " ")} | ${stats.wins
 					.toString()
-					.padEnd(6)}W ${stats.losses.toString().padEnd(6)}L`;
+					.padEnd(6, " ")}W-${stats.losses.toString().padEnd(6, " ")}L`;
 			});
 			embed.addFields({
 				name: "Most Played Champions",
