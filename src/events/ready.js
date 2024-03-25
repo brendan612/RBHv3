@@ -1,12 +1,4 @@
-const {
-	Events,
-	EmbedBuilder,
-	ActionRowBuilder,
-	StringSelectMenuBuilder,
-	StringSelectMenuOptionBuilder,
-	RoleSelectMenuBuilder,
-	RoleSelectMenuComponent,
-} = require("discord.js");
+const { Events, ActivityType } = require("discord.js");
 const webhookServer = require("../handlers/voteHandler");
 const {
 	checkAndUpdateServerMessages,
@@ -42,6 +34,9 @@ module.exports = {
 	once: true,
 	async execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
+		client.user.setActivity("Hosting Inhouses for RBH", {
+			type: ActivityType.Custom,
+		});
 		client.guild = await client.guilds.fetch(client.guildID);
 
 		const args = process.argv.slice(2);
