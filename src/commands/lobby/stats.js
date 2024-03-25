@@ -101,16 +101,17 @@ module.exports = {
 		}
 
 		if (mostPlayedChampions) {
-			console.log(mostPlayedChampions);
 			const mostPlayed = Object.entries(mostPlayedChampions).map((champion) => {
 				const [name, stats] = champion;
 				return `${name.padEnd(15, " ")} | ${stats.wins}W ${stats.losses}L`;
 			});
-			embed.addFields({
-				name: "Most Played Champions",
-				value: mostPlayed.join("\n"),
-				inline: true,
-			});
+			if (mostPlayed.length > 0) {
+				embed.addFields({
+					name: "Most Played Champions",
+					value: mostPlayed.join("\n"),
+					inline: true,
+				});
+			}
 		}
 
 		return await interaction.editReply({
