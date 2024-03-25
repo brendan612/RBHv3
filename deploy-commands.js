@@ -49,9 +49,9 @@ const syncCommands = async () => {
 			{ body: commands }
 		);
 
-		// const globalData = await rest.put(Routes.applicationCommands(clientID), {
-		// 	body: commands,
-		// });
+		const globalData = await rest.put(Routes.applicationCommands(clientID), {
+			body: commands,
+		});
 
 		console.log(
 			`Successfully reloaded ${data.length} application (/) commands.`
