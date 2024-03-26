@@ -14,22 +14,34 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		const [users, results] = await sequelize.query(`
-			SELECT bans.targeted_user_id, MAX(bans.ban_end) as ban_end
-			FROM (
-				SELECT targeted_user_id, created_at, duration as ban_end
-				FROM ModerationLogs
-				WHERE type = 'IHBAN'
-				AND duration > NOW() -- Ensures the ban is still active
-			) AS bans
-			LEFT JOIN (
-				SELECT targeted_user_id, MAX(created_at) AS unban_created_at
-				FROM ModerationLogs
-				WHERE type = 'IHUNBAN'
-				GROUP BY targeted_user_id
-			) AS unbans ON bans.targeted_user_id = unbans.targeted_user_id AND unbans.unban_created_at > bans.created_at
-			GROUP BY bans.targeted_user_id
-			HAVING MAX(bans.ban_end) > MAX(unbans.unban_created_at)
-			ORDER BY ban_end DESC;
+			SELECT 
+				bans.targeted_user_id, 
+				MAX(bans.created_at) as last_ban_time
+			FROM 
+				ModerationLogs AS bans
+			LEFT JOIN 
+				(
+					SELECT 
+						targeted_user_id, 
+						MAX(created_at) AS last_unban_time
+					FROM 
+						ModerationLogs
+					WHERE 
+						type = 'IHUNBAN'
+					GROUP BY 
+						targeted_user_id
+				) AS unbans 
+			ON 
+				bans.targeted_user_id = unbans.targeted_user_id
+			WHERE 
+				bans.type = 'IHBAN'
+				AND bans.created_at > COALESCE(unbans.last_unban_time, '1970-01-01')
+			GROUP BY 
+				bans.targeted_user_id
+			HAVING 
+				MAX(bans.created_at) > NOW() -- Assuming the ban is still active
+			ORDER BY 
+				last_ban_time DESC;
 		`);
 
 		const banned_users = users.map((user) => {
