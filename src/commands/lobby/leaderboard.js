@@ -8,6 +8,7 @@ const {
 	User,
 	Season,
 	Game,
+	Region,
 	handleGameOption,
 	handleSeasonOption,
 	seasonOption,
@@ -139,7 +140,7 @@ async function updateLeaderboard(
 	page,
 	game_id,
 	season_id,
-	region
+	region_id
 ) {
 	let game = null;
 	let season = null;
@@ -154,10 +155,12 @@ async function updateLeaderboard(
 		season = await Season.findByPk(season_id);
 	}
 
+	const region = await Region.findByPk(region_id);
+
 	const limit = 30;
 	const offset = (page - 1) * limit;
 
-	let leaderboard = await getLeaderboard(game_id, season_id, region);
+	let leaderboard = await getLeaderboard(game_id, season_id, region_id);
 
 	if (leaderboard.length === 0) {
 		return await interaction.editReply({
@@ -172,7 +175,10 @@ async function updateLeaderboard(
 
 	const title = (season ? season.name : "All-Time") + " Leaderboard";
 
-	const embed = baseEmbed(title, `Leaderboard for ${game.name}`);
+	const embed = baseEmbed(
+		title,
+		`${region.region_id} Leaderboard for ${game.name}`
+	);
 
 	let message =
 		"```diff\n" +
@@ -193,8 +199,6 @@ async function updateLeaderboard(
 
 		message += `${user.rank}${user.name}${user.elo}${user.winsString}${user.lossesString}\n`;
 	});
-
-	embed.setDescription(message + "```");
 
 	const totalPages = Math.ceil(leaderboardCount / limit);
 	embed.setFooter({ text: `Page ${page} of ${totalPages}` });

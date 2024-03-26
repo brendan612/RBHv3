@@ -29,6 +29,7 @@ const {
 	DraftRound,
 	PlayerDraftRound,
 	Champion,
+	Region,
 } = require("../../models");
 const {
 	handleGameOption,
@@ -64,6 +65,7 @@ module.exports = {
 	DraftRound,
 	PlayerDraftRound,
 	Champion,
+	Region,
 	handleGameOption,
 	handleLobbyOption,
 	handleUserOption,
