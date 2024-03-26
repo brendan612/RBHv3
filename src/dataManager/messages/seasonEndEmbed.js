@@ -68,7 +68,11 @@ async function generateSeasonEndEmbed(game_id, season_id) {
 	const attachment = await generateVeteransImage(game, season);
 	embed.setImage(`attachment://${attachment.name}`);
 
-	const channel = await guild.channels.fetch(channels["hall_of_fame"]);
+	const channel = client.guild.channels.cache.get(
+		client.serverChannels.filter(
+			(c) => c.game_id == game_id && c.region_id == "NA" && c.type == "general"
+		)[0].channel_id
+	);
 
 	await channel.send({ embeds: [embed], files: [attachment] });
 }

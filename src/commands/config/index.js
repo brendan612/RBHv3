@@ -4,6 +4,7 @@ const {
 	seasonAutocomplete,
 	lobbyAutocomplete,
 	championAutocomplete,
+	regionAutocomplete,
 } = require("../../handlers/autocompleteHandler.js");
 const {
 	gameOption,
@@ -11,6 +12,7 @@ const {
 	userOption,
 	seasonOption,
 	championOption,
+	regionOption,
 } = require("../../components/commandOptions.js");
 const {
 	handleGameOption,
@@ -18,6 +20,7 @@ const {
 	handleUserOption,
 	handleSeasonOption,
 	handleChampionOption,
+	handleRegionOption,
 } = require("../../handlers/executeOptionsHandler.js");
 const {
 	sequelize,
@@ -51,11 +54,17 @@ module.exports = {
 	seasonAutocomplete,
 	lobbyAutocomplete,
 	championAutocomplete,
+	regionAutocomplete,
 	gameOption,
 	lobbyOption,
 	userOption,
 	seasonOption,
 	championOption,
+	regionOption,
 	handleGameOption,
 	handleLobbyOption,
+	handleUserOption,
+	handleSeasonOption,
+	handleChampionOption,
+	handleRegionOption,
 };

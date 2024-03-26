@@ -1,5 +1,7 @@
 const { Lobby } = require("../../models");
 
+const client = require("../../client.js");
+
 class LobbyDTO {
 	/**
 	 *
@@ -27,6 +29,27 @@ class LobbyDTO {
 		this.joinable = this.players.length < 10 + this.max_reserves;
 		this.droppable = this.players.length > 0;
 		this.draftable = this.players.length === 10 && !this.draft_id;
+
+		this.channels = new Map();
+		const general = client.guild.channels.cache.get(
+			client.serverChannels.filter(
+				(c) =>
+					c.game_id == lobby.game_id &&
+					c.region_id == lobby.region_id &&
+					c.type == "general"
+			)[0].channel_id
+		);
+		this.channels.set("general", general);
+
+		const wins = client.guild.channels.cache.get(
+			client.serverChannels.filter(
+				(c) =>
+					c.game_id == lobby.game_id &&
+					c.region_id == lobby.region_id &&
+					c.type == "wins"
+			)[0].channel_id
+		);
+		this.channels.set("wins", wins);
 	}
 
 	/**

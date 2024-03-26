@@ -96,10 +96,23 @@ function championOption(
 		.setAutocomplete(true);
 }
 
+function regionOption(
+	name = "region",
+	description = "Region",
+	isRequired = false
+) {
+	return new SlashCommandStringOption()
+		.setName(name)
+		.setDescription(description)
+		.setRequired(isRequired)
+		.setAutocomplete(true);
+}
+
 module.exports = {
 	gameOption,
 	lobbyOption,
 	userOption,
 	seasonOption,
 	championOption,
+	regionOption,
 };

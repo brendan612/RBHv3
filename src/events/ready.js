@@ -17,6 +17,7 @@ const {
 	Referral,
 	FeatureToggle,
 	AutoResponse,
+	ServerChannel,
 	sequelize,
 } = require("../models");
 
@@ -73,6 +74,9 @@ module.exports = {
 		invites.forEach((invite) => {
 			client.invites.set(invite.code, invite.uses);
 		});
+
+		const serverChannels = await ServerChannel.findAll();
+		client.serverChannels = serverChannels;
 	},
 };
 

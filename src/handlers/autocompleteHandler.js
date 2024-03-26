@@ -14,6 +14,7 @@ const {
 	DraftRound,
 	Match,
 	MatchPlayer,
+	Region,
 } = require("../models");
 const { formatDateToMMDDYYYY } = require("../utilities/utility-functions.js");
 
@@ -216,9 +217,21 @@ async function championAutocomplete(focusedValue, interaction, match_id = -1) {
 	);
 }
 
+async function regionAutocomplete(focusedValue, interaction) {
+	const regions = await Region.findAll();
+	const regionIDs = regions.map((region) => region.region_id);
+	const filteredRegions = regionIDs.filter((region) =>
+		region?.toLowerCase().startsWith(focusedValue?.toLowerCase())
+	);
+	await interaction.respond(
+		filteredRegions.map((region) => ({ name: region, value: region }))
+	);
+}
+
 module.exports = {
 	gameAutocomplete,
 	lobbyAutocomplete,
 	seasonAutocomplete,
 	championAutocomplete,
+	regionAutocomplete,
 };

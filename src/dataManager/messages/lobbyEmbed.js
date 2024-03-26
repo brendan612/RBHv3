@@ -57,21 +57,20 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 		const components = generateLobbyButtons(lobby);
 
 		if (sendMessage) {
-			const channel = await guild.channels.fetch(
-				channels.games["League of Legends"]
-			);
 			const user = await client.users.fetch(lobby.host_id);
 			if (lobby.message_id) {
 				try {
 					//const dmChannel = user.dmChannel || (await user.createDM());
-					const message = await channel.messages.fetch(lobby.message_id);
+					const message = await lobby.channels["general"].messages.fetch(
+						lobby.message_id
+					);
 					if (message) {
 						await message.delete();
 					}
 				} catch (err) {}
 			}
 
-			const message = await channel.send({
+			const message = await lobby.channel.send({
 				embeds: [embed],
 				components: [components],
 			});

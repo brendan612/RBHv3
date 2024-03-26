@@ -11,6 +11,7 @@ const {
 	StringSelectMenuOptionBuilder,
 } = require("discord.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
+const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const { Lobby, User, PlayerDraftRound, Draft } = require("../../models");
 const { baseEmbed } = require("../../components/embed.js");
 const { generateOPGGButton } = require("../../components/buttons.js");
@@ -310,17 +311,14 @@ function generateSideSelectionButtons(draft) {
 }
 
 async function sendEmbedMessage(lobby, draft, embed, components) {
-	const guild = await client.guilds.fetch(client.guildID);
-	const channel = await guild.channels.fetch(
-		channels.games["League of Legends"]
-	);
+	const lobbyDTO = new LobbyDTO(lobby);
 
 	const draftManager = client.managers.draftManagerFactory.getDraftManager(
 		draft.draft_id
 	);
 
 	//prettier-ignore
-	const message = await draftManager.sendMessage(draft, channel, "", embed, components, null, false, true);
+	const message = await draftManager.sendMessage(draft, lobbyDTO.channels["general"], "", embed, components, null, false, true);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 	draftService.setThread(message.channelId);

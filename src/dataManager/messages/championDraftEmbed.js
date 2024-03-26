@@ -45,6 +45,7 @@ const {
 	generateTeamPlayerList,
 } = require("../../utilities/utility-functions.js");
 const { generateOPGGButton } = require("../../components/buttons.js");
+const LobbyDTO = require("../DTOs/lobbyDTO");
 
 const headerBarHeight = 150;
 const banSectionHeight = 180;
@@ -620,10 +621,7 @@ async function generateExtraInfo(ctx) {
 }
 
 async function sendEmbedMessage(lobby, draft, embed, components, files) {
-	const guild = await client.guilds.fetch(client.guildID);
-	const channel = await guild.channels.fetch(
-		channels.games["League of Legends"]
-	);
+	const lobbyDTO = new LobbyDTO(lobby);
 
 	const draftManager = client.managers.draftManagerFactory.getDraftManager(
 		draft.draft_id
@@ -632,7 +630,7 @@ async function sendEmbedMessage(lobby, draft, embed, components, files) {
 	const match = await Match.findByPk(draft.match_id);
 	const useThread = match?.end_time ? false : true;
 	//prettier-ignore
-	const message = await draftManager.sendMessage(draft, channel, "", embed, components, files, false, useThread);
+	const message = await draftManager.sendMessage(draft, lobbyDTO.channels["general"], "", embed, components, files, false, useThread);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 	if (useThread) {

@@ -13,6 +13,7 @@ const {
 	DraftRound,
 	Champion,
 	Match,
+	Region,
 } = require("../models");
 const { Op } = require("sequelize");
 
@@ -53,9 +54,16 @@ async function handleLobbyOption(interaction, game_id) {
 			}
 		}
 		if (!flag) {
+			const user = await User.findOne({
+				where: { user_id: interaction.member.id },
+			});
 			//get earliest open lobby
 			lobby = await Lobby.findOne({
-				where: { closed_date: null, game_id: game_id },
+				where: {
+					closed_date: null,
+					game_id: game_id,
+					region_id: user.region_id,
+				},
 				order: [["created_at", "ASC"]],
 			});
 		}
@@ -64,7 +72,6 @@ async function handleLobbyOption(interaction, game_id) {
 	}
 
 	if (!lobby) {
-		console.log("Lobby not found.");
 		await interaction.editReply({
 			content: "Lobby not found.",
 			ephemeral: true,
@@ -191,10 +198,33 @@ async function handleChampionOption(interaction, draft_id, search = false) {
 	return champion;
 }
 
+/**
+ *
+ * @param {Interaction} interaction
+ * @returns {Promise<Region>}
+ */
+async function handleRegionOption(interaction) {
+	const region_id = interaction.options.getString("region") ?? "NA";
+	if (!region_id) {
+		return null;
+	}
+	const region = await Region.findByPk(region_id);
+	if (!region) {
+		await interaction.reply({
+			content: "Region not found.",
+			ephemeral: true,
+		});
+		return null;
+	}
+
+	return region;
+}
+
 module.exports = {
 	handleGameOption,
 	handleLobbyOption,
 	handleUserOption,
 	handleSeasonOption,
 	handleChampionOption,
+	handleRegionOption,
 };
