@@ -3,7 +3,7 @@ const { createCanvas, loadImage, GlobalFonts } = require("@napi-rs/canvas");
 const path = require("path");
 const { Match, Lobby, MatchPlayer, User } = require("../../models");
 const { AttachmentBuilder } = require("discord.js");
-const { MatchDTO } = require("../DTOs/matchDTO.js");
+const MatchDTO = require("../DTOs/matchDTO.js");
 
 const canvasWidth = 1920;
 const canvasHeight = 1080;
@@ -37,7 +37,7 @@ async function generatePostGameImage(match) {
 		name: "profile.png",
 	});
 
-	const message = await matchDTO.channels["wins"].send({
+	const message = await matchDTO.channels.get("wins").send({
 		files: [attachment],
 	});
 }

@@ -18,23 +18,23 @@ class MatchDTO {
 		this.region_id = match.region_id;
 
 		this.channels = new Map();
-		const general = client.guild.channels.cache.get(
-			client.serverChannels.filter(
-				(c) =>
-					c.game_id == match.game_id &&
-					c.region_id == match.region_id &&
-					c.type == "general"
-			)[0].channel_id
+		const generalChannel = client.serverChannels.find(
+			(channel) =>
+				channel.game_id == match.game_id &&
+				channel.region_id == match.region_id &&
+				channel.purpose == "general"
 		);
+		const general = client.guild.channels.cache.get(generalChannel.channel_id);
+
 		this.channels.set("general", general);
-		const wins = client.guild.channels.cache.get(
-			client.serverChannels.filter(
-				(c) =>
-					c.game_id == match.game_id &&
-					c.region_id == match.region_id &&
-					c.type == "wins"
-			)[0].channel_id
+
+		const winsChannel = client.serverChannels.find(
+			(channel) =>
+				channel.game_id == match.game_id &&
+				channel.region_id == match.region_id &&
+				channel.purpose == "wins"
 		);
+		const wins = client.guild.channels.cache.get(winsChannel.channel_id);
 		this.channels.set("wins", wins);
 	}
 }

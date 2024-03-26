@@ -632,7 +632,7 @@ async function sendEmbedMessage(lobby, draft, embed, components, files) {
 	const match = await Match.findByPk(draft.match_id);
 	const useThread = match?.end_time ? false : true;
 	//prettier-ignore
-	const message = await draftManager.sendMessage(draft, lobbyDTO.channels["general"], "", embed, components, files, false, useThread);
+	const message = await draftManager.sendMessage(draft, lobbyDTO.channels.get("general"), "", embed, components, files, false, useThread);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 	if (useThread) {

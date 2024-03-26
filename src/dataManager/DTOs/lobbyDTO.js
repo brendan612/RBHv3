@@ -31,31 +31,23 @@ class LobbyDTO {
 		this.draftable = this.players.length === 10 && !this.draft_id;
 
 		this.channels = new Map();
-		console.log(lobby.game_id, lobby.region_id, client.serverChannels);
-		const generalChannel = client.serverChannels.find((channel) => {
-			return (
+		const generalChannel = client.serverChannels.find(
+			(channel) =>
 				channel.game_id == lobby.game_id &&
 				channel.region_id == lobby.region_id &&
-				channel.type == "general"
-			);
-		});
-		console.log(generalChannel);
-
-		const general = client.guild.channels.cache.get(
-			generalChannel[0].channel_id
+				channel.purpose == "general"
 		);
+		const general = client.guild.channels.cache.get(generalChannel.channel_id);
 
 		this.channels.set("general", general);
 
-		const winsChannel = client.serverChannels.find((channel) => {
-			return (
+		const winsChannel = client.serverChannels.find(
+			(channel) =>
 				channel.game_id == lobby.game_id &&
 				channel.region_id == lobby.region_id &&
-				channel.type == "wins"
-			);
-		});
-		console.log(winsChannel);
-		const wins = client.guild.channels.cache.get(winsChannel[0].channel_id);
+				channel.purpose == "wins"
+		);
+		const wins = client.guild.channels.cache.get(winsChannel.channel_id);
 		this.channels.set("wins", wins);
 	}
 

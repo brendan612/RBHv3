@@ -61,16 +61,15 @@ async function generateLobbyEmbed(lobby, sendMessage = true) {
 			if (lobby.message_id) {
 				try {
 					//const dmChannel = user.dmChannel || (await user.createDM());
-					const message = await lobby.channels["general"].messages.fetch(
-						lobby.message_id
-					);
+					const message = await lobby.channels
+						.get("general")
+						.messages.fetch(lobby.message_id);
 					if (message) {
 						await message.delete();
 					}
 				} catch (err) {}
 			}
-
-			const message = await lobby.channel.send({
+			const message = await lobby.channels.get("general").send({
 				embeds: [embed],
 				components: [components],
 			});

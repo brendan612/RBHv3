@@ -319,7 +319,7 @@ async function sendEmbedMessage(lobby, draft, embed, components) {
 	);
 
 	//prettier-ignore
-	const message = await draftManager.sendMessage(draft, lobbyDTO.channels["general"], "", embed, components, null, false, true);
+	const message = await draftManager.sendMessage(draft, lobbyDTO.channels.get("general"), "", embed, components, null, false, true);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 	draftService.setThread(message.channelId);
