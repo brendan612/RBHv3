@@ -31,6 +31,7 @@ class LobbyDTO {
 		this.draftable = this.players.length === 10 && !this.draft_id;
 
 		this.channels = new Map();
+		console.log(lobby.game_id, lobby.region_id, client.serverChannels);
 		const generalChannel = client.serverChannels.filter(
 			(c) =>
 				c.game_id == lobby.game_id &&
