@@ -34,9 +34,9 @@ class LobbyDTO {
 		console.log(lobby.game_id, lobby.region_id, client.serverChannels);
 		const generalChannel = client.serverChannels.filter(
 			(c) =>
-				c.game_id == lobby.game_id &&
-				c.region_id == lobby.region_id &&
-				c.type == "general"
+				c.dataValues.game_id == lobby.game_id &&
+				c.dataValues.region_id == lobby.region_id &&
+				c.dataValues.type == "general"
 		);
 		console.log(generalChannel);
 
@@ -48,9 +48,9 @@ class LobbyDTO {
 
 		const winsChannel = client.serverChannels.filter(
 			(c) =>
-				c.game_id == lobby.game_id &&
-				c.region_id == lobby.region_id &&
-				c.type == "wins"
+				c.dataValues.game_id == lobby.game_id &&
+				c.dataValues.region_id == lobby.region_id &&
+				c.dataValues.type == "wins"
 		);
 		console.log(winsChannel);
 		const wins = client.guild.channels.cache.get(winsChannel[0].channel_id);
