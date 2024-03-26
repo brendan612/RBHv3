@@ -34,7 +34,7 @@ async function getSummonerByRiotID(gameName, tagLine, region_id = "NA") {
 
 	const riotAccount = await axios.get(
 		//prettier-ignore
-		`https://${region.platform}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
+		`https://${region.region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
 		{
 			headers: {
 				"X-Riot-Token": process.env.RIOTAPIKEY,
