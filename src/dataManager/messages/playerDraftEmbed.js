@@ -311,7 +311,8 @@ function generateSideSelectionButtons(draft) {
 }
 
 async function sendEmbedMessage(lobby, draft, embed, components) {
-	const lobbyDTO = new LobbyDTO(lobby);
+	const newLobby = await LobbyService.getLobby(lobby.lobby_id);
+	const lobbyDTO = new LobbyDTO(newLobby);
 
 	const draftManager = client.managers.draftManagerFactory.getDraftManager(
 		draft.draft_id

@@ -37,6 +37,7 @@ const {
 	TimestampFormat,
 } = require("../../utilities/timestamp.js");
 
+const LobbyService = require("../services/lobbyService.js");
 const DraftService = require("../services/draftService.js");
 const {
 	generateWinInputComponents,
@@ -621,7 +622,8 @@ async function generateExtraInfo(ctx) {
 }
 
 async function sendEmbedMessage(lobby, draft, embed, components, files) {
-	const lobbyDTO = new LobbyDTO(lobby);
+	const newLobby = await LobbyService.getLobby(lobby.lobby_id);
+	const lobbyDTO = new LobbyDTO(newLobby);
 
 	const draftManager = client.managers.draftManagerFactory.getDraftManager(
 		draft.draft_id
