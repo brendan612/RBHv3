@@ -88,7 +88,7 @@ async function getRiotAccountByPuuid(puuid, region_id = "NA") {
 
 	const region = await Region.findByPk(region_id);
 	const riotAccount = await axios.get(
-		`https://${region.platform}.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`,
+		`https://${region.region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`,
 		{
 			headers: {
 				"X-Riot-Token": process.env.RIOTAPIKEY,
