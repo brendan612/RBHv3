@@ -64,7 +64,7 @@ module.exports = {
 				region
 			);
 		} else {
-			user.region = region;
+			user.region_id = region;
 			await user.save();
 		}
 
@@ -72,7 +72,7 @@ module.exports = {
 			where: {
 				summoner_name: game_name,
 				tag_line: tag_line,
-				region: region,
+				region_id: region,
 			},
 		});
 

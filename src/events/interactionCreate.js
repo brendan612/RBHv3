@@ -68,6 +68,10 @@ module.exports = {
 				if (!command) return;
 
 				try {
+					if (interaction.commandName === "sync-db") {
+						command.execute(interaction);
+						return;
+					}
 					const userService = await UserService.createUserService(
 						interaction.member.id
 					);

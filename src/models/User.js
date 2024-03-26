@@ -268,7 +268,7 @@ module.exports = (sequelize) => {
 				allowNull: true,
 				defaultValue: null,
 			},
-			region: {
+			region_id: {
 				type: DataTypes.STRING,
 				allowNull: true,
 				defaultValue: "NA",

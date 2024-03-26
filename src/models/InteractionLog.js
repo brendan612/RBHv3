@@ -29,13 +29,18 @@ module.exports = (sequelize) => {
 				}
 			}
 
-			return InteractionLog.create({
-				interaction: name,
-				parameters: options,
-				user_id: interaction.user.id,
-				channel_id: interaction.channel.id,
-				elapsed_time,
-			});
+			try {
+				return InteractionLog.create({
+					interaction: name,
+					parameters: options,
+					user_id: interaction.user.id,
+					channel_id: interaction?.channel?.id,
+					elapsed_time,
+				});
+			} catch {
+				console.error("Failed to log interaction", name, options);
+				return null;
+			}
 		}
 	}
 	InteractionLog.init(
@@ -61,7 +66,7 @@ module.exports = (sequelize) => {
 			},
 			channel_id: {
 				type: DataTypes.STRING,
-				allowNull: false,
+				allowNull: true,
 			},
 			elapsed_time: {
 				type: DataTypes.INTEGER,

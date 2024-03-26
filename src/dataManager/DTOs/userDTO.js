@@ -18,7 +18,7 @@ class UserDTO {
 		this.vote_streak = user.vote_streak;
 		this.last_vote_date = user.last_vote_date;
 		this.last_message_date = user.last_message_date;
-		this.region = user.region;
+		this.region_id = user.region_id;
 	}
 }
 

@@ -55,7 +55,11 @@ async function generateVerifyEmbed(user_id, game_name, tag_line, referrer) {
 	});
 
 	let verifyIcon = 0;
-	const summoner = await getSummonerByRiotID(game_name, tag_line, user.region);
+	const summoner = await getSummonerByRiotID(
+		game_name,
+		tag_line,
+		user.region_id
+	);
 	if (!summoner) {
 		return null;
 	}

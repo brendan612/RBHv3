@@ -1,5 +1,5 @@
 const client = require("../../client.js");
-const { createCanvas, loadImage, GlobalFonts } = require("@napi-rs/canvas");
+const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const path = require("path");
 const { Match, Lobby, MatchPlayer, User } = require("../../models/index.js");
 const { AttachmentBuilder } = require("discord.js");
@@ -20,12 +20,7 @@ async function generateSeasonEndImage() {
 	const canvas = createCanvas(canvasWidth, canvasHeight);
 	const ctx = canvas.getContext("2d");
 
-	GlobalFonts.registerFromPath(
-		path.join(__dirname, "../../assets/fonts/postgame.ttf"),
-		"PostGame"
-	);
-
-	ctx.font = "bold 100px PostGame";
+	ctx.font = "bold 100px Noto Serif KR";
 
 	await drawBackground(ctx, canvasWidth, canvasHeight, winningTeam);
 
@@ -78,7 +73,7 @@ async function drawMatchDetails(ctx, match) {
 		matchDate.getMonth() + 1
 	}/${matchDate.getDate()}/${matchDate.getFullYear()}`;
 
-	ctx.font = "bold 50px PostGame";
+	ctx.font = "bold 50px Noto Serif KR";
 	ctx.fillText(matchDateText, 10, 50);
 
 	const lobby_id = `#${match.lobby_id}`;
@@ -114,7 +109,7 @@ async function drawPlayers(ctx, players, winningTeam) {
 	const blueTeamStartY = blueTeamY + blueTeamSpacing;
 	const redTeamStartY = redTeamY + redTeamSpacing;
 
-	ctx.font = "bold 75px PostGame";
+	ctx.font = "bold 75px Noto Serif KR";
 
 	const longestPlayerName = await findLongestPlayerName(ctx, players);
 

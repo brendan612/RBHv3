@@ -25,13 +25,12 @@ const {
  * @property {number} rank - The current rank.
  * @property {number} elo_rating - Rating for provided season or average over all seasons.
  */
-async function getStatsForUser(user_id, game_id, season_id) {
+async function getStatsForUser(user_id, game_id, season_id, region = "NA") {
 	try {
-		const user = await User.findByPk(user_id);
 		const leaderboard = await getLeaderboard(
 			game_id,
 			season_id,
-			user.region,
+			region,
 			3,
 			true
 		);
@@ -168,6 +167,9 @@ async function getRecentMatchStatsForUser(user_id, game_id, season_id) {
 async function getMostPlayedChampionForUser(user_id, game_id, season_id) {
 	const whereClause = {
 		game_id: game_id,
+		end_time: {
+			[Op.ne]: null,
+		},
 	};
 
 	if (season_id) {

@@ -40,6 +40,7 @@ const ServerRole = require("./ServerRole.js")(sequelize);
 const ServerSetting = require("./ServerSetting.js")(sequelize);
 const ServerEmoji = require("./ServerEmoji.js")(sequelize);
 const InteractionLog = require("./InteractionLog.js")(sequelize);
+const Region = require("./Region.js")(sequelize);
 
 // Setting up many-to-many relationship
 User.belongsToMany(Lobby, { through: "LobbyUsers", ...cascadeOptions });
@@ -153,6 +154,10 @@ Draft.hasMany(DraftRound, {
 	...cascadeOptions,
 });
 DraftRound.belongsTo(Draft, { foreignKey: "draft_id", ...cascadeOptions });
+DraftRound.hasOne(Champion, {
+	foreignKey: "champion_id",
+	...cascadeOptions,
+});
 Lobby.hasOne(Match, {
 	foreignKey: "lobby_id",
 	...cascadeOptions,
@@ -211,6 +216,26 @@ User.hasMany(InteractionLog, {
 	...cascadeOptions,
 });
 
+User.hasOne(Region, {
+	foreignKey: "region_id",
+	...cascadeOptions,
+});
+
+Lobby.hasOne(Region, {
+	foreignKey: "region_id",
+	...cascadeOptions,
+});
+
+Match.hasOne(Region, {
+	foreignKey: "region_id",
+	...cascadeOptions,
+});
+
+ServerChannel.hasOne(Region, {
+	foreignKey: "region_id",
+	...cascadeOptions,
+});
+
 module.exports = {
 	sequelize,
 	Sequelize,
@@ -240,4 +265,5 @@ module.exports = {
 	ServerSetting,
 	ServerEmoji,
 	InteractionLog,
+	Region,
 };

@@ -41,7 +41,7 @@ async function getLeaderboard(
 				WHERE
 					M.game_id = ${game_id}
 					AND (${season_id ? `M.season_id = ${season_id}` : "true"})
-					AND M.region = '${region}'
+					AND M.region_id = '${region}'
 					AND M.end_time IS NOT NULL
 				GROUP BY
 					MP.user_id
@@ -78,7 +78,7 @@ async function getLeaderboard(
 						WHERE MP.user_id = UE.user_id
 						AND M.game_id = ${game_id}
 						AND (${season_id ? `M.season_id = ${season_id}` : "true"})
-						AND M.region = '${region}'
+						AND M.region_id = '${region}'
 						AND MP.elo_change > 0
 					) AS wins,
 					(
@@ -88,7 +88,7 @@ async function getLeaderboard(
 						WHERE MP.user_id = UE.user_id
 						AND M.game_id = ${game_id}
 						AND (${season_id ? `M.season_id = ${season_id}` : "true"})
-						AND M.region = '${region}'
+						AND M.region_id = '${region}'
 						AND MP.elo_change < 0
 					) AS losses,
 					UE.recent_match_count,

@@ -45,13 +45,16 @@ module.exports = (sequelize) => {
 			});
 		}
 
-		static async getOpenLobbies(game_name = "League of Legends") {
+		static async getOpenLobbies(
+			game_name = "League of Legends",
+			region = "NA"
+		) {
 			const User = require("./User.js")(sequelize);
 			const Game = require("./Game.js")(sequelize);
 			const Draft = require("./Draft.js")(sequelize);
 			const game = await Game.findOne({ where: { name: game_name } });
 			return await Lobby.findAll({
-				where: { closed_date: null, game_id: game.game_id },
+				where: { closed_date: null, game_id: game.game_id, region_id: region },
 				include: [
 					User,
 					Game,
@@ -118,7 +121,7 @@ module.exports = (sequelize) => {
 				allowNull: false,
 				defaultValue: 1,
 			},
-			region: {
+			region_id: {
 				type: DataTypes.STRING,
 				allowNull: false,
 				defaultValue: "NA",

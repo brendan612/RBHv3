@@ -10,19 +10,14 @@ const {
 
 const { Op, Transaction } = require("sequelize");
 
-const LobbyService = require("../services/lobbyService.js");
 const UserService = require("../services/userService.js");
-const DraftService = require("../services/draftService.js");
 
 const ThreadManager = require("../managers/threadManager.js");
 const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
 
-const {
-	hasRequiredRoleOrHigher,
-	calculateEloChange,
-} = require("../../utilities/utility-functions.js");
+const { calculateEloChange } = require("../../utilities/utility-functions.js");
 
 const {
 	generatePostGameImage,
@@ -72,7 +67,7 @@ class MatchService {
 			season_id: lobby.season_id,
 			draft_id: draft.draft_id,
 			start_time: new Date(),
-			region: lobby.region,
+			region_id: lobby.region_id,
 		});
 
 		await this.createMatchPlayers(lobby, draft, match);
@@ -180,6 +175,8 @@ class MatchService {
 
 			const end_time = this.match.end_time ?? new Date();
 
+			const firstSubmission = this.match.end_time === null;
+
 			await this.match.update(
 				{ winning_team: winning_team, end_time: end_time },
 				{ transaction }
@@ -189,7 +186,8 @@ class MatchService {
 				transaction,
 				this.match.match_id,
 				winning_team,
-				end_time
+				end_time,
+				firstSubmission
 			);
 
 			const lobby = await Lobby.findByPk(this.match.lobby_id);
@@ -233,7 +231,13 @@ class MatchService {
 		}
 	}
 
-	async updateAffectedMatches(transaction, match_id, winning_team, end_time) {
+	async updateAffectedMatches(
+		transaction,
+		match_id,
+		winning_team,
+		end_time,
+		firstSubmission
+	) {
 		const matchesToUpdate = await Match.findAll(
 			{
 				where: {
@@ -242,7 +246,7 @@ class MatchService {
 					match_id: {
 						[Op.gte]: this.match.match_id,
 					},
-					region: this.match.region,
+					region_id: this.match.region_id,
 				},
 				include: [
 					{
@@ -322,13 +326,6 @@ class MatchService {
 						nextMatchPlayer.elo_before = player.elo_after;
 						await nextMatchPlayer.save({ transaction });
 					}
-					console.log(
-						"next match found, updating elo_before",
-						nextMatch.match_id,
-						player.user_id,
-						player.elo_after,
-						nextMatchPlayer.elo_before
-					);
 				}
 
 				await UserEloRating.findOrCreate({
@@ -342,12 +339,21 @@ class MatchService {
 					},
 					transaction,
 				}).then(async ([eloRating, created]) => {
-					console.log("eloRating", eloRating.elo_rating, player.elo_after);
 					if (!created) {
 						eloRating.elo_rating = player.elo_after;
 						return await eloRating.save({ transaction });
 					}
 				});
+
+				if (firstSubmission) {
+					const userService = await UserService.createUserService(
+						player.user_id
+					);
+					await userService.addMatchReward(
+						player.team === match.winning_team,
+						transaction
+					);
+				}
 			}
 		}
 	}

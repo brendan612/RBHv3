@@ -5,6 +5,7 @@ const {
 	gameOption,
 	handleGameOption,
 	Season,
+	User,
 } = require("./index.js");
 
 const {
@@ -24,7 +25,12 @@ module.exports = {
 		const game = await handleGameOption(interaction);
 		const season = await Season.getCurrentSeason(game.game_id);
 
-		const attachment = await generateVeteransImage(game, season);
+		const user = await User.findByPk(interaction.user.id);
+		const attachment = await generateVeteransImage(
+			game,
+			season,
+			user.region_id
+		);
 
 		return interaction.reply({
 			files: [attachment],

@@ -6,7 +6,7 @@ const {
 } = require("../../models/index.js");
 
 const { AttachmentBuilder } = require("discord.js");
-const { createCanvas, GlobalFonts } = require("@napi-rs/canvas");
+const { createCanvas } = require("@napi-rs/canvas");
 const path = require("path");
 const { prepareImage } = require("../../utilities/utility-functions.js");
 
@@ -59,7 +59,7 @@ async function generateVeteransImage(game, season, region = "NA") {
 				where: {
 					game_id: game.game_id,
 					season_id: season.season_id,
-					region: region,
+					region_id: region,
 				},
 			},
 		],
@@ -76,11 +76,7 @@ async function generateVeteransImage(game, season, region = "NA") {
 	);
 	ctx.drawImage(background, 0, 0, canvasWidth, canvasHeight);
 
-	GlobalFonts.registerFromPath(
-		path.join(__dirname, "../../assets/fonts/postgame.ttf"),
-		"PostGame"
-	);
-	ctx.font = "bold 69px PostGame";
+	ctx.font = "bold 50px Noto Serif KR";
 
 	ctx.fillStyle = "white";
 
@@ -92,7 +88,7 @@ async function generateVeteransImage(game, season, region = "NA") {
 		100
 	);
 
-	ctx.font = "bold 40px PostGame";
+	ctx.font = "bold 35px Noto Serif KR";
 
 	let maxNameWidth = 0;
 

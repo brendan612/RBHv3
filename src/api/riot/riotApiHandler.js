@@ -22,7 +22,7 @@ async function getSummoner(user) {
 		return await getSummonerByRiotID(
 			user.summoner_name,
 			user.tag_line,
-			user.region
+			user.region_id
 		);
 	}
 }
@@ -33,7 +33,7 @@ async function getSummonerByRiotID(gameName, tagLine, region = "NA") {
 		where: {
 			summoner_name: gameName,
 			tag_line: tagLine,
-			region: region,
+			region_id: region,
 		},
 	});
 

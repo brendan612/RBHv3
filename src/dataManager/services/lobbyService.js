@@ -79,10 +79,10 @@ class LobbyService {
 			game_id: game_id,
 			season_id: season_id,
 			season_lobby_id: season_lobby_id,
-			region: host.region,
+			region_id: host.region_id,
 		});
 
-		lobby.lobby_name = `Lobby #${lobby.lobby_id}`;
+		lobby.lobby_name = `${lobby.region_id} Lobby #${lobby.lobby_id}`;
 		await lobby.save();
 
 		return await this.getLobby(lobby.lobby_id);
@@ -272,7 +272,7 @@ class LobbyService {
 
 		const user = await User.findByPk(user_id);
 
-		if (user.region !== this.lobby.region) {
+		if (user.region_id !== this.lobby.region_id) {
 			return { isJoinable: false, reason: "User is not in the same region" };
 		}
 

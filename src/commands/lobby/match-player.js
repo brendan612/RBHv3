@@ -8,6 +8,7 @@ const {
 	handleChampionOption,
 	championOption,
 	DraftRound,
+	Match,
 } = require("./index.js");
 
 const MatchService = require("../../dataManager/services/matchService.js");
@@ -15,7 +16,6 @@ const MatchService = require("../../dataManager/services/matchService.js");
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
-const { has } = require("config");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -137,7 +137,7 @@ module.exports = {
 				lobby.draft_id,
 				true
 			);
-			console.log(champion.id);
+
 			const draftRound = await DraftRound.findOne({
 				where: {
 					draft_id: lobby.draft_id,
@@ -192,9 +192,13 @@ module.exports = {
 	async autocomplete(interaction) {
 		const focusedValue = interaction.options.getFocused(true);
 		if (focusedValue.name === "lobby") {
-			lobbyAutocomplete(focusedValue.value, interaction);
+			lobbyAutocomplete(focusedValue.value, interaction, true);
 		} else if (focusedValue.name === "champion") {
-			championAutocomplete(focusedValue.value, interaction);
+			const lobbyValue = interaction.options.get("lobby");
+			const match = await Match.findOne({
+				where: { lobby_id: lobbyValue.value },
+			});
+			championAutocomplete(focusedValue.value, interaction, match.match_id);
 		}
 	},
 };

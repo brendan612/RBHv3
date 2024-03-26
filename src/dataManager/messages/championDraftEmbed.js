@@ -27,28 +27,16 @@ const {
 	channels,
 } = require(`../../../${process.env.CONFIG_FILE}`);
 const client = require("../../client.js");
-const {
-	AttachmentBuilder,
-	Client,
-	Events,
-	GatewayIntentBits,
-} = require("discord.js");
-const { createCanvas, loadImage } = require("@napi-rs/canvas");
-const Canvas = require("@napi-rs/canvas");
-const sharp = require("sharp");
+const { AttachmentBuilder } = require("discord.js");
+const { loadImage } = require("@napi-rs/canvas");
 const path = require("path");
-const Sequelize = require("sequelize");
+const Canvas = require("@napi-rs/canvas");
 const { prepareImage } = require("../../utilities/utility-functions.js");
 const {
 	displayDateAsTimestamp,
 	TimestampFormat,
 } = require("../../utilities/timestamp.js");
 
-const {
-	LeagueRankEmojis,
-	LeagueRoleEmojis,
-} = require("../../assets/emojis.js");
-const LobbyService = require("../services/lobbyService.js");
 const DraftService = require("../services/draftService.js");
 const {
 	generateWinInputComponents,
@@ -57,7 +45,6 @@ const {
 	generateTeamPlayerList,
 } = require("../../utilities/utility-functions.js");
 const { generateOPGGButton } = require("../../components/buttons.js");
-const { name } = require("../../events/interactionCreate.js");
 
 const headerBarHeight = 150;
 const banSectionHeight = 180;
@@ -342,7 +329,7 @@ async function generateComponents(blue_team, red_team) {
  */
 async function generateHeaderBar(ctx, red_captain, blue_captain) {
 	const fontSize = 75;
-	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.font = `bold ${fontSize}px Noto Serif KR`;
 
 	const redTeamText = `Team ${red_captain}`;
 	const blueTeamText = `Team ${blue_captain}`;
@@ -467,7 +454,7 @@ async function generateBanSection(ctx, blue_bans, red_bans, lobby_id) {
 
 async function generateNamePlateSection(ctx, blue_team, red_team) {
 	let fontSize = 50;
-	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.font = `bold ${fontSize}px Noto Serif KR`;
 
 	ctx.fillStyle = "#104ee0";
 
@@ -494,7 +481,7 @@ async function generateNamePlateSection(ctx, blue_team, red_team) {
 	}
 
 	fontSize = 50;
-	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.font = `bold ${fontSize}px Noto Serif KR`;
 	ctx.fillStyle = "#a10003";
 
 	for (let i = 0; i < 5; i++) {
@@ -504,7 +491,7 @@ async function generateNamePlateSection(ctx, blue_team, red_team) {
 			let nameMetrics = ctx.measureText(name);
 			while (nameMetrics.width > namePlateWidth - 10) {
 				fontSize -= 5;
-				ctx.font = `bold ${fontSize}px Arial`;
+				ctx.font = `bold ${fontSize}px Noto Serif KR`;
 				nameMetrics = ctx.measureText(name);
 			}
 			const centerOfNamePlate = i * namePlateWidth + namePlateWidth / 2;

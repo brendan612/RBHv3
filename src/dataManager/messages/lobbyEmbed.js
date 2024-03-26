@@ -1,7 +1,5 @@
 const {
 	EmbedBuilder,
-	GuildMember,
-	Interaction,
 	Message,
 	ActionRowBuilder,
 	ButtonBuilder,
@@ -19,7 +17,6 @@ const {
 	LeagueRankEmojis,
 	LeagueRoleEmojis,
 } = require("../../assets/emojis.js");
-const PlayerDraftManager = require("../managers/playerDraftManager.js");
 
 /**
  *

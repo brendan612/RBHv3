@@ -35,7 +35,9 @@ class GlobalCacheManager {
 		const cache = this.getCache(cacheName);
 		let results = [];
 		for (let [key, value] of cache) {
-			if (key.toLowerCase().startsWith(query.toLowerCase())) {
+			const formattedKey = key.replace(" ", "").toLowerCase();
+			const formattedQuery = query.replace(" ", "").toLowerCase();
+			if (formattedKey.includes(formattedQuery)) {
 				results.push({ key, value });
 			}
 		}

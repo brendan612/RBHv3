@@ -57,7 +57,7 @@ module.exports = {
 			});
 		}
 
-		if (host.region !== user.region) {
+		if (host.region_id !== user.region_id) {
 			return await interaction.reply({
 				content: "User is not in the same region as the lobby",
 				ephemeral: true,

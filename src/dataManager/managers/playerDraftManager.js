@@ -90,7 +90,7 @@ class PlayerDraftManager {
 					rank = await getRankByRiotID(
 						player.summoner_name,
 						player.tag_line,
-						player.region
+						player.region_id
 					);
 					let soloQ = rank.filter((x) => x.queueType === "RANKED_SOLO_5x5")[0];
 					PlayerDraftManager.ranks.set(user_id, soloQ.tier);

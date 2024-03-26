@@ -28,11 +28,13 @@ module.exports = {
 		const game = await handleGameOption(interaction);
 		const lobby = await handleLobbyOption(interaction, game.game_id);
 
+		await interaction.editReply({
+			content: `${lobby.lobby_name} will be reopened.`,
+		});
+
 		const lobbyService = new LobbyService(lobby);
 		await lobbyService.openLobby();
-		await interaction.editReply({
-			content: `Lobby #${lobby.lobby_id} has been reopened.`,
-		});
+
 		await lobbyService.generateLobbyEmbed(
 			await LobbyService.getLobby(lobby.lobby_id),
 			true

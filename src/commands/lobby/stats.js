@@ -46,7 +46,8 @@ module.exports = {
 		const { wins, losses, rank, elo_rating } = await getStatsForUser(
 			user.user_id,
 			game.game_id,
-			season?.season_id
+			season?.season_id,
+			user.region_id
 		);
 
 		const recent = await getRecentMatchStatsForUser(
@@ -77,7 +78,7 @@ module.exports = {
 		if (rank === -1) {
 			//prettier-ignore
 			embed.setFooter({
-				text: `Unranked - Play ${(3 - (wins + losses)) } more game(s) to get a rank`,
+				text: `Unranked - Play ${(3 - (parseInt(wins) + parseInt(losses))) } more game(s) to get a rank`,
 			});
 		}
 

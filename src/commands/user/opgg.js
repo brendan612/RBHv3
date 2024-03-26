@@ -41,7 +41,7 @@ module.exports = {
 			});
 			if (user && user.verified && user.summoner_name) {
 				return await interaction.reply({
-					content: `${baseURL}/${user.region}/${user.summoner_name}`,
+					content: `${baseURL}/${user.region_id}/${user.summoner_name}`,
 					ephemeral: true,
 				});
 			}

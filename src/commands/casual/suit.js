@@ -110,7 +110,6 @@ module.exports = {
 
 		let message = null;
 		if (prevSuit) {
-			console.log(prevCommandInteraction);
 			message = await prevCommandInteraction.followUp({
 				embeds: [embed],
 				components: [components],

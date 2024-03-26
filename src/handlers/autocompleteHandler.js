@@ -12,10 +12,13 @@ const {
 	Champion,
 	Draft,
 	DraftRound,
+	Match,
+	MatchPlayer,
 } = require("../models");
 const { formatDateToMMDDYYYY } = require("../utilities/utility-functions.js");
 
 const client = require("../client.js");
+const { Op } = require("sequelize");
 
 /**
  *
@@ -33,8 +36,47 @@ async function gameAutocomplete(focusedValue, interaction) {
 	);
 }
 
-async function lobbyAutocomplete(focusedValue, interaction) {
-	let lobbies = await Lobby.getOpenLobbies();
+async function lobbyAutocomplete(
+	focusedValue,
+	interaction,
+	filterToUser = false
+) {
+	const user = await User.findByPk(interaction.user.id);
+	let lobbies = [];
+	if (filterToUser) {
+		const currentSeason = await Season.getCurrentSeason();
+		lobbies = await MatchPlayer.findAll({
+			where: { user_id: user.user_id },
+			include: [
+				{
+					model: Match,
+					include: [
+						{
+							model: Lobby,
+							include: [
+								Game,
+								{
+									model: User,
+									as: "Host",
+								},
+								{
+									model: User,
+									as: "Users",
+								},
+							],
+						},
+					],
+					where: {
+						season_id: currentSeason.season_id,
+					},
+				},
+			],
+		}).then((matchPlayers) => {
+			return matchPlayers.map((matchPlayer) => matchPlayer.Match.Lobby);
+		});
+	} else {
+		lobbies = await Lobby.getOpenLobbies("League of Legends", user.region_id);
+	}
 
 	if (
 		//if the interaction is in a thread, just return the related lobby
@@ -50,7 +92,7 @@ async function lobbyAutocomplete(focusedValue, interaction) {
 	}
 
 	const lobbyDetails = lobbies.map((lobby) => ({
-		label: `${lobby.Game.name} Lobby #${lobby.lobby_id} (${lobby.Users.length}/10) - Hosted By: ${lobby.Host.summoner_name}`,
+		label: `${lobby.Game.name} ${lobby.lobby_name} (${lobby.Users.length}/10) - Hosted By: ${lobby.Host.summoner_name}`,
 		value: lobby.lobby_id.toString(),
 	}));
 
@@ -123,15 +165,48 @@ async function seasonAutocomplete(focusedValue, interaction) {
 	);
 }
 
-async function championAutocomplete(focusedValue, interaction) {
-	const strippedSearch = focusedValue
-		.replace("'", "")
-		.replace(" ", "")
-		.toLowerCase();
+async function championAutocomplete(focusedValue, interaction, match_id = -1) {
+	const strippedSearch = focusedValue.replace("'", "").toLowerCase();
 
-	const champions = client.cache
-		.findByQuery(strippedSearch, "autoCompleteChampionData")
-		.slice(0, 25);
+	let champions = [];
+	if (match_id !== -1) {
+		const match = await Match.findByPk(match_id, {
+			include: [
+				{
+					model: Draft,
+					include: [
+						{
+							model: DraftRound,
+							where: {
+								type: "pick",
+							},
+						},
+					],
+				},
+			],
+		});
+
+		const takenChampions = match.Draft.DraftRounds.map(
+			(draftRound) => draftRound.champion_id
+		);
+
+		const cache = client.cache.getCache("autoCompleteChampionData");
+		for (const [key, value] of cache) {
+			const strippedKey = key.replace(" ", "").toLowerCase();
+			const includes = strippedKey.includes(strippedSearch);
+			const emptySearch = strippedSearch.length == 0;
+			if (
+				(includes || emptySearch) &&
+				takenChampions.some((tc) => tc == value)
+			) {
+				champions.push({ key, value });
+			}
+		}
+	} else {
+		champions = client.cache
+			.findByQuery(strippedSearch, "autoCompleteChampionData")
+			.slice(0, 25);
+	}
 
 	await interaction.respond(
 		champions.map((champion) => ({

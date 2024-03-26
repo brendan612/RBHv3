@@ -31,6 +31,7 @@ const {
 	Champion,
 	Sequelize,
 	PlayerDraftRound,
+	Region,
 } = require("../../models");
 
 module.exports = {
@@ -47,6 +48,7 @@ module.exports = {
 	PlayerDraftRound,
 	Champion,
 	Sequelize,
+	Region,
 	gameAutocomplete,
 	seasonAutocomplete,
 	lobbyAutocomplete,

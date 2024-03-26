@@ -49,7 +49,7 @@ module.exports = {
 				page,
 				game.game_id,
 				season?.season_id,
-				user.region
+				user.region_id
 			);
 
 			await collectButtonInteractions(
@@ -57,7 +57,7 @@ module.exports = {
 				message,
 				game.game_id,
 				season?.season_id,
-				user.region
+				user.region_id
 			);
 		} catch (e) {
 			console.log(e);

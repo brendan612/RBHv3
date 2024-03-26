@@ -50,6 +50,12 @@ module.exports = {
 			player2 = temp;
 		}
 
+		if (player1.region_id !== player2.region_id) {
+			return await interaction.editReply({
+				content: "Players must be in the same region.",
+			});
+		}
+
 		const { winsWith, winsAgainst, lossesWith, lossesAgainst } =
 			await getSynergyStatsForUsers(
 				player1.user_id,

@@ -31,7 +31,7 @@ const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const roles = require(`../../../${process.env.CONFIG_FILE}`).roles.game_roles[
 	"League of Legends"
 ];
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, Transaction } = require("sequelize");
 const moment = require("moment");
 const { ActionType } = require("../../components/moderationActionTypeEnum.js");
 const {
@@ -60,8 +60,7 @@ class UserService {
 	static async createUserService(user_id) {
 		let user = await User.findByPk(user_id);
 		if (!user) {
-			const guild = await client.guilds.fetch(client.guildID);
-			const member = await guild.members.fetch(user_id);
+			const member = await client.guild.members.fetch(user_id);
 			user = await UserService.createUser(user_id, member.joinedAt);
 		}
 		return new UserService(user);
@@ -81,7 +80,7 @@ class UserService {
 			defaults: {
 				user_id: user_id,
 				join_date: join_date,
-				region: region,
+				region_id: region,
 			},
 		});
 
@@ -277,7 +276,7 @@ class UserService {
 		let puuid = null;
 
 		const user = await User.findByPk(user_id);
-		await getSummonerByRiotID(game_name, tag_line, user.region).then(
+		await getSummonerByRiotID(game_name, tag_line, user.region_id).then(
 			(summoner) => {
 				const currentIcon = summoner.profileIconId;
 				puuid = summoner.puuid;
@@ -287,20 +286,22 @@ class UserService {
 			}
 		);
 
-		await getRankByRiotID(game_name, tag_line, user.region).then((summoner) => {
-			if (Array.isArray(summoner)) {
-				summoner = summoner[0];
+		await getRankByRiotID(game_name, tag_line, user.region_id).then(
+			(summoner) => {
+				if (Array.isArray(summoner)) {
+					summoner = summoner[0];
+				}
+				if (!summoner) return;
+				const tier = summoner.tier ?? LeagueTier.UNRANKED;
+				const rank = summoner.rank;
+				validRank = ![
+					LeagueTier.UNRANKED,
+					LeagueTier.IRON,
+					LeagueTier.BRONZE,
+					LeagueTier.SILVER,
+				].includes(tier);
 			}
-			if (!summoner) return;
-			const tier = summoner.tier ?? LeagueTier.UNRANKED;
-			const rank = summoner.rank;
-			validRank = ![
-				LeagueTier.UNRANKED,
-				LeagueTier.IRON,
-				LeagueTier.BRONZE,
-				LeagueTier.SILVER,
-			].includes(tier);
-		});
+		);
 
 		if (!correctIcon) {
 			return await interaction.followUp({
@@ -405,13 +406,18 @@ class UserService {
 		await this.user.save();
 	}
 
-	async addMatchReward(winLoss) {
+	/**
+	 *
+	 * @param {boolean} winLoss
+	 * @param {*} transaction
+	 */
+	async addMatchReward(winLoss, transaction) {
 		const userLevelManager = new UserLevelManager();
 		this.user.server_money += userLevelManager.calculateMatchReward(
 			this.user.server_level,
 			winLoss
 		);
-		await this.user.save();
+		await this.user.save({ transaction });
 	}
 
 	async setLastMessageDate(date) {

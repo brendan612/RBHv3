@@ -16,7 +16,7 @@ class LobbyDTO {
 		this.season_lobby_id = lobby.season_lobby_id;
 		this.created_at = lobby.created_at;
 		this.message_id = lobby.message_id;
-		this.region = lobby.region;
+		this.region_id = lobby.region_id;
 
 		this.max_reserves = 3;
 

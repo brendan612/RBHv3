@@ -83,7 +83,7 @@ class ChampionService {
 
 		for (let champion of champions) {
 			client.cache.set(
-				champion.name.replace("'", "").replace(" ", ""),
+				champion.name.replace("'", ""),
 				champion.champion_id.toString(),
 				"autoCompleteChampionData"
 			);

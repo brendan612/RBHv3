@@ -22,7 +22,8 @@ const {
 
 const ChampionService = require("../dataManager/services/championService");
 
-const { row, resolve } = require("mathjs");
+const { GlobalFonts } = require("@napi-rs/canvas");
+const path = require("path");
 
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("src/database_prod.db");
@@ -39,6 +40,8 @@ module.exports = {
 			type: ActivityType.Custom,
 		});
 		client.guild = await client.guilds.fetch(client.guildID);
+
+		registerFonts();
 
 		const args = process.argv.slice(2);
 		if (args.includes("--sync")) {
@@ -404,4 +407,15 @@ const translateDataToDraftPick = (sqliteRow, draft_id) => {
 		user_id: sqliteRow.uid,
 		team: sqliteRow.teamId == 2 ? "red" : "blue",
 	};
+};
+
+const registerFonts = () => {
+	GlobalFonts.registerFromPath(
+		path.join(__dirname, "../assets/fonts/postgame.ttf"),
+		"PostGame"
+	);
+	GlobalFonts.registerFromPath(
+		path.join(__dirname, "../assets/fonts/NotoSerifKR-Regular.otf"),
+		"Noto Serif KR"
+	);
 };
