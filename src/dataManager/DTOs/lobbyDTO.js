@@ -32,12 +32,13 @@ class LobbyDTO {
 
 		this.channels = new Map();
 		console.log(lobby.game_id, lobby.region_id, client.serverChannels);
-		const generalChannel = client.serverChannels.filter(
-			(c) =>
-				c.dataValues.game_id == lobby.game_id &&
-				c.dataValues.region_id == lobby.region_id &&
-				c.dataValues.type == "general"
-		);
+		const generalChannel = client.serverChannels.find((channel) => {
+			return (
+				channel.game_id == lobby.game_id &&
+				channel.region_id == lobby.region_id &&
+				channel.type == "general"
+			);
+		});
 		console.log(generalChannel);
 
 		const general = client.guild.channels.cache.get(
@@ -46,12 +47,13 @@ class LobbyDTO {
 
 		this.channels.set("general", general);
 
-		const winsChannel = client.serverChannels.filter(
-			(c) =>
-				c.dataValues.game_id == lobby.game_id &&
-				c.dataValues.region_id == lobby.region_id &&
-				c.dataValues.type == "wins"
-		);
+		const winsChannel = client.serverChannels.find((channel) => {
+			return (
+				channel.game_id == lobby.game_id &&
+				channel.region_id == lobby.region_id &&
+				channel.type == "wins"
+			);
+		});
 		console.log(winsChannel);
 		const wins = client.guild.channels.cache.get(winsChannel[0].channel_id);
 		this.channels.set("wins", wins);
