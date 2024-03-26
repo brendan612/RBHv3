@@ -175,10 +175,8 @@ async function updateLeaderboard(
 
 	const title = (season ? season.name : "All-Time") + " Leaderboard";
 
-	const embed = baseEmbed(
-		title,
-		`${region.region_id} Leaderboard for ${game.name}`
-	);
+	const description = `${region.region_id} Leaderboard for ${game.name}`;
+	const embed = baseEmbed(title, description);
 
 	let message =
 		"```diff\n" +
@@ -199,6 +197,8 @@ async function updateLeaderboard(
 
 		message += `${user.rank}${user.name}${user.elo}${user.winsString}${user.lossesString}\n`;
 	});
+
+	embed.setDescription(description + message + "```");
 
 	const totalPages = Math.ceil(leaderboardCount / limit);
 	embed.setFooter({ text: `Page ${page} of ${totalPages}` });
