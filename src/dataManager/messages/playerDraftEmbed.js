@@ -312,14 +312,13 @@ function generateSideSelectionButtons(draft) {
 
 async function sendEmbedMessage(lobby, draft, embed, components) {
 	const newLobby = await LobbyService.getLobby(lobby.lobby_id);
-	const lobbyDTO = new LobbyDTO(newLobby);
 
 	const draftManager = client.managers.draftManagerFactory.getDraftManager(
 		draft.draft_id
 	);
 
 	//prettier-ignore
-	const message = await draftManager.sendMessage(draft, lobbyDTO.channels.get("general"), "", embed, components, null, false, true);
+	const message = await draftManager.sendMessage(draft, newLobby.channels.get("general"), "", embed, components, null, false, true);
 
 	const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 	draftService.setThread(message.channelId);
