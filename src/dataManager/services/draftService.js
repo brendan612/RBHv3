@@ -94,12 +94,7 @@ class DraftService {
 					},
 				],
 			});
-			console.log("TOTAL MATCHES for " + player.user_id, totalMatches);
-			if (totalMatches < 5) {
-				ineligiblePlayers.push(player);
-			} else {
-				eligiblePlayers.push(player);
-			}
+
 			if (elo) {
 				ratings.push(elo);
 			} else {
@@ -114,6 +109,12 @@ class DraftService {
 						elo_rating: 800,
 					});
 				}
+			}
+
+			if (totalMatches < 5) {
+				ineligiblePlayers.push(elo);
+			} else {
+				eligiblePlayers.push(elo);
 			}
 		}
 
