@@ -1,4 +1,10 @@
-const { Draft, Lobby, UserEloRating } = require("../../models/index.js");
+const {
+	Draft,
+	Lobby,
+	UserEloRating,
+	MatchPlayer,
+	Match,
+} = require("../../models/index.js");
 const UserService = require("./userService.js");
 const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
@@ -75,13 +81,20 @@ class DraftService {
 		for (const player of lobby.players) {
 			const userService = new UserService(player);
 			let elo = await userService.getEloRating(lobby.game_id, lobby.season_id);
-			const { wins, losses } = await getStatsForUser(
-				player.user_id,
-				lobby.game_id,
-				null,
-				player.region_id
-			);
-			const totalMatches = wins + losses;
+			const totalMatches = await MatchPlayer.count({
+				where: {
+					user_id: player.user_id,
+				},
+				include: [
+					{
+						model: Match,
+						where: {
+							game_id: lobby.game_id,
+						},
+					},
+				],
+			});
+			console.log("TOTAL MATCHES for " + player.user_id, totalMatches);
 			if (totalMatches < 5) {
 				ineligiblePlayers.push(player);
 			} else {
