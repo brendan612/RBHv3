@@ -129,9 +129,7 @@ async function handleUserOption(interaction, optionName) {
 		user_id = interaction.member.id;
 	}
 
-	return await User.findOne({
-		where: { user_id: user_id },
-	});
+	return await User.findByPk(user_id);
 }
 
 /**

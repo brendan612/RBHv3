@@ -34,4 +34,5 @@ module.exports = {
 	regionAutocomplete,
 	handleRegionOption,
 	regionOption,
+	handleUserOption,
 };

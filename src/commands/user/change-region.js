@@ -7,6 +7,7 @@ const {
 	regionOption,
 	regionAutocomplete,
 	handleRegionOption,
+	handleUserOption,
 } = require("./index.js");
 
 const {
@@ -25,13 +26,11 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		const region = await handleRegionOption(interaction);
-		let target = interaction.options.getUser("user");
+		let user = await handleUserOption(interaction, "target");
 
 		if (!hasRequiredRoleOrHigher(interaction.member, "admin")) {
-			target = interaction.user;
+			user = await User.findByPk(interaction.user.id);
 		}
-
-		let user = await User.findByPk(target?.id ?? interaction.user.id);
 
 		if (user.region_id === region.region_id) {
 			return await interaction.reply({
