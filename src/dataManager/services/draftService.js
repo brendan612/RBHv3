@@ -95,6 +95,8 @@ class DraftService {
 				],
 			});
 
+			console.log("TOTAL MATCHES for " + player.user_id, totalMatches);
+
 			if (elo) {
 				ratings.push(elo);
 			} else {
