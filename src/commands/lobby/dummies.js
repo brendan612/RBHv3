@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 const {
 	SlashCommandBuilder,
 	Interaction,
@@ -40,10 +40,12 @@ module.exports = {
 
 		const dummies = await User.findAll({
 			where: {
-				user_id: {
-					[Op.between]: [1, 10 - lobbyUsers.length],
+				summoner_name: {
+					[Op.like]: "Dummy%",
 				},
+				region_id: lobby.region_id,
 			},
+			limit: 10 - lobbyUsers.length,
 		});
 
 		const lobbyService = new LobbyService(lobby);

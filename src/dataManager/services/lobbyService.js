@@ -11,6 +11,7 @@ const {
 	PlayerDraftRound,
 	DraftRound,
 	Sequelize,
+	Region,
 } = require("../../models/index");
 const LobbyDTO = require("../DTOs/lobbyDTO");
 const { generateLobbyEmbed } = require("../messages/lobbyEmbed");
@@ -128,20 +129,23 @@ class LobbyService {
 	 * @param {boolean} force
 	 */
 	async destroyLobby(force = false) {
-		const channel = await client.guild.channels.fetch(
-			channels.games["League of Legends"]
-		);
+		const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
 		if (this.lobby.draft_id) {
 			const draft = await Draft.findByPk(this.lobby.draft_id);
 			if (draft.thread_id) {
 				try {
-					await ThreadManager.deleteThread(channel, draft.thread_id);
+					await ThreadManager.deleteThread(
+						lobbyDTO.channels.get("general"),
+						draft.thread_id
+					);
 					draft.thread_id = null;
 					await draft.save();
 				} catch {}
 			} else if (draft.message_id) {
 				try {
-					const message = await channel.messages.fetch(draft.message_id);
+					const message = await lobbyDTO.channels
+						.get("general")
+						.messages.fetch(draft.message_id);
 					if (message) {
 						await message.delete();
 					}
@@ -157,7 +161,9 @@ class LobbyService {
 			}
 		} else {
 			try {
-				const message = await channel.messages.fetch(this.lobby.message_id);
+				const message = await lobbyDTO.channels
+					.get("general")
+					.messages.fetch(this.lobby.message_id);
 				if (message) {
 					await message.delete();
 				}
@@ -169,7 +175,9 @@ class LobbyService {
 		for (const user of users) {
 			try {
 				const guildMember = await guild.members.fetch(user.user_id);
-				await channel.permissionOverwrites.delete(guildMember);
+				await lobbyDTO.channels
+					.get("general")
+					.permissionOverwrites.delete(guildMember);
 				const userService = new UserService(user);
 				await userService.removeRole(permission_roles.lobby_participant);
 			} catch {}
@@ -440,12 +448,10 @@ class LobbyService {
 		}
 
 		const draft = await DraftService.createDraft(this.lobby.lobby_id);
-		const channel = await client.guild.channels.fetch(
-			channels.games["League of Legends"]
-		);
+		let lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
 
 		const thread = await ThreadManager.createChannelThread(
-			channel,
+			lobbyDTO.channels.get("general"),
 			draft.draft_id
 		);
 
@@ -455,7 +461,7 @@ class LobbyService {
 		const draftService = new DraftService(await Draft.findByPk(draft.draft_id));
 		await draftService.startPlayerDraft();
 
-		const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
+		lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
 		for (const user of lobbyDTO.players) {
 			const userService = new UserService(user);
 			await userService.addRole(permission_roles.lobby_participant);
