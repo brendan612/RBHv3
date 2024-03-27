@@ -50,7 +50,7 @@ module.exports = {
 	async autocomplete(interaction) {
 		const focusedValue = interaction.options.getFocused(true);
 		if (focusedValue.name === "region") {
-			await regionAutocomplete(interaction);
+			regionAutocomplete(focusedValue.value, interaction);
 		}
 	},
 };

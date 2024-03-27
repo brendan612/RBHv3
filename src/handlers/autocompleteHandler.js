@@ -221,9 +221,12 @@ async function championAutocomplete(focusedValue, interaction, match_id = -1) {
 async function regionAutocomplete(focusedValue, interaction) {
 	const regions = await Region.findAll();
 	const regionIDs = regions.map((region) => region.region_id);
-	const filteredRegions = regionIDs.filter((region) =>
-		region?.toLowerCase().startsWith(focusedValue?.toLowerCase())
-	);
+	const filteredRegions =
+		focusedValue.length > 0
+			? regionIDs.filter((region) =>
+					region?.toLowerCase().startsWith(focusedValue?.toLowerCase())
+			  )
+			: regionIDs;
 	await interaction.respond(
 		filteredRegions.map((region) => ({ name: region, value: region }))
 	);

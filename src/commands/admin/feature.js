@@ -76,7 +76,7 @@ module.exports = {
 
 			await feature.update({ enabled: enabled });
 
-			client.features[feature.name] = enabled;
+			client.features.set(feature.name, enabled);
 
 			await interaction.reply({
 				content: `Feature \`\`${feature.name}\`\` is now ${
