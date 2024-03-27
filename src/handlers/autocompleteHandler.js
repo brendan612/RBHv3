@@ -72,6 +72,7 @@ async function lobbyAutocomplete(
 					},
 				},
 			],
+			order: [[sequelize.col("Match.Lobby.lobby_id"), "DESC"]],
 		}).then((matchPlayers) => {
 			return matchPlayers.map((matchPlayer) => matchPlayer.Match.Lobby);
 		});

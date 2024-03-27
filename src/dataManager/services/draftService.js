@@ -3,6 +3,8 @@ const UserService = require("./userService.js");
 const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
 
+const { getStatsForUser } = require("../../dataManager/queries/stats/stats.js");
+
 const client = require("../../client.js");
 
 class DraftService {
@@ -67,9 +69,24 @@ class DraftService {
 	 */
 	async pickCaptains(lobby) {
 		let ratings = [];
+		let ineligiblePlayers = [];
+		let eligiblePlayers = [];
+
 		for (const player of lobby.players) {
 			const userService = new UserService(player);
 			let elo = await userService.getEloRating(lobby.game_id, lobby.season_id);
+			const { wins, losses } = await getStatsForUser(
+				player.user_id,
+				lobby.game_id,
+				null,
+				player.region_id
+			);
+			const totalMatches = wins + losses;
+			if (totalMatches < 5) {
+				ineligiblePlayers.push(player);
+			} else {
+				eligiblePlayers.push(player);
+			}
 			if (elo) {
 				ratings.push(elo);
 			} else {
@@ -86,8 +103,17 @@ class DraftService {
 				}
 			}
 		}
+
 		ratings.sort((a, b) => b.elo_rating - a.elo_rating);
-		return ratings.slice(0, 2);
+		eligiblePlayers.sort((a, b) => b.elo_rating - a.elo_rating);
+
+		let selectedCaptains = eligiblePlayers.slice(0, 2);
+		if (selectedCaptains.length < 2) {
+			selectedCaptains = selectedCaptains.concat(
+				ineligiblePlayers.slice(0, 2 - selectedCaptains.length)
+			);
+		}
+		return selectedCaptains;
 	}
 
 	async startPlayerDraft() {
