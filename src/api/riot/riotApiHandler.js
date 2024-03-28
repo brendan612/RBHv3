@@ -79,7 +79,7 @@ async function getRankByRiotID(gameName, tagLine, region_id = "NA") {
 			},
 		}
 	);
-	console.log(gameName, tagline, region_id, rank.data);
+	console.log(gameName, tagLine, region_id, rank.data);
 	return rank.data;
 }
 
