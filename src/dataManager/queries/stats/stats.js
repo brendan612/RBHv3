@@ -221,9 +221,73 @@ async function getMostPlayedChampionForUser(user_id, game_id, season_id) {
 	return sortedChampionStatsObject;
 }
 
+/**
+ * @param {string} user_id
+ * @param {number} game_id
+ * @param {number} season_id
+ * @returns {Promise<Object>} An object containing role stats for a user.
+ * @property {number} wins - The number of wins.
+ * @property {number} losses - The number of losses.
+ */
+async function getMostPlayedRoleForUser(user_id, game_id, season_id) {
+	const whereClause = {
+		game_id: game_id,
+		end_time: {
+			[Op.ne]: null,
+		},
+	};
+
+	if (season_id) {
+		whereClause.season_id = season_id;
+	}
+
+	const matchPlayers = await MatchPlayer.findAll({
+		where: {
+			user_id: user_id,
+			role: {
+				[Op.ne]: null,
+			},
+		},
+		include: [
+			{
+				model: Match,
+				where: whereClause,
+			},
+		],
+	});
+
+	const roleStats = {};
+
+	for (const matchPlayer of matchPlayers) {
+		if (!roleStats[matchPlayer.role]) {
+			roleStats[matchPlayer.role] = {
+				wins: 0,
+				losses: 0,
+			};
+		}
+
+		if (matchPlayer.elo_change > 0) {
+			roleStats[matchPlayer.role].wins++;
+		} else {
+			roleStats[matchPlayer.role].losses++;
+		}
+	}
+
+	const sortedRoleStats = Object.entries(roleStats).sort((a, b) => {
+		const totalMatchesA = a[1].wins + a[1].losses;
+		const totalMatchesB = b[1].wins + b[1].losses;
+		return totalMatchesB - totalMatchesA;
+	});
+
+	const sortedRoleStatsObject = Object.fromEntries(sortedRoleStats);
+
+	return sortedRoleStatsObject;
+}
+
 module.exports = {
 	getStatsForUser,
 	getSynergyStatsForUsers,
 	getRecentMatchStatsForUser,
 	getMostPlayedChampionForUser,
+	getMostPlayedRoleForUser,
 };
