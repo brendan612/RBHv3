@@ -303,6 +303,7 @@ class UserService {
 				}
 				if (!summoner) return;
 				if (Array.isArray(summoner)) {
+					console.log("USER SERVICE", "ARRAY");
 					let highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
 					if (summoner.length > 1) {
 						if (isValidRank(summoner[0])) {
@@ -327,6 +328,7 @@ class UserService {
 					validRank =
 						highestIndex >= LeagueTierHierarchy.indexOf(LeagueTier.GOLD);
 				} else {
+					console.log("USER SERVICE", "SINGLE");
 					validRank = isValidRank(summoner);
 				}
 			}
