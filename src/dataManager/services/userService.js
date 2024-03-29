@@ -305,12 +305,13 @@ class UserService {
 				if (Array.isArray(summoner)) {
 					console.log("USER SERVICE", "ARRAY");
 					let highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
-					if (summoner.length > 1) {
+					if (summoner.length >= 1) {
 						if (isValidRank(summoner[0])) {
 							console.log("USER SERVICE", "VALID RANK", summoner[0]);
 							highestIndex = LeagueTierHierarchy.indexOf(summoner[0].tier);
 						}
-						if (isValidRank(summoner[1])) {
+
+						if (summoner.length > 1 && isValidRank(summoner[1])) {
 							console.log("USER SERVICE", "VALID RANK", summoner[1]);
 							highestIndex = Math.max(
 								highestIndex,
