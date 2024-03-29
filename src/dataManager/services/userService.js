@@ -286,16 +286,7 @@ class UserService {
 
 		await getRankByRiotID(game_name, tag_line, user.region_id).then(
 			(summoner) => {
-				console.log("USER SERVICE", summoner);
 				function isValidRank(summoner) {
-					console.log(
-						"TIER",
-						LeagueTierHierarchy.indexOf(summoner.tier),
-						"GOLD",
-						LeagueTierHierarchy.indexOf(LeagueTier.GOLD),
-						game_name,
-						tag_line
-					);
 					return (
 						LeagueTierHierarchy.indexOf(summoner.tier) >=
 						LeagueTierHierarchy.indexOf(LeagueTier.GOLD)
@@ -303,33 +294,22 @@ class UserService {
 				}
 				if (!summoner) return;
 				if (Array.isArray(summoner)) {
-					console.log("USER SERVICE", "ARRAY");
 					let highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
 					if (summoner.length >= 1) {
 						if (isValidRank(summoner[0])) {
-							console.log("USER SERVICE", "VALID RANK", summoner[0]);
 							highestIndex = LeagueTierHierarchy.indexOf(summoner[0].tier);
 						}
 
 						if (summoner.length > 1 && isValidRank(summoner[1])) {
-							console.log("USER SERVICE", "VALID RANK", summoner[1]);
 							highestIndex = Math.max(
 								highestIndex,
 								LeagueTierHierarchy.indexOf(summoner[1].tier)
 							);
 						}
 					}
-					console.log(
-						"USER SERVICE",
-						"HIGHEST INDEX",
-						highestIndex,
-						game_name,
-						tag_line
-					);
 					validRank =
 						highestIndex >= LeagueTierHierarchy.indexOf(LeagueTier.GOLD);
 				} else {
-					console.log("USER SERVICE", "SINGLE");
 					validRank = isValidRank(summoner);
 				}
 			}
