@@ -12,6 +12,20 @@ const LeagueTier = {
 	CHALLENGER: "CHALLENGER",
 };
 
+const LeagueTierHierarchy = [
+	LeagueTier.UNRANKED,
+	LeagueTier.IRON,
+	LeagueTier.BRONZE,
+	LeagueTier.SILVER,
+	LeagueTier.GOLD,
+	LeagueTier.PLATINUM,
+	LeagueTier.EMERALD,
+	LeagueTier.DIAMOND,
+	LeagueTier.MASTER,
+	LeagueTier.GRANDMASTER,
+	LeagueTier.CHALLENGER,
+];
+
 const LeagueRank = {
 	I: 1,
 	II: 2,
@@ -19,4 +33,8 @@ const LeagueRank = {
 	IV: 4,
 };
 
-module.exports = { LeagueTier, LeagueRank };
+module.exports = {
+	LeagueTier,
+	LeagueTierHierarchy,
+	LeagueRank,
+};

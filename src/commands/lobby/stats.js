@@ -136,6 +136,12 @@ module.exports = {
 			}
 		}
 
+		if (rank !== -1 && !mostPlayedChampions && !mostPlayedRoles) {
+			embed.setFooter({
+				text: `To get champion and role stats use the "/match-player update" command`,
+			});
+		}
+
 		return await interaction.editReply({
 			embeds: [embed],
 		});
