@@ -288,6 +288,14 @@ class UserService {
 			(summoner) => {
 				console.log("USER SERVICE", summoner);
 				function isValidRank(summoner) {
+					console.log(
+						"TIER",
+						LeagueTierHierarchy.indexOf(summoner.tier),
+						"GOLD",
+						LeagueTierHierarchy.indexOf(LeagueTier.GOLD),
+						game_name,
+						tag_line
+					);
 					return (
 						LeagueTierHierarchy.indexOf(summoner.tier) >=
 						LeagueTierHierarchy.indexOf(LeagueTier.GOLD)
