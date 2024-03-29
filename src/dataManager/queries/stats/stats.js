@@ -218,7 +218,8 @@ async function getMostPlayedChampionForUser(user_id, game_id, season_id) {
 
 	const sortedChampionStatsObject = Object.fromEntries(sortedChampionStats);
 
-	return sortedChampionStatsObject;
+	//take first 5 champions
+	return Object.fromEntries(sortedChampionStats.slice(0, 5));
 }
 
 /**
