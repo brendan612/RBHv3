@@ -123,14 +123,17 @@ class PlayerDraftManager {
 				LeagueTierHierarchy.indexOf(LeagueTier.GOLD)
 			);
 		}
+		console.log(summoner);
 		if (!summoner) return;
 		if (Array.isArray(summoner)) {
 			if (summoner.length > 1) {
 				highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
 				if (isValidRank(summoner[0])) {
+					console.log("VALID RANK", summoner[0].tier, summoner[0].rank);
 					highestIndex = LeagueTierHierarchy.indexOf(summoner[0].tier);
 				}
 				if (isValidRank(summoner[1])) {
+					console.log("VALID RANK", summoner[1].tier, summoner[1].rank);
 					highestIndex = Math.max(
 						highestIndex,
 						LeagueTierHierarchy.indexOf(summoner[1].tier)
@@ -139,6 +142,7 @@ class PlayerDraftManager {
 			}
 		} else {
 			if (isValidRank(summoner)) {
+				console.log("VALID RANK", summoner.tier, summoner.rank);
 				highestIndex = LeagueTierHierarchy.indexOf(summoner.tier);
 			}
 		}
