@@ -8,7 +8,6 @@ const {
 const UserDTO = require("../DTOs/userDTO.js");
 const {
 	generateVerifyEmbed,
-	generateLevelUpEmbed,
 	generateProfileEmbed,
 } = require("../messages/userEmbed.js");
 const {
@@ -17,28 +16,27 @@ const {
 	ButtonStyle,
 	ActionRowBuilder,
 	Interaction,
-	PermissionsBitField,
 } = require("discord.js");
 const {
 	getSummonerByRiotID,
 	getRankByRiotID,
 	getRiotAccountByPuuid,
 } = require("../../api/riot/riotApiHandler.js");
-const { LeagueTier } = require("../../components/leagueRankedEnums.js");
+const {
+	LeagueTier,
+	LeagueTierHierarchy,
+} = require("../../components/leagueRankedEnums.js");
 const client = require("../../client.js");
 const UserLevelManager = require("../managers/userLevelManager.js");
-const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const roles = require(`../../../${process.env.CONFIG_FILE}`).roles.game_roles[
 	"League of Legends"
 ];
-const { Op, Sequelize, Transaction } = require("sequelize");
-const moment = require("moment");
+const { Op, Sequelize } = require("sequelize");
 const { ActionType } = require("../../components/moderationActionTypeEnum.js");
 const {
 	displayDateAsTimestamp,
 	TimestampFormat,
 } = require("../../utilities/timestamp.js");
-const roleHierarchy = require("../../utilities/role-hierarchy.js");
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
@@ -288,22 +286,35 @@ class UserService {
 
 		await getRankByRiotID(game_name, tag_line, user.region_id).then(
 			(summoner) => {
-				if (Array.isArray(summoner)) {
-					summoner = summoner[0];
+				function isValidRank(summoner) {
+					return (
+						LeagueTierHierarchy.indexOf(summoner.tier) >=
+						LeagueTierHierarchy.indexOf(LeagueTier.GOLD)
+					);
 				}
 				if (!summoner) return;
-				const tier = summoner.tier ?? LeagueTier.UNRANKED;
-				const rank = summoner.rank;
-				validRank = ![
-					LeagueTier.UNRANKED,
-					LeagueTier.IRON,
-					LeagueTier.BRONZE,
-					LeagueTier.SILVER,
-				].includes(tier);
+				if (Array.isArray(summoner)) {
+					let highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
+					if (summoner.length > 1) {
+						if (isValidRank(summoner[0])) {
+							highestIndex = LeagueTierHierarchy.indexOf(summoner[0].tier);
+						}
+						if (isValidRank(summoner[1])) {
+							highestIndex = Math.max(
+								highestIndex,
+								LeagueTierHierarchy.indexOf(summoner[1].tier)
+							);
+						}
+					}
+					validRank =
+						highestIndex >= LeagueTierHierarchy.indexOf(LeagueTier.GOLD);
+				} else {
+					validRank = isValidRank(summoner);
+				}
 			}
 		);
 
-		if (!correctIcon) {
+		if (!correctIcon && !hasRequiredRoleOrHigher(member, "developer")) {
 			return await interaction.followUp({
 				content: "Incorrect Summoner Icon",
 				ephemeral: true,

@@ -37,6 +37,10 @@ module.exports = (sequelize) => {
 				type: DataTypes.STRING,
 				allowNull: false,
 			},
+			parent_id: {
+				type: DataTypes.STRING,
+				allowNull: true,
+			},
 			game_id: {
 				type: DataTypes.INTEGER,
 				allowNull: true,

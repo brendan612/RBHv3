@@ -2,6 +2,10 @@ const DraftDTO = require("../DTOs/draftDTO");
 const UserDTO = require("../DTOs/userDTO");
 const PlayerDraftService = require("../services/playerDraftService.js");
 const { getRankByRiotID } = require("../../api/riot/riotApiHandler.js");
+const {
+	LeagueTier,
+	LeagueTierHierarchy,
+} = require("../../components/leagueRankedEnums.js");
 
 class PlayerDraftManager {
 	static ranks = new Map();
@@ -92,9 +96,8 @@ class PlayerDraftManager {
 						player.tag_line,
 						player.region_id
 					);
-					let soloQ = rank.filter((x) => x.queueType === "RANKED_SOLO_5x5")[0];
-					PlayerDraftManager.ranks.set(user_id, soloQ.tier);
-					rank = soloQ.tier;
+					const highestRank = PlayerDraftManager.getHighestQueueRank(rank);
+					PlayerDraftManager.ranks.set(user_id, highestRank);
 				} catch (err) {
 					PlayerDraftManager.ranks.set(user_id, defaultRank);
 					rank = defaultRank;
@@ -110,6 +113,36 @@ class PlayerDraftManager {
 				PlayerDraftManager.ranks.get(player.user_id),
 			])
 		);
+	}
+
+	static getHighestQueueRank(summoner) {
+		let highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
+		function isValidRank(summoner) {
+			return (
+				LeagueTierHierarchy.indexOf(summoner.tier) >=
+				LeagueTierHierarchy.indexOf(LeagueTier.GOLD)
+			);
+		}
+		if (!summoner) return;
+		if (Array.isArray(summoner)) {
+			if (summoner.length > 1) {
+				highestIndex = LeagueTierHierarchy.indexOf(LeagueTier.UNRANKED);
+				if (isValidRank(summoner[0])) {
+					highestIndex = LeagueTierHierarchy.indexOf(summoner[0].tier);
+				}
+				if (isValidRank(summoner[1])) {
+					highestIndex = Math.max(
+						highestIndex,
+						LeagueTierHierarchy.indexOf(summoner[1].tier)
+					);
+				}
+			}
+		} else {
+			if (isValidRank(summoner)) {
+				highestIndex = LeagueTierHierarchy.indexOf(summoner.tier);
+			}
+		}
+		return LeagueTierHierarchy[highestIndex];
 	}
 }
 
