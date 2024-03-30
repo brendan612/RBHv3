@@ -1,4 +1,10 @@
-const { SlashCommandBuilder, Interaction } = require("./index.js");
+const {
+	SlashCommandBuilder,
+	Interaction,
+	handleRegionOption,
+	regionOption,
+	regionAutocomplete,
+} = require("./index.js");
 const { getSummonerByRiotID } = require("../../api/riot/riotApiHandler");
 const UserService = require("../../dataManager/services/userService.js");
 
@@ -23,7 +29,14 @@ module.exports = {
 				.setName("tag-line")
 				.setDescription("The user's tag line. Ex: 1234")
 				.setRequired(true);
-		}),
+		})
+		.addStringOption(regionOption("region", "The user's region", true))
+		.addUserOption((option) =>
+			option
+				.setName("referrer")
+				.setDescription("The user who referred this user")
+				.setRequired(false)
+		),
 	/**
 	 *
 	 * @param {Interaction} interaction
@@ -35,8 +48,11 @@ module.exports = {
 		const target_user = interaction.options.getUser("user");
 		const game_name = interaction.options.getString("game-name");
 		const tag_line = interaction.options.getString("tag-line");
+		const region = await handleRegionOption(interaction);
+		const referrer = interaction.options.getUser("referrer");
 
 		const summoner = await getSummonerByRiotID(game_name, tag_line);
+
 		if (!summoner) {
 			return await interaction.reply({
 				content: "User not found",
@@ -50,12 +66,20 @@ module.exports = {
 			target_user.id,
 			game_name,
 			tag_line,
-			summoner.puuid
+			summoner.puuid,
+			referrer?.id,
+			region.region_id
 		);
 
 		return await interaction.editReply({
 			content: `<@${target_user.id}> has been verified.`,
 			ephemeral: true,
 		});
+	},
+	async autocomplete(interaction) {
+		const focusedValue = interaction.options.getFocused(true);
+		if (focusedValue.name === "region") {
+			regionAutocomplete(focusedValue.value, interaction);
+		}
 	},
 };

@@ -94,13 +94,21 @@ class UserService {
 		return new UserDTO(user);
 	}
 
-	async verifyUser(user_id, game_name, tag_line, puuid, referrer_id) {
+	async verifyUser(
+		user_id,
+		game_name,
+		tag_line,
+		puuid,
+		referrer_id,
+		region_id
+	) {
 		const user = await User.findByPk(user_id);
 		const guild = await client.guilds.fetch(client.guildID);
 		user.summoner_name = game_name;
 		user.tag_line = tag_line;
 		user.puuid = puuid;
 		user.verified = true;
+		user.region_id = region_id;
 		if (referrer_id && referrer_id !== user_id) {
 			const referral = await Referral.create({
 				user_id: user_id,
@@ -331,7 +339,8 @@ class UserService {
 				ephemeral: true,
 			});
 		} else {
-			await this.verifyUser(user_id, game_name, tag_line, puuid, referrer_id);
+			//prettier-ignore
+			await this.verifyUser(user_id, game_name, tag_line, puuid, referrer_id, user.region_id);
 
 			const newVerifyButton = new ButtonBuilder()
 				.setCustomId("verified")
