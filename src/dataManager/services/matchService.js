@@ -187,6 +187,7 @@ class MatchService {
 				this.match.match_id,
 				winning_team,
 				end_time,
+				this.match.region_id,
 				firstSubmission
 			);
 
@@ -236,6 +237,7 @@ class MatchService {
 		match_id,
 		winning_team,
 		end_time,
+		region_id,
 		firstSubmission
 	) {
 		const matchesToUpdate = await Match.findAll(
@@ -333,6 +335,7 @@ class MatchService {
 						user_id: player.user_id,
 						game_id: match.game_id,
 						season_id: match.season_id,
+						region_id: region_id,
 					},
 					defaults: {
 						elo_rating: player.elo_after,

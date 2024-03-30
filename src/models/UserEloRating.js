@@ -57,6 +57,11 @@ module.exports = (sequelize) => {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
+			region_id: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				defaultValue: "NA",
+			},
 			elo_rating: {
 				type: DataTypes.INTEGER,
 				allowNull: false,

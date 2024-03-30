@@ -64,6 +64,7 @@ async function getLeaderboard(
 					E.game_id = ${game_id}
 					AND (${season_id ? `E.season_id = ${season_id}` : "true"})
 					AND LENGTH(U.user_id) > 5
+					And E.region_id = '${region}'
 			),
 			UserStats AS (
 				SELECT

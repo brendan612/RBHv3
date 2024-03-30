@@ -132,6 +132,7 @@ async function getSynergyStatsForUsers(user1_id, user2_id, game_id, season_id) {
 }
 
 async function getRecentMatchStatsForUser(user_id, game_id, season_id) {
+	const user = await User.findByPk(user_id);
 	const matchPlayers = await MatchPlayer.findAll({
 		where: {
 			user_id: user_id,
@@ -142,6 +143,7 @@ async function getRecentMatchStatsForUser(user_id, game_id, season_id) {
 				where: {
 					game_id: game_id,
 					season_id: season_id,
+					region_id: user.region_id,
 				},
 			},
 			{
@@ -165,11 +167,13 @@ async function getRecentMatchStatsForUser(user_id, game_id, season_id) {
  * @property {number} losses - The number of losses.
  */
 async function getMostPlayedChampionForUser(user_id, game_id, season_id) {
+	const user = await User.findByPk(user_id);
 	const whereClause = {
 		game_id: game_id,
 		end_time: {
 			[Op.ne]: null,
 		},
+		region_id: user.region_id,
 	};
 
 	if (season_id) {
@@ -231,11 +235,13 @@ async function getMostPlayedChampionForUser(user_id, game_id, season_id) {
  * @property {number} losses - The number of losses.
  */
 async function getMostPlayedRoleForUser(user_id, game_id, season_id) {
+	const user = await User.findByPk(user_id);
 	const whereClause = {
 		game_id: game_id,
 		end_time: {
 			[Op.ne]: null,
 		},
+		region_id: user.region_id,
 	};
 
 	if (season_id) {
