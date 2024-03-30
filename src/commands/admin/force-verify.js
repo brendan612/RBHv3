@@ -51,7 +51,11 @@ module.exports = {
 		const region = await handleRegionOption(interaction);
 		const referrer = interaction.options.getUser("referrer");
 
-		const summoner = await getSummonerByRiotID(game_name, tag_line);
+		const summoner = await getSummonerByRiotID(
+			game_name,
+			tag_line,
+			region.region_id
+		);
 
 		if (!summoner) {
 			return await interaction.reply({
