@@ -3,6 +3,7 @@ const { SlashCommandBuilder, Interaction, User } = require("./index.js");
 const { calculateDailyBoostMoney } = require("../../utilities/economy.js");
 const { baseEmbed } = require("../../components/embed.js");
 const ms = require("ms");
+const moment = require("moment-timezone");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,19 +14,15 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
-		const now = new Date();
+		const now = moment().tz("America/New_York");
+
 		// Convert the current UTC time to PST by subtracting 8 hours
 		now.setUTCHours(now.getUTCHours() - 8);
-		console.log(now);
 		const user = await User.findByPk(interaction.member.id);
-		const userLastDailyDate = new Date(user.last_daily_date);
-		userLastDailyDate.setUTCHours(userLastDailyDate.getUTCHours() - 8);
-		console.log(userLastDailyDate);
-		const alreadyUsedDaily =
-			now.getUTCFullYear() === userLastDailyDate.getUTCFullYear() &&
-			now.getUTCMonth() === userLastDailyDate.getUTCMonth() &&
-			now.getUTCDate() === userLastDailyDate.getUTCDate();
-		console.log(alreadyUsedDaily);
+		const userLastDailyDate = moment(user.last_daily_date).tz(
+			"America/New_York"
+		);
+		const alreadyUsedDaily = userLastDailyDate.isSame(now, "day");
 		if (alreadyUsedDaily) {
 			await interaction.reply({
 				content: `You've already collected your daily reward! Try again later.`,
@@ -33,7 +30,6 @@ module.exports = {
 			});
 		} else {
 			user.last_daily_date = now;
-
 			const dailyMoney = calculateDailyBoostMoney(
 				interaction.guild,
 				interaction.member
