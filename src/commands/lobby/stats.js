@@ -88,12 +88,12 @@ module.exports = {
 				embed.setFooter({
 					text: `Inactive - To be eligible for a rank, play 3 games every 7 days.`,
 				});
-			}
-
-			//prettier-ignore
-			embed.setFooter({
+			} else {
+				//prettier-ignore
+				embed.setFooter({
 				text: `Unranked - Play ${(3 - totalMatches) } more game(s) to get a rank`,
 			});
+			}
 		}
 
 		if (recent.length > 0) {
