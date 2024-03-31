@@ -52,6 +52,9 @@ async function getStatsForUser(user_id, game_id, season_id, region = "NA") {
 								game_id: game_id,
 								season_id: season_id,
 								region_id: region,
+								end_time: {
+									[Op.ne]: null,
+								},
 							},
 						},
 					],
