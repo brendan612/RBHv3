@@ -83,9 +83,16 @@ module.exports = {
 		);
 
 		if (rank === -1) {
+			const totalMatches = wins + losses;
+			if (totalMatches >= 3) {
+				embed.setFooter({
+					text: `Inactive - To be eligible for a rank, play 3 games every 7 days.`,
+				});
+			}
+
 			//prettier-ignore
 			embed.setFooter({
-				text: `Unranked - Play ${(3 - (parseInt(wins) + parseInt(losses))) } more game(s) to get a rank`,
+				text: `Unranked - Play ${(3 - totalMatches) } more game(s) to get a rank`,
 			});
 		}
 
