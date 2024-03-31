@@ -38,11 +38,21 @@ async function getLeaderboard(
 					MatchPlayers MP
 				JOIN
 					Matches M ON MP.match_id = M.match_id
+				JOIN
+					UserEloRatings U ON MP.user_id = U.user_id
 				WHERE
 					M.game_id = ${game_id}
 					AND (${season_id ? `M.season_id = ${season_id}` : "true"})
 					AND M.region_id = '${region}'
+					AND U.game_id = ${game_id}
+					AND (${season_id ? `U.season_id = ${season_id}` : "true"})
+					AND U.region_id = '${region}'
 					AND M.end_time IS NOT NULL
+					AND (
+						(M.end_time >= NOW() - INTERVAL 7 DAY AND U.elo_rating >= 900) 
+						OR
+						(M.end_time IS NOT NULL AND U.elo_rating < 900) 
+					)
 				GROUP BY
 					MP.user_id
 			),
