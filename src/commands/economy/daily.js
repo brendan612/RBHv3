@@ -15,9 +15,6 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		const now = moment().tz("America/New_York");
-
-		// Convert the current UTC time to PST by subtracting 8 hours
-		now.setUTCHours(now.getUTCHours() - 8);
 		const user = await User.findByPk(interaction.member.id);
 		const userLastDailyDate = moment(user.last_daily_date).tz(
 			"America/New_York"
