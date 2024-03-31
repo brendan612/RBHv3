@@ -16,16 +16,16 @@ module.exports = {
 		const now = new Date();
 		// Convert the current UTC time to PST by subtracting 8 hours
 		now.setUTCHours(now.getUTCHours() - 8);
-		const user = await User.findOne({
-			where: { user_id: interaction.member.id },
-		});
+		console.log(now);
+		const user = await User.findByPk(interaction.member.id);
 		const userLastDailyDate = new Date(user.last_daily_date);
 		userLastDailyDate.setUTCHours(userLastDailyDate.getUTCHours() - 8);
-
+		console.log(userLastDailyDate);
 		const alreadyUsedDaily =
 			now.getUTCFullYear() === userLastDailyDate.getUTCFullYear() &&
 			now.getUTCMonth() === userLastDailyDate.getUTCMonth() &&
 			now.getUTCDate() === userLastDailyDate.getUTCDate();
+		console.log(alreadyUsedDaily);
 		if (alreadyUsedDaily) {
 			await interaction.reply({
 				content: `You've already collected your daily reward! Try again later.`,
