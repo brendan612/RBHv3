@@ -39,52 +39,56 @@ async function getStatsForUser(user_id, game_id, season_id, region = "NA") {
 		const leaderboardUser = leaderboard.find((u) => u.user_id === user_id);
 
 		if (!leaderboardUser) {
-			const recent = getRecentMatchStatsForUser(user_id, game_id, season_id);
-			if (recent.length > 0) {
-				const matches = await MatchPlayer.findAll({
-					where: {
-						user_id: user_id,
-					},
-					include: [
-						{
-							model: Match,
-							where: {
-								game_id: game_id,
-								season_id: season_id,
-								region_id: region,
-								end_time: {
-									[Op.ne]: null,
-								},
+			console.log("User not found in leaderboard, calculating stats manually.");
+			const matches = await MatchPlayer.findAll({
+				where: {
+					user_id: user_id,
+				},
+				include: [
+					{
+						model: Match,
+						where: {
+							game_id: game_id,
+							season_id: season_id,
+							region_id: region,
+							end_time: {
+								[Op.ne]: null,
 							},
 						},
-					],
-				});
-
-				const wins = matches.filter((m) => m.elo_change > 0).length;
-				const losses = matches.filter((m) => m.elo_change < 0).length;
-
-				const elo_rating = await UserEloRating.findOne({
-					where: {
-						user_id,
-						season_id,
-						game_id,
-						region_id: region,
 					},
-				});
+				],
+			});
 
+			console.log(matches.length, "matches found for user", user_id);
+
+			if (matches.length === 0) {
 				return {
-					wins,
-					losses,
+					wins: 0,
+					losses: 0,
 					rank: -1,
-					elo_rating: elo_rating ? elo_rating.elo_rating : 800,
+					elo_rating: 800,
 				};
 			}
 
+			const wins = matches.filter((m) => m.elo_change > 0).length;
+			const losses = matches.filter((m) => m.elo_change < 0).length;
+
+			const elo_rating = await UserEloRating.findOne({
+				where: {
+					user_id,
+					season_id,
+					game_id,
+					region_id: region,
+				},
+			});
+
+			console.log("elo_rating", elo_rating);
+
 			return {
-				wins: 0,
-				losses: 0,
+				wins,
+				losses,
 				rank: -1,
-				elo_rating: 800,
+				elo_rating: elo_rating ? elo_rating.elo_rating : 800,
 			};
 		}
 
