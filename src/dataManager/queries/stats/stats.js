@@ -337,10 +337,53 @@ async function getMostPlayedRoleForUser(user_id, game_id, season_id) {
 	return sortedRoleStatsObject;
 }
 
+async function getVeteransForSeason(game_id, season_id, region_id) {
+	const matchPlayers = await MatchPlayer.findAll({
+		attributes: [
+			"user_id",
+			[
+				Sequelize.fn(
+					"SUM",
+					Sequelize.literal(`CASE WHEN elo_change < 0 THEN 1 ELSE 0 END`)
+				),
+				"losses",
+			],
+			[
+				Sequelize.fn(
+					"SUM",
+					Sequelize.literal(`CASE WHEN elo_change > 0 THEN 1 ELSE 0 END`)
+				),
+				"wins",
+			],
+			[
+				Sequelize.fn("COUNT", Sequelize.col("MatchPlayer.user_id")),
+				"total_matches",
+			],
+		],
+		include: [
+			{
+				model: Match,
+				attributes: [],
+				where: {
+					game_id: game_id,
+					season_id: season_id,
+					region_id: region_id,
+				},
+			},
+		],
+		group: ["MatchPlayer.user_id"],
+		order: [[Sequelize.literal("total_matches"), "DESC"]],
+		limit: 10,
+	});
+
+	return matchPlayers;
+}
+
 module.exports = {
 	getStatsForUser,
 	getSynergyStatsForUsers,
 	getRecentMatchStatsForUser,
 	getMostPlayedChampionForUser,
 	getMostPlayedRoleForUser,
+	getVeteransForSeason,
 };

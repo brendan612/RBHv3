@@ -56,6 +56,7 @@ class UserService {
 	}
 
 	static async createUserService(user_id) {
+		const { User } = require("../../models/index.js");
 		let user = await User.findByPk(user_id);
 		if (!user) {
 			const member = await client.guild.members.fetch(user_id);

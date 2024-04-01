@@ -10,6 +10,8 @@ const { createCanvas } = require("@napi-rs/canvas");
 const path = require("path");
 const { prepareImage } = require("../../utilities/utility-functions.js");
 
+const { getVeteransForSeason } = require("../queries/stats/stats.js");
+
 const veteransBackground = path.join(
 	__dirname,
 	"../../assets/images/veterans/veterans.jpg"
@@ -30,43 +32,11 @@ const textSectionHeight = 760;
  * @returns
  */
 async function generateVeteransImage(game, season, region = "NA") {
-	const matchPlayers = await MatchPlayer.findAll({
-		attributes: [
-			"user_id",
-			[
-				Sequelize.fn(
-					"SUM",
-					Sequelize.literal(`CASE WHEN elo_change < 0 THEN 1 ELSE 0 END`)
-				),
-				"losses",
-			],
-			[
-				Sequelize.fn(
-					"SUM",
-					Sequelize.literal(`CASE WHEN elo_change > 0 THEN 1 ELSE 0 END`)
-				),
-				"wins",
-			],
-			[
-				Sequelize.fn("COUNT", Sequelize.col("MatchPlayer.user_id")),
-				"total_matches",
-			],
-		],
-		include: [
-			{
-				model: Match,
-				attributes: [],
-				where: {
-					game_id: game.game_id,
-					season_id: season.season_id,
-					region_id: region,
-				},
-			},
-		],
-		group: ["MatchPlayer.user_id"],
-		order: [[Sequelize.literal("total_matches"), "DESC"]],
-		limit: 10,
-	});
+	const matchPlayers = await getVeteransForSeason(
+		game.game_id,
+		season.season_id,
+		region
+	);
 	const canvas = createCanvas(canvasWidth, canvasHeight);
 	const ctx = canvas.getContext("2d");
 	const background = await prepareImage(
