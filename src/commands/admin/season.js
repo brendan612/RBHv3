@@ -186,7 +186,11 @@ module.exports = {
 			);
 
 			try {
-				const veterans = await getVeteransForSeason(game_id, season_id, "NA");
+				const veterans = await getVeteransForSeason(
+					game.game_id,
+					season_id,
+					"NA"
+				);
 
 				const topVeteran = veterans[0];
 				const otherVeterans = veterans.slice(1);
@@ -211,7 +215,7 @@ module.exports = {
 				});
 
 				const leaderboard = await getLeaderboard(
-					game_id,
+					game.game_id,
 					season_id,
 					"NA",
 					3,
@@ -242,7 +246,7 @@ module.exports = {
 				await userService.addMoney(5000000); //first place
 
 				const whereClause = {
-					game_id: game_id,
+					game_id: game.game_id,
 					closed_date: {
 						[Op.ne]: null,
 					},
