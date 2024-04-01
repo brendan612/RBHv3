@@ -32,6 +32,8 @@ const {
 
 const client = require("../../client.js");
 
+const { Op } = require("sequelize");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("season")
