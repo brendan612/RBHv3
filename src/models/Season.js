@@ -194,7 +194,7 @@ module.exports = (sequelize) => {
 						}
 					});
 
-					hostStats.forEach(async (host, lobbies) => {
+					hostStats.forEach(async (lobbies, host) => {
 						const user = await UserService.createUserService(host);
 						await user.addMoney(lobbies * 10000);
 					});
