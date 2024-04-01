@@ -59,6 +59,7 @@ class UserService {
 		const { User } = require("../../models/index.js");
 		let user = await User.findByPk(user_id);
 		if (!user) {
+			console.log("User not found, fetching from guild.", user_id);
 			const member = await client.guild.members.fetch(user_id);
 			user = await UserService.createUser(user_id, member.joinedAt);
 		}
