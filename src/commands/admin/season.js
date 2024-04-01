@@ -274,6 +274,10 @@ module.exports = {
 			} catch {
 				console.log("error");
 			}
+
+			return await interaction.editReply({
+				content: `Generated end of season rewards for ${season.name}`,
+			});
 		}
 	},
 	/**
