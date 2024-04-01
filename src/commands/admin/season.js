@@ -30,6 +30,8 @@ const {
 	getLeaderboard,
 } = require("../../dataManager/queries/stats/leaderboard");
 
+const client = require("../../client.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("season")
