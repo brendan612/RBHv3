@@ -271,8 +271,9 @@ module.exports = {
 					const user = await UserService.createUserService(host);
 					await user.addMoney(lobbies * 10000);
 				});
-			} catch {
-				console.log("error");
+			} catch (e) {
+				console.log("Error generating end of season rewards");
+				console.log(e);
 			}
 
 			return await interaction.editReply({
