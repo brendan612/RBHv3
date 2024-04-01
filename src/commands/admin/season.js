@@ -173,19 +173,19 @@ module.exports = {
 
 			console.log(misc_roles);
 			const qc_veteran_role = client.guild.roles.cache.find(
-				(role) => role.name === misc_roles.qc_veteran
+				(role) => role.id === misc_roles.qc_veteran
 			);
 
 			const qc_top_veteran_role = client.guild.roles.cache.find(
-				(role) => role.name === misc_roles.qc_top_veteran
+				(role) => role.id === misc_roles.qc_top_veteran
 			);
 
 			const qc_top_3_role = client.guild.roles.cache.find(
-				(role) => role.name === misc_roles.qc_top_3
+				(role) => role.id === misc_roles.qc_top_3
 			);
 
 			const qc_champion_role = client.guild.roles.cache.find(
-				(role) => role.name === misc_roles.qc_champion
+				(role) => role.id === misc_roles.qc_champion
 			);
 
 			try {
