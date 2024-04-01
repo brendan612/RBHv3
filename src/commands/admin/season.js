@@ -171,6 +171,7 @@ module.exports = {
 			const season = await Season.findByPk(season_id);
 			await generateSeasonEndEmbed(game.game_id, season.season_id);
 
+			console.log(misc_roles);
 			const qc_veteran_role = client.guild.roles.cache.find(
 				(role) => role.name === misc_roles.qc_veteran
 			);
