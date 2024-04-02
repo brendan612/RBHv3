@@ -50,6 +50,21 @@ class ChannelManager {
 		const EUWRole = client.guild.roles.cache.find(
 			(role) => role.name === "EUW"
 		);
+		const guestRole = client.guild.roles.cache.find(
+			(role) => role.name === "Guest"
+		);
+		const memberRole = client.guild.roles.cache.find(
+			(role) => role.name === "Member"
+		);
+		const refRole = client.guild.roles.cache.find(
+			(role) => role.name === "⚔️Queen's Croquet Referee⚔️"
+		);
+		const babyRefRole = client.guild.roles.cache.find(
+			(role) => role.name === "🍼Referee Trainee🍼"
+		);
+		const deckmasterrole = client.guild.roles.cache.find(
+			(role) => role.name === "📛Deckmaster📛"
+		);
 		const channel = await client.guild.channels.create({
 			name: `${emoji} ${lobby.lobby_name} ${team}`,
 			type: channelType,
@@ -75,9 +90,26 @@ class ChannelManager {
 					id: lobbyParticipantRole.id,
 					allow: [PermissionsBitField.Flags.Speak],
 				},
+				{
+					id: refRole.id,
+					allow: [PermissionsBitField.Flags.Speak],
+				},
+				{
+					id: babyRefRole.id,
+					allow: [PermissionsBitField.Flags.Speak],
+				},
+				{
+					id: deckmasterrole.id,
+					allow: [PermissionsBitField.Flags.Speak],
+				},
 			],
 		});
-		ChannelManager.setPosition(channel, 3);
+
+		if (team === "Blue") {
+			ChannelManager.setPosition(channel, 3);
+		} else {
+			ChannelManager.setPosition(channel, 4);
+		}
 
 		//prettier-ignore
 		ChannelManager.createServerChannel(channel, lobby.game_id, lobby.lobby_name + "_" + team, lobby.region_id);
