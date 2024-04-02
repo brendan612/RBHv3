@@ -28,11 +28,15 @@ module.exports = {
 						.addChoices(
 							{
 								name: "Voice",
-								value: "GUILD_VOICE",
+								value: "2",
 							},
 							{
 								name: "Text",
-								value: "GUILD_TEXT",
+								value: "0",
+							},
+							{
+								name: "Category",
+								value: "4",
 							}
 						)
 				)

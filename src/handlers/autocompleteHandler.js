@@ -227,6 +227,7 @@ async function regionAutocomplete(focusedValue, interaction) {
 					region?.toLowerCase().startsWith(focusedValue?.toLowerCase())
 			  )
 			: regionIDs;
+	filteredRegions.push("GLOBAL");
 	await interaction.respond(
 		filteredRegions.map((region) => ({ name: region, value: region }))
 	);

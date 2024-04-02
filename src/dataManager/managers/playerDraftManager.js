@@ -123,7 +123,6 @@ class PlayerDraftManager {
 				LeagueTierHierarchy.indexOf(LeagueTier.GOLD)
 			);
 		}
-		console.log(summoner);
 		if (!summoner) return;
 		if (Array.isArray(summoner)) {
 			if (summoner.length >= 1) {

@@ -4,6 +4,9 @@ const {
 	User,
 	UserEloRating,
 	DraftRound,
+	MatchPlayer,
+	Match,
+	PlayerDraftRound,
 } = require("../../models/index.js");
 const LobbyService = require("./lobbyService.js");
 const UserService = require("./userService.js");
@@ -12,12 +15,13 @@ const MatchService = require("./matchService.js");
 const LobbyDTO = require("../DTOs/lobbyDTO.js");
 const DraftDTO = require("../DTOs/draftDTO.js");
 
+const ChannelManager = require("../managers/channelManager.js");
+
 const client = require("../../client.js");
 
 const {
 	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
-const Match = require("../../models/Match.js");
 
 class ChampionDraftService {
 	/**
@@ -34,6 +38,43 @@ class ChampionDraftService {
 		);
 		draftManager.begun = true;
 		await this.generateChampionDraftEmbed(this.draft);
+
+		const lobby = await Lobby.findByPk(this.draft.lobby_id);
+		const redTeam = await PlayerDraftRound.findAll({
+			where: {
+				draft_id: this.draft.draft_id,
+				team: "red",
+			},
+		});
+
+		const blueTeam = await PlayerDraftRound.findAll({
+			where: {
+				draft_id: this.draft.draft_id,
+				team: "blue",
+			},
+		});
+
+		const redVoice = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			lobby.region_id,
+			lobby.lobby_name + "_Red"
+		);
+
+		const blueVoice = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			lobby.region_id,
+			lobby.lobby_name + "_Blue"
+		);
+
+		await ChannelManager.moveUsersToChannel(
+			redVoice,
+			redTeam.map((u) => u.user_id)
+		);
+
+		await ChannelManager.moveUsersToChannel(
+			blueVoice,
+			blueTeam.map((u) => u.user_id)
+		);
 	}
 
 	async addBan(team, champion_id, round_number) {

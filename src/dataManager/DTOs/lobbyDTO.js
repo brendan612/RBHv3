@@ -1,6 +1,7 @@
 const { Lobby } = require("../../models");
-
+const { Channel } = require("discord.js");
 const client = require("../../client.js");
+const ChannelManager = require("../managers/channelManager.js");
 
 class LobbyDTO {
 	/**
@@ -30,25 +31,21 @@ class LobbyDTO {
 		this.droppable = this.players.length > 0;
 		this.draftable = this.players.length === 10 && !this.draft_id;
 
+		/**@type {Map<string, Channel>} */
 		this.channels = new Map();
-		const generalChannel = client.serverChannels.find(
-			(channel) =>
-				channel.game_id == lobby.game_id &&
-				channel.region_id == lobby.region_id &&
-				channel.purpose == "general"
+		const generalChannel = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			lobby.region_id,
+			"general"
 		);
-		const general = client.guild.channels.cache.get(generalChannel.channel_id);
+		this.channels.set("general", generalChannel);
 
-		this.channels.set("general", general);
-
-		const winsChannel = client.serverChannels.find(
-			(channel) =>
-				channel.game_id == lobby.game_id &&
-				channel.region_id == lobby.region_id &&
-				channel.purpose == "wins"
+		const winsChannel = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			lobby.region_id,
+			"wins"
 		);
-		const wins = client.guild.channels.cache.get(winsChannel.channel_id);
-		this.channels.set("wins", wins);
+		this.channels.set("wins", winsChannel);
 	}
 
 	/**

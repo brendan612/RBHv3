@@ -11,7 +11,11 @@ const DraftDTO = require("../DTOs/draftDTO.js");
 
 const { getStatsForUser } = require("../../dataManager/queries/stats/stats.js");
 
+const ChannelManager = require("../managers/channelManager.js");
+
 const client = require("../../client.js");
+
+const { ChannelType } = require("discord.js");
 
 class DraftService {
 	/**
@@ -94,9 +98,6 @@ class DraftService {
 					},
 				],
 			});
-
-			console.log("TOTAL MATCHES for " + player.user_id, totalMatches);
-
 			if (elo) {
 				ratings.push(elo);
 			} else {
@@ -150,6 +151,17 @@ class DraftService {
 		await playerDraftService.generatePlayerDraftEmbed(
 			await DraftService.getDraft(this.draft.draft_id),
 			true
+		);
+
+		const blue = await ChannelManager.createChannelForLobby(
+			ChannelType.GuildVoice,
+			lobby,
+			"Blue"
+		);
+		const red = await ChannelManager.createChannelForLobby(
+			ChannelType.GuildVoice,
+			lobby,
+			"Red"
 		);
 	}
 }

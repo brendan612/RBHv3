@@ -11,6 +11,7 @@ const {
 const { Op, Transaction } = require("sequelize");
 
 const UserService = require("../services/userService.js");
+const LobbyService = require("../services/lobbyService.js");
 
 const ThreadManager = require("../managers/threadManager.js");
 const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
@@ -222,8 +223,10 @@ class MatchService {
 				await ThreadManager.deleteThread(channel, draft.thread_id);
 			}
 
-			client.cache.clear("lobby_id_" + lobby.lobby_id);
+			const lobbyService = new LobbyService(lobby);
+			await lobbyService.moveUsersAndDestroyLobbyVoiceChannel(true);
 
+			client.cache.clear("lobby_id_" + lobby.lobby_id);
 			client.cache.clear("leaderboard");
 		} catch (error) {
 			console.error("Error submitting win for match: " + this.match.match_id);

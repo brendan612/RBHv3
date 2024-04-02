@@ -90,7 +90,7 @@ async function handleLobbyOption(interaction, game_id) {
 				}
 			}
 
-			if (draft.thread_id && draft.thread_id != interaction.channelId) {
+			if (draft?.thread_id && draft?.thread_id != interaction.channelId) {
 				if (
 					interaction.channel.type === ChannelType.PublicThread ||
 					interaction.channel.type === ChannelType.PrivateThread

@@ -1,5 +1,5 @@
 const { LeagueRankEmojis, LeagueRoleEmojis } = require("../assets/emojis.js");
-const { User } = require("../models");
+const { User, ServerChannel } = require("../models");
 const { GuildMember } = require("discord.js");
 
 const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
@@ -8,6 +8,7 @@ const roleHierarchy = require("../utilities/role-hierarchy.js");
 
 const sharp = require("sharp");
 const { loadImage } = require("@napi-rs/canvas");
+const client = require("../client.js");
 
 /**
  *
@@ -152,6 +153,11 @@ function countScriptCharacters(text) {
 	return count;
 }
 
+async function updateClientChannels() {
+	const serverChannels = await ServerChannel.findAll();
+	client.serverChannels = serverChannels;
+}
+
 module.exports = {
 	hasRequiredRole,
 	hasRequiredRoleOrHigher,
@@ -161,4 +167,5 @@ module.exports = {
 	prepareImage,
 	identifyScript,
 	countScriptCharacters,
+	updateClientChannels,
 };

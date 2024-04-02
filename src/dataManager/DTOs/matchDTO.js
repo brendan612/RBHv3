@@ -1,5 +1,8 @@
 const { Match } = require("../../models");
 const client = require("../../client.js");
+const { Channel } = require("discord.js");
+
+const ChannelManager = require("../managers/channelManager.js");
 
 class MatchDTO {
 	/**
@@ -17,25 +20,22 @@ class MatchDTO {
 		this.draft_id = match.draft_id;
 		this.region_id = match.region_id;
 
+		/**@type {Map<string, Channel>} */
 		this.channels = new Map();
-		const generalChannel = client.serverChannels.find(
-			(channel) =>
-				channel.game_id == match.game_id &&
-				channel.region_id == match.region_id &&
-				channel.purpose == "general"
+		const generalChannel = ChannelManager.getChannelViaServerChannel(
+			match.game_id,
+			match.region_id,
+			"general"
 		);
-		const general = client.guild.channels.cache.get(generalChannel.channel_id);
 
-		this.channels.set("general", general);
+		this.channels.set("general", generalChannel);
 
-		const winsChannel = client.serverChannels.find(
-			(channel) =>
-				channel.game_id == match.game_id &&
-				channel.region_id == match.region_id &&
-				channel.purpose == "wins"
+		const winsChannel = ChannelManager.getChannelViaServerChannel(
+			match.game_id,
+			match.region_id,
+			"wins"
 		);
-		const wins = client.guild.channels.cache.get(winsChannel.channel_id);
-		this.channels.set("wins", wins);
+		this.channels.set("wins", winsChannel);
 	}
 }
 

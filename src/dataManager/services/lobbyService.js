@@ -12,6 +12,7 @@ const {
 	DraftRound,
 	Sequelize,
 	Region,
+	ServerChannel,
 } = require("../../models/index");
 const LobbyDTO = require("../DTOs/lobbyDTO");
 const { generateLobbyEmbed } = require("../messages/lobbyEmbed");
@@ -19,6 +20,7 @@ const DraftService = require("./draftService");
 const channels = require(`../../../${process.env.CONFIG_FILE}`).channels;
 const client = require("../../client.js");
 const ThreadManager = require("../managers/threadManager.js");
+const ChannelManager = require("../managers/channelManager.js");
 const UserService = require("./userService.js");
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.permission_roles;
@@ -110,19 +112,19 @@ class LobbyService {
 		lobby.closed_date = null;
 		lobby.draft_id = null;
 
-		const channel = await client.guild.channels.fetch(
-			channels.games["League of Legends"]
-		);
+		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
+		const channel = lobbyDTO.channels.get("general");
 		await ThreadManager.deleteThread(channel, lobby.thread_id);
 		lobby.thread_id = null;
 
 		await lobby.save();
 
-		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
 		for (const user of lobbyDTO.players) {
 			const userService = new UserService(user);
 			await userService.removeRole(permission_roles.lobby_participant);
 		}
+
+		await this.moveUsersAndDestroyLobbyVoiceChannel();
 	}
 
 	/**
@@ -132,7 +134,7 @@ class LobbyService {
 		const lobbyDTO = await LobbyService.getLobby(this.lobby.lobby_id);
 		if (this.lobby.draft_id) {
 			const draft = await Draft.findByPk(this.lobby.draft_id);
-			if (draft.thread_id) {
+			if (draft?.thread_id) {
 				try {
 					await ThreadManager.deleteThread(
 						lobbyDTO.channels.get("general"),
@@ -141,7 +143,7 @@ class LobbyService {
 					draft.thread_id = null;
 					await draft.save();
 				} catch {}
-			} else if (draft.message_id) {
+			} else if (draft?.message_id) {
 				try {
 					const message = await lobbyDTO.channels
 						.get("general")
@@ -151,7 +153,7 @@ class LobbyService {
 					}
 				} catch (err) {}
 			}
-			if (force) {
+			if (force && draft) {
 				await draft.destroy();
 
 				if (this.lobby.match_id) {
@@ -183,8 +185,42 @@ class LobbyService {
 			} catch {}
 		}
 
+		await this.moveUsersAndDestroyLobbyVoiceChannel();
+
 		await this.lobby.destroy();
 		return true;
+	}
+
+	async moveUsersAndDestroyLobbyVoiceChannel(postGame = false) {
+		const lobby = await Lobby.findByPk(this.lobby.lobby_id);
+		const lobbyDTO = await LobbyService.getLobby(lobby.lobby_id);
+
+		const channelToMoveToPurpose = postGame ? "post_game" : "pre_draft";
+		const channelToMoveTo = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			"GLOBAL",
+			channelToMoveToPurpose
+		);
+
+		await ChannelManager.moveUsersToChannel(
+			channelToMoveTo,
+			lobbyDTO.players.map((p) => p.user_id)
+		);
+
+		const redVoice = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			lobby.region_id,
+			lobby.lobby_name + "_" + "Red"
+		);
+
+		const blueVoice = ChannelManager.getChannelViaServerChannel(
+			lobby.game_id,
+			lobby.region_id,
+			lobby.lobby_name + "_" + "Blue"
+		);
+
+		await ChannelManager.deleteChannel(blueVoice);
+		await ChannelManager.deleteChannel(redVoice);
 	}
 
 	async redraft() {
