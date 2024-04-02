@@ -46,6 +46,10 @@ class ChannelManager {
 		const queensCroquetRole = client.guild.roles.cache.find(
 			(role) => role.name === "Queen's Croquet"
 		);
+		const NARole = client.guild.roles.cache.find((role) => role.name === "NA");
+		const EUWRole = client.guild.roles.cache.find(
+			(role) => role.name === "EUW"
+		);
 		const channel = await client.guild.channels.create({
 			name: `${emoji} ${lobby.lobby_name} ${team}`,
 			type: channelType,
@@ -56,7 +60,11 @@ class ChannelManager {
 					deny: [PermissionsBitField.Flags.Speak],
 				},
 				{
-					id: queensCroquetRole.id,
+					id: NARole.id,
+					allow: [PermissionsBitField.Flags.ViewChannel],
+				},
+				{
+					id: EUWRole.id,
 					allow: [PermissionsBitField.Flags.ViewChannel],
 				},
 				{
