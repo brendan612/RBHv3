@@ -46,7 +46,7 @@ class ChannelManager {
 		const channel = await client.guild.channels.create({
 			name: `${emoji} ${lobby.lobby_name} ${team}`,
 			type: channelType,
-			parent: "772727590116130835",
+			parent: "587057368731484170",
 			permissionOverwrites: [
 				{
 					id: client.guild.id,
