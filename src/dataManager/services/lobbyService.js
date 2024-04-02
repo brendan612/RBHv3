@@ -185,7 +185,9 @@ class LobbyService {
 			} catch {}
 		}
 
-		await this.moveUsersAndDestroyLobbyVoiceChannel();
+		try {
+			await this.moveUsersAndDestroyLobbyVoiceChannel();
+		} catch {}
 
 		await this.lobby.destroy();
 		return true;
