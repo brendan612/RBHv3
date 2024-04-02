@@ -106,9 +106,9 @@ class ChannelManager {
 		});
 
 		if (team === "Blue") {
-			ChannelManager.setPosition(channel, 3);
+			ChannelManager.setPosition(channel, 2);
 		} else {
-			ChannelManager.setPosition(channel, 4);
+			ChannelManager.setPosition(channel, 3);
 		}
 
 		//prettier-ignore
