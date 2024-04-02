@@ -68,6 +68,10 @@ class ChannelManager {
 					allow: [PermissionsBitField.Flags.ViewChannel],
 				},
 				{
+					id: queensCroquetRole.id,
+					allow: [PermissionsBitField.Flags.ViewChannel],
+				},
+				{
 					id: lobbyParticipantRole.id,
 					allow: [PermissionsBitField.Flags.Speak],
 				},
