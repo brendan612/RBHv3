@@ -223,8 +223,10 @@ class MatchService {
 				await ThreadManager.deleteThread(channel, draft.thread_id);
 			}
 
-			const lobbyService = new LobbyService(lobby);
-			await lobbyService.moveUsersAndDestroyLobbyVoiceChannel(true);
+			try {
+				const lobbyService = new LobbyService(lobby);
+				await lobbyService.moveUsersAndDestroyLobbyVoiceChannel(true);
+			} catch (error) {}
 
 			client.cache.clear("lobby_id_" + lobby.lobby_id);
 			client.cache.clear("leaderboard");
@@ -355,10 +357,12 @@ class MatchService {
 					const userService = await UserService.createUserService(
 						player.user_id
 					);
-					await userService.addMatchReward(
-						player.team === match.winning_team,
-						transaction
-					);
+					try {
+						await userService.addMatchReward(
+							player.team === match.winning_team,
+							transaction
+						);
+					} catch {}
 				}
 			}
 		}
