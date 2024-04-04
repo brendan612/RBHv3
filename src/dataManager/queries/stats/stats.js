@@ -6,6 +6,8 @@ const {
 	Champion,
 	Season,
 	UserEloRating,
+	DraftRound,
+	Draft,
 	sequelize,
 	Sequelize,
 } = require("../../../models");
@@ -379,6 +381,121 @@ async function getVeteransForSeason(game_id, season_id, region_id) {
 	return matchPlayers;
 }
 
+/**
+ *
+ * @param {number} game_id
+ * @param {number} season_id
+ * @param {string} region_id
+ * @returns {Promise<Match[]>} An array of matches played for a season.
+ */
+async function getMatchesPlayedForSeason(game_id, season_id, region_id) {
+	const matches = await Match.findAll({
+		where: {
+			game_id,
+			season_id,
+			region_id,
+			end_time: {
+				[Op.ne]: null,
+			},
+		},
+	});
+
+	return matches;
+}
+
+/**
+ *
+ * @param {number} game_id
+ * @param {number} season_id
+ * @param {string} region_id
+ * @returns {Promise<Object[]>} An array of champion stats for a server.
+ */
+async function getChampionMatchDataForServer(game_id, season_id, region_id) {
+	const seasonClause = season_id ? `AND m.season_id = ${season_id}` : "";
+	const regionClause = region_id ? `AND m.region_id = '${region_id}'` : "";
+	const [results, metadata] = await sequelize.query(`
+		WITH ChampionWins AS (
+			SELECT c.champion_id, c.name, COUNT(*) AS 'wins'
+			FROM DraftRounds dr
+			JOIN Drafts d ON dr.draft_id = d.draft_id 
+			JOIN Matches m ON d.match_id = m.match_id
+			JOIN Champions c ON dr.champion_id = c.champion_id 
+			WHERE dr.\`type\` = 'pick'
+			${regionClause}
+			${seasonClause}
+			AND m.game_id = ${game_id}
+			AND m.end_time IS NOT NULL
+			AND m.winning_team = dr.team 
+			GROUP BY c.champion_id, c.name
+			ORDER BY COUNT(*) DESC 
+		), ChampionLosses AS (
+			SELECT c.champion_id, c.name, COUNT(*) AS 'losses'
+			FROM DraftRounds dr
+			JOIN Drafts d ON dr.draft_id = d.draft_id 
+			JOIN Matches m ON d.match_id = m.match_id
+			JOIN Champions c ON dr.champion_id = c.champion_id 
+			WHERE dr.\`type\` = 'pick'
+			${regionClause}
+			${seasonClause}
+			AND m.game_id = ${game_id}
+			AND m.end_time IS NOT NULL
+			AND m.winning_team != dr.team 
+			GROUP BY c.champion_id, c.name
+			ORDER BY COUNT(*) DESC 
+		)
+		SELECT cw.champion_id, cw.name, cw.wins, cl.losses
+		FROM ChampionWins cw
+		JOIN ChampionLosses cl on cw.champion_id = cl.champion_id
+	`);
+
+	return results;
+}
+
+async function getCaptainStatsForServer(game_id, season_id, region_id) {
+	const seasonClause = season_id ? `AND m.season_id = ${season_id}` : "";
+	const regionClause = region_id ? `AND m.region_id = '${region_id}'` : "";
+	const [results, metadata] = await sequelize.query(`
+		WITH CaptainWins AS (
+			SELECT u.user_id, u.summoner_name, COUNT(*) AS 'wins'
+			FROM Drafts d
+			JOIN Matches m ON d.match_id = m.match_id
+			JOIN Users u ON d.red_captain_id = u.user_id OR d.blue_captain_id = u.user_id
+			WHERE m.end_time IS NOT NULL
+			${regionClause}
+			${seasonClause}
+			AND m.game_id = ${game_id}
+			AND (
+				( m.winning_team = 'red' AND d.red_captain_id = u.user_id )
+				OR
+				( m.winning_team = 'blue' AND d.blue_captain_id = u.user_id )
+			)
+			GROUP BY u.user_id, u.summoner_name
+			ORDER BY COUNT(*) DESC 
+		), CaptainLosses AS (
+			SELECT u.user_id, u.summoner_name, COUNT(*) AS 'losses'
+			FROM Drafts d
+			JOIN Matches m ON d.match_id = m.match_id
+			JOIN Users u ON d.red_captain_id = u.user_id OR d.blue_captain_id = u.user_id
+			WHERE m.end_time IS NOT NULL
+			${regionClause}
+			${seasonClause}
+			AND m.game_id = ${game_id}
+			AND (
+				( m.winning_team = 'red' AND d.blue_captain_id = u.user_id )
+				OR
+				( m.winning_team = 'blue' AND d.red_captain_id = u.user_id )
+			)
+			GROUP BY u.user_id, u.summoner_name
+			ORDER BY COUNT(*) DESC 
+		)
+		SELECT cw.user_id, cw.summoner_name, cw.wins, cl.losses
+		FROM CaptainWins cw
+		JOIN CaptainLosses cl on cw.user_id = cl.user_id
+	`);
+
+	return results;
+}
+
 module.exports = {
 	getStatsForUser,
 	getSynergyStatsForUsers,
@@ -386,4 +503,7 @@ module.exports = {
 	getMostPlayedChampionForUser,
 	getMostPlayedRoleForUser,
 	getVeteransForSeason,
+	getMatchesPlayedForSeason,
+	getChampionMatchDataForServer,
+	getCaptainStatsForServer,
 };

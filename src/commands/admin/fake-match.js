@@ -20,7 +20,23 @@ const { Op } = require("sequelize");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("fake-match")
-		.setDescription("Create a fake match for testing purposes"),
+		.setDescription("Create a fake match for testing purposes")
+		.addStringOption((option) =>
+			option
+				.setName("winning-team")
+				.setDescription("The team that won the match")
+				.addChoices(
+					{
+						name: "Red",
+						value: "red",
+					},
+					{
+						name: "Blue",
+						value: "blue",
+					}
+				)
+				.setRequired(false)
+		),
 	/**
 	 *
 	 * @param {Interaction} interaction
@@ -155,7 +171,13 @@ module.exports = {
 		}
 
 		await championDraftService.generateChampionDraftEmbed(draft);
-		await MatchService.createMatch(draft);
+		const match = await MatchService.createMatch(draft);
+
+		const winningTeam = interaction.options.getString("winning-team");
+		if (winningTeam) {
+			await match.submitWin(winningTeam, false);
+		}
+
 		await interaction.editReply("Fake match created");
 	},
 };
