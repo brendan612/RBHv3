@@ -31,21 +31,23 @@ class LobbyDTO {
 		this.droppable = this.players.length > 0;
 		this.draftable = this.players.length === 10 && !this.draft_id;
 
-		/**@type {Map<string, Channel>} */
-		this.channels = new Map();
-		const generalChannel = ChannelManager.getChannelViaServerChannel(
-			lobby.game_id,
-			lobby.region_id,
-			"general"
-		);
-		this.channels.set("general", generalChannel);
+		try {
+			/**@type {Map<string, Channel>} */
+			this.channels = new Map();
+			const generalChannel = ChannelManager.getChannelViaServerChannel(
+				lobby.game_id,
+				lobby.region_id,
+				"general"
+			);
+			this.channels.set("general", generalChannel);
 
-		const winsChannel = ChannelManager.getChannelViaServerChannel(
-			lobby.game_id,
-			lobby.region_id,
-			"wins"
-		);
-		this.channels.set("wins", winsChannel);
+			const winsChannel = ChannelManager.getChannelViaServerChannel(
+				lobby.game_id,
+				lobby.region_id,
+				"wins"
+			);
+			this.channels.set("wins", winsChannel);
+		} catch {}
 	}
 
 	/**
