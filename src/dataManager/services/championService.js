@@ -91,7 +91,7 @@ class ChampionService {
 			} else {
 				const log = await ModerationLog.findOne({
 					where: {
-						action: "TOGGLECHAMP",
+						type: "TOGGLECHAMP",
 						reason: champion.champion_id.toString(),
 					},
 					order: [["created_at", "DESC"]],
