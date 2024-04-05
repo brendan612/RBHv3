@@ -77,6 +77,8 @@ module.exports = {
 
 		const serverChannels = await ServerChannel.findAll();
 		client.serverChannels = serverChannels;
+
+		
 	},
 };
 

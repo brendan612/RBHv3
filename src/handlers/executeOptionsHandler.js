@@ -181,16 +181,29 @@ async function handleChampionOption(interaction, draft_id, search = false) {
 		});
 		return null;
 	}
-	const existing = await DraftRound.findOne({
-		where: { draft_id: draft_id, champion_id: champion_id },
-	});
 
-	if (existing && !search) {
-		await interaction.reply({
-			content: "Champion already selected.",
-			ephemeral: true,
-		});
-		return null;
+	if (!search) {
+		if (!champion.enabled) {
+			await interaction.reply({
+				content: "Champion is disabled.",
+				ephemeral: true,
+			});
+			return null;
+		}
+
+		if (draft_id) {
+			const existing = await DraftRound.findOne({
+				where: { draft_id: draft_id, champion_id: champion_id },
+			});
+
+			if (existing) {
+				await interaction.reply({
+					content: "Champion already selected.",
+					ephemeral: true,
+				});
+				return null;
+			}
+		}
 	}
 
 	return champion;

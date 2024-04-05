@@ -14,7 +14,6 @@ module.exports = (sequelize) => {
 			type,
 			reason
 		) {
-			console.log(moderator_id, targeted_user_id, duration, type, reason);
 			return await ModerationLog.create({
 				user_id: moderator_id,
 				targeted_user_id: targeted_user_id,

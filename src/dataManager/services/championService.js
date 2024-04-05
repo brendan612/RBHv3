@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { Champion } = require("../../models");
+const { Champion, ModerationLog } = require("../../models");
 
 const fs = require("fs").promises;
 const configPath = require("path").resolve(
@@ -82,11 +82,34 @@ class ChampionService {
 		});
 
 		for (let champion of champions) {
-			client.cache.set(
-				champion.name.replace("'", ""),
-				champion.champion_id.toString(),
-				"autoCompleteChampionData"
-			);
+			if (champion.enabled) {
+				client.cache.set(
+					champion.name.replace("'", ""),
+					champion.champion_id.toString(),
+					"autoCompleteChampionData"
+				);
+			} else {
+				const log = await ModerationLog.findOne({
+					where: {
+						action: "TOGGLECHAMP",
+						reason: champion.champion_id.toString(),
+					},
+					order: [["created_at", "DESC"]],
+				});
+
+				if (log) {
+					const expiration_date = new Date(log.duration);
+					if (expiration_date < new Date()) {
+						champion.enabled = true;
+						await champion.save();
+						client.cache.set(
+							champion.name.replace("'", ""),
+							champion.champion_id.toString(),
+							"autoCompleteChampionData"
+						);
+					}
+				}
+			}
 		}
 	}
 }
