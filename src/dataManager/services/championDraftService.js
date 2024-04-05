@@ -54,27 +54,29 @@ class ChampionDraftService {
 			},
 		});
 
-		const redVoice = ChannelManager.getChannelViaServerChannel(
-			lobby.game_id,
-			lobby.region_id,
-			lobby.lobby_name + "_Red"
-		);
+		try {
+			const redVoice = ChannelManager.getChannelViaServerChannel(
+				lobby.game_id,
+				lobby.region_id,
+				lobby.lobby_name + "_Red"
+			);
 
-		const blueVoice = ChannelManager.getChannelViaServerChannel(
-			lobby.game_id,
-			lobby.region_id,
-			lobby.lobby_name + "_Blue"
-		);
+			const blueVoice = ChannelManager.getChannelViaServerChannel(
+				lobby.game_id,
+				lobby.region_id,
+				lobby.lobby_name + "_Blue"
+			);
 
-		await ChannelManager.moveUsersToChannel(
-			redVoice,
-			redTeam.map((u) => u.user_id)
-		);
+			await ChannelManager.moveUsersToChannel(
+				redVoice,
+				redTeam.map((u) => u.user_id)
+			);
 
-		await ChannelManager.moveUsersToChannel(
-			blueVoice,
-			blueTeam.map((u) => u.user_id)
-		);
+			await ChannelManager.moveUsersToChannel(
+				blueVoice,
+				blueTeam.map((u) => u.user_id)
+			);
+		} catch {}
 	}
 
 	async addBan(team, champion_id, round_number) {
