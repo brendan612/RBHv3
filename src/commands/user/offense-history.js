@@ -47,10 +47,17 @@ module.exports = {
 			`All offenses for <@${user.user_id}>`
 		);
 
-		embed.addFields({
-			name: "Offenses",
-			value: formatted.join("\n"),
-		});
+		if (!logs.length) {
+			embed.addFields({
+				name: "\u200b",
+				value: "**This user is squeaky clean :)**",
+			});
+		} else {
+			embed.addFields({
+				name: "Offenses",
+				value: formatted.join("\n"),
+			});
+		}
 
 		return await interaction.reply({ embeds: [embed] });
 	},
