@@ -85,6 +85,27 @@ function formatDateToMMDDYYYY(date) {
 	return `${month}/${day}/${year}`;
 }
 
+/**
+ * Subtracts two dates and returns the difference as a human-readable string.
+ * Only the largest non-zero time unit will be displayed.
+ *
+ * @param {Date} date1 The later date.
+ * @param {Date} date2 The earlier date.
+ * @return {string} The time difference as a human-readable string.
+ */
+function formatDateDifference(date1, date2) {
+	const diff = date1 - date2;
+	const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+	const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+	const minutes = Math.floor((diff / (1000 * 60)) % 60);
+	const seconds = Math.floor((diff / 1000) % 60);
+
+	if (days > 0) return `${days}d`;
+	if (hours > 0) return `${hours}h`;
+	if (minutes > 0) return `${minutes}m`;
+	return `${seconds}s`;
+}
+
 function calculateEloChange(currentRating, opponentRating, winLoss) {
 	const k = 32;
 	const expectedScore =
@@ -163,6 +184,7 @@ module.exports = {
 	hasRequiredRoleOrHigher,
 	generateTeamPlayerList,
 	formatDateToMMDDYYYY,
+	formatDateDifference,
 	calculateEloChange,
 	prepareImage,
 	identifyScript,

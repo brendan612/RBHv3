@@ -1,5 +1,11 @@
 const { SlashCommandBuilder, Interaction } = require("discord.js");
-const { sequelize, User, Referral, ReferralCode } = require("../../models");
+const {
+	sequelize,
+	User,
+	Referral,
+	ReferralCode,
+	ModerationLog,
+} = require("../../models");
 const {
 	gameAutocomplete,
 	seasonAutocomplete,
@@ -30,6 +36,7 @@ module.exports = {
 	User,
 	Referral,
 	ReferralCode,
+	ModerationLog,
 	userOption,
 	regionAutocomplete,
 	handleRegionOption,
