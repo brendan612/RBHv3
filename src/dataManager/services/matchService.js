@@ -167,6 +167,7 @@ class MatchService {
 		});
 
 		try {
+			console.log(this.match);
 			const players = this.match.MatchPlayers;
 			const roleUpdatePromises = players.map(async (player) => {
 				const userService = await UserService.createUserService(player.user_id);
