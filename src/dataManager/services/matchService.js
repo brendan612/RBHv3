@@ -142,18 +142,23 @@ class MatchService {
 	 * @returns {Promise<Match>}
 	 */
 	static async getMatch(match_id) {
-		const match = await Match.findOne({
-			where: {
-				match_id: match_id,
-			},
-			include: [
-				{
-					model: MatchPlayer,
+		try {
+			const match = await Match.findOne({
+				where: {
+					match_id: match_id,
 				},
-			],
-		});
+				include: [
+					{
+						model: MatchPlayer,
+					},
+				],
+			});
 
-		return match;
+			return match;
+		} catch {
+			console.error("Error getting match: " + match_id);
+			return null;
+		}
 	}
 
 	/**
