@@ -5,16 +5,9 @@ const {
 	gameOption,
 	handleGameOption,
 	Lobby,
-	User,
-	Game,
 } = require("./index.js");
 
 const LobbyService = require("../../dataManager/services/lobbyService.js");
-const LobbyDTO = require("../../dataManager/DTOs/lobbyDTO.js");
-const {
-	generateLobbyEmbed,
-} = require("../../dataManager/messages/lobbyEmbed.js");
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("host")
@@ -25,9 +18,6 @@ module.exports = {
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
-		// interaction.user is the object representing the User who ran the command
-		// interaction.member is the GuildMember object, which represents the user in the specific guild
-
 		await interaction.deferReply();
 		const game = await handleGameOption(interaction);
 

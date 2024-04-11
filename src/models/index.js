@@ -41,6 +41,8 @@ const ServerSetting = require("./ServerSetting.js")(sequelize);
 const ServerEmoji = require("./ServerEmoji.js")(sequelize);
 const InteractionLog = require("./InteractionLog.js")(sequelize);
 const Region = require("./Region.js")(sequelize);
+const Tournament = require("./Tournament.js")(sequelize);
+const Team = require("./Team.js")(sequelize);
 
 // Setting up many-to-many relationship
 User.belongsToMany(Lobby, { through: "LobbyUsers", ...cascadeOptions });
@@ -236,6 +238,65 @@ ServerChannel.hasOne(Region, {
 	...cascadeOptions,
 });
 
+// Tournament.hasOne(Region, {
+// 	foreignKey: "region_id",
+// 	...cascadeOptions,
+// });
+
+// Tournament.hasOne(Game, {
+// 	foreignKey: "game_id",
+// 	...cascadeOptions,
+// });
+
+// Tournament.hasOne(GameMode, {
+// 	foreignKey: "game_mode_id",
+// 	...cascadeOptions,
+// });
+
+// Tournament.hasOne(Season, {
+// 	foreignKey: "season_id",
+// 	...cascadeOptions,
+// });
+
+// Tournament.hasOne(User, {
+// 	foreignKey: "created_by",
+// 	...cascadeOptions,
+// });
+
+// Tournament.hasMany(Team, {
+// 	foreignKey: "tournament_id",
+// 	...cascadeOptions,
+// });
+
+// Team.hasOne(Game, {
+// 	foreignKey: "game_id",
+// 	...cascadeOptions,
+// });
+
+// Team.hasMany(GameMode, {
+// 	foreignKey: "game_mode_id",
+// 	...cascadeOptions,
+// });
+
+// Team.hasMany(Tournament, {
+// 	foreignKey: "tournament_id",
+// 	...cascadeOptions,
+// });
+
+// Team.belongsTo(User, {
+// 	foreignKey: "team_captain_id",
+// 	...cascadeOptions,
+// });
+// User.hasMany(Team, {
+// 	foreignKey: "team_captain_id",
+// 	...cascadeOptions,
+// });
+
+// Team.hasOne(Region, {
+// 	foreignKey: "region_id",
+// 	...cascadeOptions,
+// });
+
 module.exports = {
 	sequelize,
 	Sequelize,
@@ -266,4 +327,6 @@ module.exports = {
 	ServerEmoji,
 	InteractionLog,
 	Region,
+	Tournament,
+	Team,
 };

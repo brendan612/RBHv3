@@ -13,6 +13,8 @@ const {
 	formatDateDifference,
 } = require("../../utilities/utility-functions.js");
 const { baseEmbed } = require("../../components/embed.js");
+
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("offense-history")
