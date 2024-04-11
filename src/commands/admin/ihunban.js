@@ -45,7 +45,6 @@ module.exports = {
 
 		await interaction.reply({
 			content: `<@${userService.user_id}> has been unbanned from inhouses`,
-			ephemeral: false,
 		});
 	},
 };

@@ -1,4 +1,4 @@
-const { ActionRowBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const {
 	SlashCommandBuilder,
 	Interaction,
@@ -11,9 +11,17 @@ const { Op } = require("sequelize");
 
 const {
 	formatDateDifference,
+	hasRequiredRoleOrHigher,
 } = require("../../utilities/utility-functions.js");
+
+const {
+	displayDateAsTimestamp,
+	TimestampFormat,
+} = require("../../utilities/timestamp.js");
+
 const { baseEmbed } = require("../../components/embed.js");
 
+const UserService = require("../../dataManager/services/userService.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -27,6 +35,7 @@ module.exports = {
 	async execute(interaction) {
 		const user = await handleUserOption(interaction, "target");
 
+		const userService = await UserService.createUserService(user.user_id);
 		const logs = await ModerationLog.findAll({
 			where: {
 				targeted_user_id: user.user_id,
@@ -34,14 +43,17 @@ module.exports = {
 					[Op.in]: ["IHBAN", "MUTE"],
 				},
 			},
-			order: [["created_at", "ASC"]],
+			order: [["created_at", "DESC"]],
 		});
 
 		const formatted = logs.map((log) => {
-			return `\`\`${log.type} | ${log.reason} | ${formatDateDifference(
+			return `${displayDateAsTimestamp(
+				log.created_at,
+				TimestampFormat.ShortDate
+			)} | **${log.type}** | ${log.reason} | ${formatDateDifference(
 				log.duration,
 				log.created_at
-			)}\`\``;
+			)}`;
 		});
 
 		const embed = baseEmbed(
@@ -61,6 +73,26 @@ module.exports = {
 			});
 		}
 
-		return await interaction.reply({ embeds: [embed] });
+		const components = [];
+		const isIHBanned = await userService.isIHBanned();
+		//prettier-ignore
+		if (isIHBanned.isBanned && hasRequiredRoleOrHigher(interaction.member, "moderator")) {
+			const unban = new ButtonBuilder()
+				.setCustomId(`unban_${user.user_id}`)
+				.setLabel("Unban")
+				.setStyle(ButtonStyle.Danger);
+			
+			const row = new ActionRowBuilder().addComponents(unban);
+			components.push(row);
+
+			return await interaction.reply({
+				embeds: [embed],
+				components: components,
+			});
+		}
+
+		return await interaction.reply({
+			embeds: [embed],
+		});
 	},
 };

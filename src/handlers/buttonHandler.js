@@ -277,6 +277,25 @@ async function handleCancelWinButton(interaction) {
 	});
 }
 
+async function handleUnbanButton(interaction) {
+	if (!hasRequiredRoleOrHigher(interaction.member, "moderator")) {
+		return await interaction.reply({
+			content: "You do not have permission to use this button",
+			ephemeral: true,
+		});
+	}
+	const idParts = interaction.customId.split("_");
+	const userService = await UserService.createUserService(idParts[1]);
+	await userService.ihunban(interaction.user.id, "Unbanned via button");
+
+	await interaction.message.edit({
+		components: [],
+	});
+	await interaction.reply({
+		content: `<@${userService.user_id}> has been unbanned from inhouses`,
+	});
+}
+
 module.exports = {
 	handleJoinButton,
 	handleDropButton,
@@ -289,4 +308,5 @@ module.exports = {
 	handleBlueWinButton,
 	handleBlueWinConfirmButton,
 	handleCancelWinButton,
+	handleUnbanButton,
 };
