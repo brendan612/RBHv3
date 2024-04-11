@@ -190,7 +190,12 @@ async function handleRedWinConfirmButton(interaction) {
 		});
 	}
 
-	const matchService = await MatchService.createMatchService(draft.match_id);
+	let match = await MatchService.getMatch(draft.match_id);
+	if (!match) {
+		match = await MatchService.createMatch(draft);
+	}
+
+	const matchService = await MatchService.createMatchService(match.match_id);
 	await matchService.submitWin("red");
 }
 
@@ -247,7 +252,13 @@ async function handleBlueWinConfirmButton(interaction) {
 		});
 	}
 
-	const matchService = await MatchService.createMatchService(draft.match_id);
+	let match = await MatchService.getMatch(draft.match_id);
+	if (!match) {
+		match = await MatchService.createMatch(draft);
+	}
+
+	const matchService = await MatchService.createMatchService(match.match_id);
+
 	await matchService.submitWin("blue");
 }
 
