@@ -159,7 +159,7 @@ async function updateLeaderboard(
 
 	const region = await Region.findByPk(region_id);
 
-	const limit = 25;
+	const limit = 20;
 	const offset = (page - 1) * limit;
 
 	const image = await generateLeaderboardImage(

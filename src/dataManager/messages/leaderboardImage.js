@@ -88,7 +88,7 @@ async function generateLeaderboardImage(
 	ctx.font = "bold 45px Noto Serif KR";
 	ctx.fillText(
 		seasonText,
-		borderOffset + textSectionWidth / 2 - seasonMetrics.width / 2,
+		(borderOffset + textSectionWidth) / 2 - seasonMetrics.width / 2,
 		150
 	);
 
