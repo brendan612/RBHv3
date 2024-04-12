@@ -83,14 +83,14 @@ async function generateLeaderboardImage(
 	);
 
 	ctx.font = "bold 45px Noto Serif KR";
-	
+
 	const seasonText = season ? season.name : "All Time";
 	const seasonMetrics = ctx.measureText(seasonText);
 
 	ctx.fillText(
 		seasonText,
 		(borderOffset + textSectionWidth) / 2 - seasonMetrics.width / 2,
-		150
+		155
 	);
 
 	ctx.font = "bold 45px Noto Serif KR";
