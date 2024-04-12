@@ -644,6 +644,10 @@ class UserService {
 			value: reason,
 		});
 
+		embed.setFooter({
+			text: `Report Log ID: ${log.ModerationLog_id}`,
+		});
+
 		const channel = ChannelManager.getChannelViaServerChannel(
 			1,
 			"GLOBAL",
