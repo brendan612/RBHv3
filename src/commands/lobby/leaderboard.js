@@ -25,6 +25,10 @@ const {
 	getLeaderboard,
 } = require("../../dataManager/queries/stats/leaderboard.js");
 
+const {
+	generateLeaderboardImage,
+} = require("../../dataManager/messages/leaderboardImage.js");
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("leaderboard")
@@ -115,19 +119,17 @@ function createComponents(page, totalPages) {
 async function fetchLeaderboardData(leaderboard, offset) {
 	// Create an array of promises
 	const promises = leaderboard.map((user, i) => {
-		let defaultNamePadding = 26;
-		const scriptCharacters = countScriptCharacters(
-			user.summoner_name + user.tag_line
-		);
+		let defaultNamePadding = 19;
+		const scriptCharacters = countScriptCharacters(user.summoner_name);
 		defaultNamePadding -= scriptCharacters;
 
 		//prettier-ignore
 		return {
 			rank: `${i + 1 + offset}.`.padEnd(7, " "),
-			name: `${user.summoner_name}#${user.tag_line}`.padEnd(defaultNamePadding, " "),
-			elo: `${parseInt(user.elo_rating)}`.padEnd(8, " "),
-			winsString: `${user.wins}`.padEnd(5, " "),
-			lossesString: `${user.losses}`.padEnd(5, " "),
+			name: `${user.summoner_name}`.padEnd(defaultNamePadding, " "),
+			elo: `${parseInt(user.elo_rating)}`.padEnd(7, " "),
+			winsString: `${user.wins}`,
+			lossesString: `${user.losses}`.padEnd(5, " ")
 		};
 	});
 
@@ -157,12 +159,27 @@ async function updateLeaderboard(
 
 	const region = await Region.findByPk(region_id);
 
-	const limit = 30;
+	const limit = 25;
 	const offset = (page - 1) * limit;
 
-	let leaderboard = await getLeaderboard(game_id, season_id, region_id);
+	const image = await generateLeaderboardImage(
+		offset,
+		limit,
+		game,
+		season,
+		region.region_id
+	);
 
-	if (leaderboard.length === 0) {
+	const leaderboard = await getLeaderboard(
+		game.game_id,
+		season?.season_id,
+		region.region_id,
+		3,
+		false,
+		true
+	);
+
+	if (!image) {
 		return await interaction.editReply({
 			content: "No leaderboards found",
 			ephemeral: true,
@@ -171,45 +188,15 @@ async function updateLeaderboard(
 
 	const leaderboardCount = leaderboard.length;
 
-	leaderboard = leaderboard.slice(offset, offset + limit);
-
-	const title = (season ? season.name : "All-Time") + " Leaderboard";
-
-	const description = `${region.region_id} Leaderboard for ${game.name}`;
-	const embed = baseEmbed(title, description);
-
-	let message =
-		"```diff\n" +
-		"+RANK".padEnd(7, " ") +
-		"NAME".padEnd(26, " ") +
-		"ELO".padEnd(8, " ") +
-		"W".padEnd(5, " ") +
-		"L".padEnd(5, " ") +
-		"```";
-
-	const leaderboardData = await fetchLeaderboardData(leaderboard, offset);
-
-	message += "```asciidoc\n";
-	leaderboardData.forEach((user, i) => {
-		if (i === 3 && page === 1) {
-			message += "``````asciidoc\n";
-		}
-
-		message += `${user.rank}${user.name}${user.elo}${user.winsString}${user.lossesString}\n`;
-	});
-
-	embed.setDescription(description + message + "```");
-
 	const totalPages = Math.ceil(leaderboardCount / limit);
-	embed.setFooter({ text: `Page ${page} of ${totalPages}` });
 
 	const components = createComponents(page, totalPages);
 	let hasComponents = components.components.length > 0;
 
 	let discordMessage = await interaction.editReply({
 		content: "",
-		embeds: [embed],
 		components: hasComponents ? [components] : [],
+		files: [image],
 	});
 
 	return discordMessage;

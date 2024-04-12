@@ -16,7 +16,8 @@ async function getLeaderboard(
 	season_id,
 	region,
 	minimumMatches = 3,
-	includeInactive = false
+	includeInactive = false,
+	testingMode = false
 ) {
 	const cachedLeaderboard = client.cache.get(
 		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`,
@@ -26,6 +27,8 @@ async function getLeaderboard(
 	if (cachedLeaderboard) {
 		return cachedLeaderboard;
 	}
+
+	const testingModeString = !testingMode ? "AND LENGTH(U.user_id) > 5" : "";
 
 	let [results, metadata] = await sequelize.query(
 		`
@@ -73,7 +76,7 @@ async function getLeaderboard(
 				WHERE
 					E.game_id = ${game_id}
 					AND (${season_id ? `E.season_id = ${season_id}` : "true"})
-					AND LENGTH(U.user_id) > 5
+					${testingModeString}
 					And E.region_id = '${region}'
 			),
 			UserStats AS (
