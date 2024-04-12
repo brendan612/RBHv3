@@ -109,7 +109,6 @@ async function generateLeaderboardImage(
 
 	const playerYStart = 250;
 	const spacing = 75;
-	let top3Spacing = 0;
 	for (let i = 0; i < leaderboard.length; i++) {
 		const player = leaderboard[i];
 		const user = await User.findByPk(player.user_id);
@@ -130,7 +129,6 @@ async function generateLeaderboardImage(
 			ctx.fillStyle = "#CD7F32";
 		} else {
 			ctx.fillStyle = "#FFF";
-			top3Spacing = 60;
 		}
 
 		ctx.fillText(
@@ -141,12 +139,12 @@ async function generateLeaderboardImage(
 		ctx.fillText(
 			elo.toString(),
 			borderOffset + spacing + maxNameWidth + 100,
-			playerYStart + i * spacing + top3Spacing
+			playerYStart + i * spacing
 		);
 		ctx.fillText(
 			winLoss,
 			borderOffset + spacing + maxNameWidth + 200,
-			playerYStart + i * spacing + top3Spacing
+			playerYStart + i * spacing
 		);
 	}
 
