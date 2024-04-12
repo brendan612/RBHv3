@@ -1,10 +1,7 @@
 const { Events, Interaction, CommandInteraction } = require("discord.js");
-const { sequelize, Lobby, User, Draft, InteractionLog } = require("../models");
-const LobbyService = require("../dataManager/services/lobbyService.js");
+const { Draft, InteractionLog } = require("../models");
 const PlayerDraftService = require("../dataManager/services/playerDraftService.js");
-const ChampionDraftService = require("../dataManager/services/championDraftService.js");
 const UserService = require("../dataManager/services/userService.js");
-const { all } = require("axios");
 const {
 	handleJoinButton,
 	handleDropButton,
@@ -17,12 +14,20 @@ const {
 	handleRedWinConfirmButton,
 	handleBlueWinConfirmButton,
 	handleCancelWinButton,
+	handleUnbanButton,
 } = require("../handlers/buttonHandler.js");
 const client = require("../client.js");
-const permission_roles = require(`../../${process.env.CONFIG_FILE}`).roles
-	.permission_roles;
-const roleHierarchy = require("../utilities/role-hierarchy.js");
 
+const {
+	handleTournamentCreate,
+	handleFollowUpTournamentDatesButton,
+	handleTournamentDatesSubmit,
+	handleTournamentGameFormatButton,
+	handleTournamentGameFormatSelectMenu,
+	handleTournamentRegistrationTypeSelectMenu,
+	handleTournamentEliminationTypeSelectMenu,
+} = require("../commands/tournament/tournament-subcommands/create.js");
+//prettier-ignore
 const buttonHandlers = {
 	join: handleJoinButton,
 	drop: handleDropButton,
@@ -35,6 +40,16 @@ const buttonHandlers = {
 	redwinconfirm: handleRedWinConfirmButton,
 	bluewinconfirm: handleBlueWinConfirmButton,
 	cancelwin: handleCancelWinButton,
+	unban: handleUnbanButton,
+	tournament_create_form_dates_button: handleFollowUpTournamentDatesButton,
+	tournament_create_form_game_button: handleTournamentGameFormatButton,
+	tournament_registration_type_selection: handleTournamentRegistrationTypeSelectMenu,
+	tournament_elimination_type_selection: handleTournamentEliminationTypeSelectMenu,
+};
+
+const modalHandlers = {
+	tournament_create_form: handleTournamentCreate,
+	tournament_create_form_dates: handleTournamentDatesSubmit,
 };
 
 const {
@@ -123,7 +138,10 @@ module.exports = {
 					});
 				}
 			} else if (interaction.isButton()) {
-				const action = interaction.customId.split("_")[0];
+				let action = interaction.customId.split("_")[0];
+				if (action === "tournament") {
+					action = interaction.customId;
+				}
 				const handler = buttonHandlers[action];
 				if (handler) {
 					await handler(interaction);
@@ -148,6 +166,24 @@ module.exports = {
 					);
 					await userService.handleLeagueRoleSelectMenu(interaction, values);
 				}
+
+				const tournament_game_format_regex =
+					/tournament_game_format_selection/gm;
+				if (tournament_game_format_regex.test(interaction.customId)) {
+					await handleTournamentGameFormatSelectMenu(interaction, values);
+				}
+
+				const tournament_registration_type_regex =
+					/tournament_registration_type/gm;
+				if (tournament_registration_type_regex.test(interaction.customId)) {
+					await handleTournamentRegistrationTypeSelectMenu(interaction, values);
+				}
+
+				const tournament_elimination_type_regex =
+					/tournament_elimination_type/gm;
+				if (tournament_elimination_type_regex.test(interaction.customId)) {
+					await handleTournamentEliminationTypeSelectMenu(interaction, values);
+				}
 			} else if (interaction.isUserContextMenuCommand()) {
 				/** @type {CommandInteraction} */
 				const command = interaction.client.commands.get(
@@ -157,6 +193,14 @@ module.exports = {
 				if (!command) return;
 
 				command.execute(interaction);
+			} else if (interaction.isModalSubmit()) {
+				const action = interaction.customId;
+				const handler = modalHandlers[action];
+				if (handler) {
+					await handler(interaction);
+				} else {
+					console.log("No handler for modal action: ", action);
+				}
 			}
 
 			const end = new Date();

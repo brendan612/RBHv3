@@ -45,6 +45,9 @@ const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 const donor_roles = require(`../../../${process.env.CONFIG_FILE}`).roles
 	.donor_roles;
 
+const { baseEmbed } = require("../../components/embed.js");
+const ChannelManager = require("../managers/channelManager.js");
+
 class UserService {
 	/**
 	 *
@@ -615,6 +618,39 @@ class UserService {
 			ActionType.IHBAN,
 			reason
 		);
+
+		const embed = baseEmbed("Report Log", "User IH Banned");
+
+		embed.addFields({
+			name: "Banned User",
+			value: `<@${this.user_id}>`,
+			inline: true,
+		});
+
+		embed.addFields({
+			name: "Staff Member",
+			value: `<@${moderator_id}>`,
+			inline: true,
+		});
+
+		embed.addFields({
+			name: "Ban Expires",
+			value: displayDateAsTimestamp(bannedUntil, TimestampFormat.Relative),
+			inline: true,
+		});
+
+		embed.addFields({
+			name: "Reason",
+			value: reason,
+		});
+
+		const channel = ChannelManager.getChannelViaServerChannel(
+			1,
+			"GLOBAL",
+			"reports"
+		);
+
+		channel.send({ embeds: [embed] });
 	}
 
 	/**
