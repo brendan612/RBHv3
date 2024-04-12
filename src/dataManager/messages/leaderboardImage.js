@@ -78,7 +78,7 @@ async function generateLeaderboardImage(
 	const titleMetrics = ctx.measureText(title);
 	ctx.fillText(
 		title,
-		borderOffset + textSectionWidth / 2 - titleMetrics.width / 2,
+		(borderOffset + textSectionWidth) / 2 - titleMetrics.width / 2,
 		100
 	);
 
@@ -129,7 +129,7 @@ async function generateLeaderboardImage(
 			ctx.fillStyle = "#CD7F32";
 		} else {
 			ctx.fillStyle = "#FFF";
-			top3Spacing = 75;
+			top3Spacing = 60;
 		}
 
 		ctx.fillText(
