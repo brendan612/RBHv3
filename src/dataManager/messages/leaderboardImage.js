@@ -90,7 +90,7 @@ async function generateLeaderboardImage(
 	ctx.fillText(
 		seasonText,
 		(borderOffset + textSectionWidth) / 2 - seasonMetrics.width / 2,
-		155
+		175
 	);
 
 	ctx.font = "bold 45px Noto Serif KR";
@@ -107,7 +107,7 @@ async function generateLeaderboardImage(
 		}
 	});
 
-	const playerYStart = 250;
+	const playerYStart = 300;
 	const spacing = 75;
 	for (let i = 0; i < leaderboard.length; i++) {
 		const player = leaderboard[i];
