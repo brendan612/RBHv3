@@ -140,23 +140,23 @@ async function generateLeaderboardImage(
 
 		ctx.strokeText(
 			elo.toString(),
-			borderOffset + spacing + maxNameWidth + 100,
+			borderOffset + spacing + maxNameWidth + 125,
 			playerYStart + i * spacing
 		);
 		ctx.fillText(
 			elo.toString(),
-			borderOffset + spacing + maxNameWidth + 100,
+			borderOffset + spacing + maxNameWidth + 125,
 			playerYStart + i * spacing
 		);
 
 		ctx.strokeText(
 			winLoss,
-			borderOffset + spacing + maxNameWidth + 200,
+			borderOffset + spacing + maxNameWidth + 225,
 			playerYStart + i * spacing
 		);
 		ctx.fillText(
 			winLoss,
-			borderOffset + spacing + maxNameWidth + 200,
+			borderOffset + spacing + maxNameWidth + 225,
 			playerYStart + i * spacing
 		);
 	}
