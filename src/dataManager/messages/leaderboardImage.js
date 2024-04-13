@@ -52,7 +52,8 @@ async function generateLeaderboardImage(
 		season?.season_id,
 		region,
 		3,
-		false
+		false,
+		true
 	);
 
 	if (!leaderboard) {
@@ -109,6 +110,9 @@ async function generateLeaderboardImage(
 
 	const playerYStart = 300;
 	const spacing = 75;
+
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 8;
 	for (let i = 0; i < leaderboard.length; i++) {
 		const player = leaderboard[i];
 		const user = await User.findByPk(player.user_id);
@@ -131,10 +135,23 @@ async function generateLeaderboardImage(
 			ctx.fillStyle = "#FFF";
 		}
 
+		ctx.strokeText(name, borderOffset + spacing, playerYStart + i * spacing);
 		ctx.fillText(name, borderOffset + spacing, playerYStart + i * spacing);
+
+		ctx.strokeText(
+			elo.toString(),
+			borderOffset + spacing + maxNameWidth + 100,
+			playerYStart + i * spacing
+		);
 		ctx.fillText(
 			elo.toString(),
 			borderOffset + spacing + maxNameWidth + 100,
+			playerYStart + i * spacing
+		);
+
+		ctx.strokeText(
+			winLoss,
+			borderOffset + spacing + maxNameWidth + 200,
 			playerYStart + i * spacing
 		);
 		ctx.fillText(
