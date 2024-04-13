@@ -131,11 +131,7 @@ async function generateLeaderboardImage(
 			ctx.fillStyle = "#FFF";
 		}
 
-		ctx.fillText(
-			name,
-			borderOffset + spacing,
-			playerYStart + i * spacing + top3Spacing
-		);
+		ctx.fillText(name, borderOffset + spacing, playerYStart + i * spacing);
 		ctx.fillText(
 			elo.toString(),
 			borderOffset + spacing + maxNameWidth + 100,
