@@ -5,3 +5,5 @@ server.env
 config.local.json
 .vscode/settings.json
 config.local.json
+.vscode/launch.json
+src/RBHv3.code-workspace

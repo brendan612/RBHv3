@@ -1,9 +1,4 @@
-const {
-	Match,
-	MatchPlayer,
-	User,
-	Sequelize,
-} = require("../../models/index.js");
+const { Match, MatchPlayer, User, Sequelize } = require("../../models/index.js");
 
 const { AttachmentBuilder } = require("discord.js");
 const { createCanvas } = require("@napi-rs/canvas");
@@ -12,10 +7,7 @@ const { prepareImage } = require("../../utilities/utility-functions.js");
 
 const { getVeteransForSeason } = require("../queries/stats/stats.js");
 
-const veteransBackground = path.join(
-	__dirname,
-	"../../assets/images/veterans/veterans.jpg"
-);
+const veteransBackground = path.join(__dirname, "../../assets/images/veterans/veterans.jpg");
 
 const canvasWidth = 1380;
 const canvasHeight = 776;
@@ -32,78 +24,54 @@ const textSectionHeight = 760;
  * @returns
  */
 async function generateVeteransImage(game, season, region = "NA") {
-	const matchPlayers = await getVeteransForSeason(
-		game.game_id,
-		season.season_id,
-		region
-	);
-	const canvas = createCanvas(canvasWidth, canvasHeight);
-	const ctx = canvas.getContext("2d");
-	const background = await prepareImage(
-		veteransBackground,
-		canvasWidth,
-		canvasHeight
-	);
-	ctx.drawImage(background, 0, 0, canvasWidth, canvasHeight);
+    const matchPlayers = await getVeteransForSeason(game.game_id, season.season_id, region);
+    const canvas = createCanvas(canvasWidth, canvasHeight);
+    const ctx = canvas.getContext("2d");
+    const background = await prepareImage(veteransBackground, canvasWidth, canvasHeight);
+    ctx.drawImage(background, 0, 0, canvasWidth, canvasHeight);
 
-	ctx.font = "bold 50px Noto Serif KR";
+    ctx.font = "bold 50px Noto Serif KR";
 
-	ctx.fillStyle = "white";
+    ctx.fillStyle = "white";
 
-	const title = "Queen's Croquet Veterans";
-	const titleMetrics = ctx.measureText(title);
-	ctx.fillText(
-		title,
-		borderOffset + textSectionWidth / 2 - titleMetrics.width / 2,
-		100
-	);
+    const title = "Queen's Croquet Veterans";
+    const titleMetrics = ctx.measureText(title);
+    ctx.fillText(title, borderOffset + textSectionWidth / 2 - titleMetrics.width / 2, 100);
 
-	ctx.font = "bold 35px Noto Serif KR";
+    ctx.font = "bold 35px Noto Serif KR";
 
-	let maxNameWidth = 0;
+    let maxNameWidth = 0;
 
-	matchPlayers.forEach(async (player) => {
-		const user = await User.findByPk(player.user_id);
+    matchPlayers.forEach(async (player) => {
+        const user = await User.findByPk(player.user_id);
 
-		const name = user.summoner_name + "#" + user.tag_line;
-		const nameMetrics = ctx.measureText(name);
-		if (nameMetrics.width > maxNameWidth) {
-			maxNameWidth = nameMetrics.width;
-		}
-	});
+        const name = user.summoner_name + "#" + user.tag_line;
+        const nameMetrics = ctx.measureText(name);
+        if (nameMetrics.width > maxNameWidth) {
+            maxNameWidth = nameMetrics.width;
+        }
+    });
 
-	for (let i = 0; i < matchPlayers.length; i++) {
-		const player = matchPlayers[i];
-		const user = await User.findByPk(player.user_id);
-		const wins = parseInt(player.dataValues.wins);
-		const losses = parseInt(player.dataValues.losses);
+    for (let i = 0; i < matchPlayers.length; i++) {
+        const player = matchPlayers[i];
+        const user = await User.findByPk(player.user_id);
+        const wins = parseInt(player.dataValues.wins);
+        const losses = parseInt(player.dataValues.losses);
 
-		const name =
-			`${(i + 1).toString().padStart(2, " ")}. ` +
-			user.summoner_name +
-			"#" +
-			user.tag_line;
+        const name = `${(i + 1).toString().padStart(2, " ")}. ` + user.summoner_name + "#" + user.tag_line;
 
-		const winLoss = `${wins}W ${losses}L`;
+        const winLoss = `${wins}W ${losses}L`;
 
-		ctx.fillText(
-			name,
-			borderOffset + 50,
-			200 + matchPlayers.indexOf(player) * 50
-		);
+        ctx.fillText(name, borderOffset + 50, 200 + matchPlayers.indexOf(player) * 50);
 
-		ctx.fillText(
-			winLoss,
-			borderOffset + 50 + maxNameWidth + 150,
-			200 + matchPlayers.indexOf(player) * 50
-		);
-	}
+        ctx.fillText(winLoss, borderOffset + 50 + maxNameWidth + 150, 200 + matchPlayers.indexOf(player) * 50);
+    }
 
-	const attachment = new AttachmentBuilder(canvas.toBuffer("image/png"), {
-		name: "veterans.png",
-	});
+    const attachment = new AttachmentBuilder(canvas.toBuffer("image/png"), {
+        name: "veterans.png",
+    });
 
-	return attachment;
+    return attachment;
 }
 
 module.exports = { generateVeteransImage };

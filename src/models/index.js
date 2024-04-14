@@ -1,20 +1,15 @@
 const { Sequelize, DataTypes, Model } = require("sequelize");
 require("dotenv").config();
-const sequelize = new Sequelize(
-	process.env.DBNAME,
-	process.env.DBUSER,
-	process.env.DBPASSWORD,
-	{
-		host: process.env.DBHOST,
-		port: process.env.DBPORT,
-		dialect: "mysql",
-		logging: false,
-	}
-);
+const sequelize = new Sequelize(process.env.DBNAME, process.env.DBUSER, process.env.DBPASSWORD, {
+    host: process.env.DBHOST,
+    port: parseInt(process.env.DBPORT),
+    dialect: "mysql",
+    logging: false,
+});
 
 const cascadeOptions = {
-	onDelete: "cascade",
-	onUpdate: "cascade",
+    onDelete: "cascade",
+    onUpdate: "cascade",
 };
 
 const ServerMessage = require("./ServerMessage.js")(sequelize);
@@ -50,283 +45,282 @@ Lobby.belongsToMany(User, { through: "LobbyUsers", ...cascadeOptions });
 Lobby.belongsTo(User, { as: "Host", foreignKey: "host_id", ...cascadeOptions });
 User.hasMany(Lobby, { foreignKey: "host_id" });
 Game.hasMany(Lobby, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 Lobby.belongsTo(Game, { foreignKey: "game_id", ...cascadeOptions });
 Game.hasMany(Season, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 Game.hasMany(GameMode, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 GameMode.belongsTo(Game, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 // User model associations
 User.hasMany(Referral, {
-	as: "Referrals",
-	foreignKey: "referrer_id",
-	...cascadeOptions,
+    as: "Referrals",
+    foreignKey: "referrer_id",
+    ...cascadeOptions,
 });
 
 // Referral model associations
 Referral.belongsTo(User, {
-	as: "Referrer",
-	foreignKey: "referrer_id",
-	...cascadeOptions,
+    as: "Referrer",
+    foreignKey: "referrer_id",
+    ...cascadeOptions,
 });
 
 User.hasMany(ReferralCode, {
-	foreignKey: "user_id",
-	as: "ReferralCodes",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    as: "ReferralCodes",
+    ...cascadeOptions,
 });
 
 ReferralCode.belongsTo(User, {
-	foreignKey: "user_id",
-	as: "User",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    as: "User",
+    ...cascadeOptions,
 });
 
 User.hasMany(ModerationLog, {
-	foreignKey: "user_id",
-	as: "ModerationLogs",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    as: "ModerationLogs",
+    ...cascadeOptions,
 });
 User.hasMany(ModerationLog, {
-	foreignKey: "targeted_user_id",
-	as: "TargetedModerationLogs",
-	...cascadeOptions,
+    foreignKey: "targeted_user_id",
+    as: "TargetedModerationLogs",
+    ...cascadeOptions,
 });
 
 User.hasMany(UserEloRating, {
-	foreignKey: "user_id",
-	as: "UserEloRatings",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    as: "UserEloRatings",
+    ...cascadeOptions,
 });
 UserEloRating.belongsTo(User, {
-	foreignKey: "user_id",
-	as: "User",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    as: "User",
+    ...cascadeOptions,
 });
 UserEloRating.belongsTo(Game, {
-	foreignKey: "game_id",
-	as: "Game",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    as: "Game",
+    ...cascadeOptions,
 });
 UserEloRating.belongsTo(Season, {
-	foreignKey: "season_id",
-	as: "Season",
-	...cascadeOptions,
+    foreignKey: "season_id",
+    as: "Season",
+    ...cascadeOptions,
 });
 
 ModerationLog.belongsTo(User, {
-	foreignKey: "user_id",
-	as: "User",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    as: "User",
+    ...cascadeOptions,
 });
 ModerationLog.belongsTo(User, {
-	foreignKey: "targeted_user_id",
-	as: "TargetedUser",
-	...cascadeOptions,
+    foreignKey: "targeted_user_id",
+    as: "TargetedUser",
+    ...cascadeOptions,
 });
 Lobby.hasOne(Draft, {
-	foreignKey: "lobby_id",
-	...cascadeOptions,
+    foreignKey: "lobby_id",
+    ...cascadeOptions,
 });
 Draft.belongsTo(Lobby, { foreignKey: "lobby_id", ...cascadeOptions });
 Draft.hasMany(PlayerDraftRound, {
-	foreignKey: "draft_id",
-	...cascadeOptions,
+    foreignKey: "draft_id",
+    ...cascadeOptions,
 });
 PlayerDraftRound.belongsTo(Draft, {
-	foreignKey: "draft_id",
-	...cascadeOptions,
+    foreignKey: "draft_id",
+    ...cascadeOptions,
 });
 PlayerDraftRound.belongsTo(User, { foreignKey: "user_id", ...cascadeOptions });
 User.hasMany(PlayerDraftRound, { foreignKey: "user_id", ...cascadeOptions });
 Draft.hasMany(DraftRound, {
-	foreignKey: "draft_id",
-	...cascadeOptions,
+    foreignKey: "draft_id",
+    ...cascadeOptions,
 });
 DraftRound.belongsTo(Draft, { foreignKey: "draft_id", ...cascadeOptions });
 DraftRound.hasOne(Champion, {
-	foreignKey: "champion_id",
-	...cascadeOptions,
+    foreignKey: "champion_id",
+    ...cascadeOptions,
 });
 Lobby.hasOne(Match, {
-	foreignKey: "lobby_id",
-	...cascadeOptions,
+    foreignKey: "lobby_id",
+    ...cascadeOptions,
 });
 Match.belongsTo(Lobby, {
-	foreignKey: "lobby_id",
-	...cascadeOptions,
+    foreignKey: "lobby_id",
+    ...cascadeOptions,
 });
 Game.hasMany(Match, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 Season.hasMany(Match, {
-	foreignKey: "season_game_id",
-	...cascadeOptions,
+    foreignKey: "season_game_id",
+    ...cascadeOptions,
 });
 Season.belongsTo(Game, { foreignKey: "game_id", ...cascadeOptions });
 Match.belongsTo(Draft, { foreignKey: "draft_id", ...cascadeOptions });
 Match.hasMany(MatchPlayer, {
-	foreignKey: "match_id",
-	...cascadeOptions,
+    foreignKey: "match_id",
+    ...cascadeOptions,
 });
 MatchPlayer.belongsTo(User, { foreignKey: "user_id", ...cascadeOptions });
 MatchPlayer.belongsTo(Match, { foreignKey: "match_id", ...cascadeOptions });
 User.hasMany(MatchPlayer, { foreignKey: "user_id", ...cascadeOptions });
 
 MatchPlayer.hasOne(Champion, {
-	foreignKey: "champion_id",
-	...cascadeOptions,
+    foreignKey: "champion_id",
+    ...cascadeOptions,
 });
 
 AutoResponse.belongsTo(User, { foreignKey: "created_by", ...cascadeOptions });
 
 Game.hasOne(ServerChannel, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 Game.hasMany(ServerEmoji, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 Game.hasMany(ServerRole, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 Game.hasMany(ServerSetting, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 User.hasMany(InteractionLog, {
-	foreignKey: "user_id",
-	...cascadeOptions,
+    foreignKey: "user_id",
+    ...cascadeOptions,
 });
 
 User.hasOne(Region, {
-	foreignKey: "region_id",
-	...cascadeOptions,
+    foreignKey: "region_id",
+    ...cascadeOptions,
 });
 
 Lobby.hasOne(Region, {
-	foreignKey: "region_id",
-	...cascadeOptions,
+    foreignKey: "region_id",
+    ...cascadeOptions,
 });
 
 Match.hasOne(Region, {
-	foreignKey: "region_id",
-	...cascadeOptions,
+    foreignKey: "region_id",
+    ...cascadeOptions,
 });
 
 ServerChannel.hasOne(Region, {
-	foreignKey: "region_id",
-	...cascadeOptions,
+    foreignKey: "region_id",
+    ...cascadeOptions,
 });
 
 Tournament.hasOne(Region, {
-	foreignKey: "region_id",
-	...cascadeOptions,
+    foreignKey: "region_id",
+    ...cascadeOptions,
 });
 
 Tournament.hasOne(Game, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 Tournament.hasOne(GameMode, {
-	foreignKey: "game_mode_id",
-	...cascadeOptions,
+    foreignKey: "game_mode_id",
+    ...cascadeOptions,
 });
 
 Tournament.hasOne(Season, {
-	foreignKey: "season_id",
-	...cascadeOptions,
+    foreignKey: "season_id",
+    ...cascadeOptions,
 });
 
 Tournament.hasOne(User, {
-	foreignKey: "created_by",
-	...cascadeOptions,
+    foreignKey: "created_by",
+    ...cascadeOptions,
 });
 
 Tournament.hasMany(Team, {
-	foreignKey: "tournament_id",
-	...cascadeOptions,
+    foreignKey: "tournament_id",
+    ...cascadeOptions,
 });
 
 Team.hasOne(Game, {
-	foreignKey: "game_id",
-	...cascadeOptions,
+    foreignKey: "game_id",
+    ...cascadeOptions,
 });
 
 Team.hasMany(GameMode, {
-	foreignKey: "game_mode_id",
-	...cascadeOptions,
+    foreignKey: "game_mode_id",
+    ...cascadeOptions,
 });
 
 Team.hasMany(Tournament, {
-	foreignKey: "tournament_id",
-	...cascadeOptions,
+    foreignKey: "tournament_id",
+    ...cascadeOptions,
 });
 
 Team.belongsTo(User, {
-	foreignKey: "team_captain_id",
-	...cascadeOptions,
+    foreignKey: "team_captain_id",
+    ...cascadeOptions,
 });
 User.hasMany(Team, {
-	foreignKey: "team_captain_id",
-	...cascadeOptions,
+    foreignKey: "team_captain_id",
+    ...cascadeOptions,
 });
 
 Team.hasOne(Region, {
-	foreignKey: "region_id",
-	...cascadeOptions,
+    foreignKey: "region_id",
+    ...cascadeOptions,
 });
 
 module.exports = {
-	sequelize,
-	Sequelize,
-	DataTypes,
-	Model,
-	ServerMessage,
-	User,
-	UserEloRating,
-	Referral,
-	Lobby,
-	Game,
-	Season,
-	Referral,
-	ReferralCode,
-	ModerationLog,
-	Match,
-	MatchPlayer,
-	Draft,
-	PlayerDraftRound,
-	DraftRound,
-	Champion,
-	AutoResponse,
-	FeatureToggle,
-	GameMode,
-	ServerChannel,
-	ServerRole,
-	ServerSetting,
-	ServerEmoji,
-	InteractionLog,
-	Region,
-	Tournament,
-	Team,
+    sequelize,
+    Sequelize,
+    DataTypes,
+    Model,
+    ServerMessage,
+    User,
+    UserEloRating,
+    Lobby,
+    Game,
+    Season,
+    Referral,
+    ReferralCode,
+    ModerationLog,
+    Match,
+    MatchPlayer,
+    Draft,
+    PlayerDraftRound,
+    DraftRound,
+    Champion,
+    AutoResponse,
+    FeatureToggle,
+    GameMode,
+    ServerChannel,
+    ServerRole,
+    ServerSetting,
+    ServerEmoji,
+    InteractionLog,
+    Region,
+    Tournament,
+    Team,
 };

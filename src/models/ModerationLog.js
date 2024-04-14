@@ -1,65 +1,59 @@
 const { DataTypes, Model } = require("sequelize");
 
 module.exports = (sequelize) => {
-	class ModerationLog extends Model {
-		/**
-		 *
-		 * @param {string} name
-		 * @returns {Promise<ModerationLog>}
-		 */
-		static async createModerationLog(
-			moderator_id,
-			targeted_user_id,
-			duration,
-			type,
-			reason
-		) {
-			return await ModerationLog.create({
-				user_id: moderator_id,
-				targeted_user_id: targeted_user_id,
-				duration: duration,
-				type: type,
-				reason: reason,
-			});
-		}
-	}
-	ModerationLog.init(
-		{
-			ModerationLog_id: {
-				type: DataTypes.INTEGER,
-				allowNull: false,
-				primaryKey: true,
-				unique: true,
-				autoIncrement: true,
-			},
-			user_id: {
-				type: DataTypes.STRING,
-				allowNull: false,
-			},
-			targeted_user_id: {
-				type: DataTypes.STRING,
-				allowNull: false,
-			},
-			duration: {
-				type: DataTypes.DATE,
-				allowNull: true,
-			},
-			type: {
-				type: DataTypes.STRING,
-				allowNull: false,
-			},
-			reason: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
-		},
-		{
-			sequelize,
-			modelName: "ModerationLog",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
+    class ModerationLog extends Model {
+        /**
+         *
+         * @param {string} name
+         * @returns {Promise<ModerationLog>}
+         */
+        static async createModerationLog(moderator_id, targeted_user_id, duration, type, reason) {
+            return await ModerationLog.create({
+                user_id: moderator_id,
+                targeted_user_id: targeted_user_id,
+                duration: duration,
+                type: type,
+                reason: reason,
+            });
+        }
+    }
+    ModerationLog.init(
+        {
+            ModerationLog_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                primaryKey: true,
+                unique: true,
+                autoIncrement: true,
+            },
+            user_id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            targeted_user_id: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            duration: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            },
+            type: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            reason: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+        },
+        {
+            sequelize,
+            modelName: "ModerationLog",
+            createdAt: "created_at",
+            updatedAt: "updated_at",
+        },
+    );
 
-	return ModerationLog;
+    return ModerationLog;
 };

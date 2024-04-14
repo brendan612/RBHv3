@@ -1,26 +1,26 @@
 const { emojis } = require(`../../${process.env.CONFIG_FILE}`);
 
 const LeagueRoleEmojis = {
-	Top: emojis.top,
-	Jungle: emojis.jungle,
-	Mid: emojis.mid,
-	Bot: emojis.bot,
-	Support: emojis.support,
-	Fill: emojis.fill,
+    Top: emojis.top,
+    Jungle: emojis.jungle,
+    Mid: emojis.mid,
+    Bot: emojis.bot,
+    Support: emojis.support,
+    Fill: emojis.fill,
 };
 
 const LeagueRankEmojis = {
-	UNRANKED: emojis.unranked,
-	IRON: emojis.iron,
-	BRONZE: emojis.bronze,
-	SILVER: emojis.silver,
-	GOLD: emojis.gold,
-	PLATINUM: emojis.platinum,
-	EMERALD: emojis.emerald,
-	DIAMOND: emojis.diamond,
-	MASTER: emojis.master,
-	GRANDMASTER: emojis.grandmaster,
-	CHALLENGER: emojis.challenger,
+    UNRANKED: emojis.unranked,
+    IRON: emojis.iron,
+    BRONZE: emojis.bronze,
+    SILVER: emojis.silver,
+    GOLD: emojis.gold,
+    PLATINUM: emojis.platinum,
+    EMERALD: emojis.emerald,
+    DIAMOND: emojis.diamond,
+    MASTER: emojis.master,
+    GRANDMASTER: emojis.grandmaster,
+    CHALLENGER: emojis.challenger,
 };
 
 module.exports = { LeagueRoleEmojis, LeagueRankEmojis };

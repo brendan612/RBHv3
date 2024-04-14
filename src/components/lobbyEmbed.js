@@ -12,16 +12,14 @@ const { LeagueRankEmojis, LeagueRoleEmojis } = require("../assets/emojis.js");
  * @returns {EmbedBuilder}
  */
 const lobbyEmbed = (title, description, member, lobby_id) => {
-	const embed = baseEmbed(title, description);
-	embed
-		.setFooter({
-			text: `Hosted by ${
-				member.nickname ?? member.user.globalName
-			} • Lobby ID: ${lobby_id}`,
-			iconURL: member.user.displayAvatarURL(),
-		})
-		.setThumbnail(inhouse_icon_url);
-	return embed;
+    const embed = baseEmbed(title, description);
+    embed
+        .setFooter({
+            text: `Hosted by ${member.nickname ?? member.user.globalName} • Lobby ID: ${lobby_id}`,
+            iconURL: member.user.displayAvatarURL(),
+        })
+        .setThumbnail(inhouse_icon_url);
+    return embed;
 };
 
 /**
@@ -30,45 +28,43 @@ const lobbyEmbed = (title, description, member, lobby_id) => {
  * @returns {string}
  */
 const generatePlayerListForEmbed = (players) => {
-	if (players.length === 0) return "```\u0020```";
-	let playerList = "";
-	for (let i = 0; i < players.length; i++) {
-		let player = `${players[i]}`;
-		playerList += `${i + 1 < 10 ? "\u0020" : ""}${i + 1}. ${player}\n`;
-	}
-	return playerList;
+    if (players.length === 0) return "```\u0020```";
+    let playerList = "";
+    for (let i = 0; i < players.length; i++) {
+        let player = `${players[i]}`;
+        playerList += `${i + 1 < 10 ? "\u0020" : ""}${i + 1}. ${player}\n`;
+    }
+    return playerList;
 };
 
 const generatePlayerRolesListForEmbed = (players, roles) => {
-	if (players.length === 0) return "";
-	let playerList = "";
-	for (let i = 0; i < players.length; i++) {
-		playerList += `${getRandomValue(LeagueRoleEmojis)}${getRandomValue(
-			LeagueRoleEmojis
-		)}\n`;
-	}
-	return playerList;
+    if (players.length === 0) return "";
+    let playerList = "";
+    for (let i = 0; i < players.length; i++) {
+        playerList += `${getRandomValue(LeagueRoleEmojis)}${getRandomValue(LeagueRoleEmojis)}\n`;
+    }
+    return playerList;
 };
 
 const generatePlayerRanksListForEmbed = (players, ranks) => {
-	if (players.length === 0) return "";
-	let playerList = "";
-	for (let i = 0; i < players.length; i++) {
-		playerList += `${getRandomValue(LeagueRankEmojis)}\n`;
-	}
-	return playerList;
+    if (players.length === 0) return "";
+    let playerList = "";
+    for (let i = 0; i < players.length; i++) {
+        playerList += `${getRandomValue(LeagueRankEmojis)}\n`;
+    }
+    return playerList;
 };
 
 function getRandomValue(obj) {
-	const keys = Object.keys(obj);
-	const randomIndex = Math.floor(Math.random() * keys.length);
-	const randomKey = keys[randomIndex];
-	return obj[randomKey];
+    const keys = Object.keys(obj);
+    const randomIndex = Math.floor(Math.random() * keys.length);
+    const randomKey = keys[randomIndex];
+    return obj[randomKey];
 }
 
 module.exports = {
-	lobbyEmbed,
-	generatePlayerListForEmbed,
-	generatePlayerRanksListForEmbed,
-	generatePlayerRolesListForEmbed,
+    lobbyEmbed,
+    generatePlayerListForEmbed,
+    generatePlayerRanksListForEmbed,
+    generatePlayerRolesListForEmbed,
 };

@@ -11,27 +11,17 @@ const client = require("../../../client.js");
  * @param {boolean} includeInactive
  * @returns {<Promise<Any[]>} An array of users.
  */
-async function getLeaderboard(
-	game_id,
-	season_id,
-	region,
-	minimumMatches = 3,
-	includeInactive = false,
-	testingMode = false
-) {
-	const cachedLeaderboard = client.cache.get(
-		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`,
-		"leaderboard"
-	);
+async function getLeaderboard(game_id, season_id, region, minimumMatches = 3, includeInactive = false, testingMode = false) {
+    const cachedLeaderboard = client.cache.get(`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`, "leaderboard");
 
-	if (cachedLeaderboard) {
-		return cachedLeaderboard;
-	}
+    if (cachedLeaderboard) {
+        return cachedLeaderboard;
+    }
 
-	const testingModeString = !testingMode ? "AND LENGTH(U.user_id) > 5" : "";
+    const testingModeString = !testingMode ? "AND LENGTH(U.user_id) > 5" : "";
 
-	let [results, metadata] = await sequelize.query(
-		`
+    let [results, metadata] = await sequelize.query(
+        `
 			WITH RecentMatches AS (
 				SELECT
 					MP.user_id,
@@ -123,24 +113,20 @@ async function getLeaderboard(
 			UserStats
 		WHERE recent_match_count >= ${minimumMatches}
 		ORDER BY 'rank';
-	`
-	);
+	`,
+    );
 
-	if (results) {
-		results = results.filter((user) => {
-			return includeInactive || user.activity_status === "Active";
-		});
-	}
+    if (results) {
+        results = results.filter((user) => {
+            return includeInactive || user.activity_status === "Active";
+        });
+    }
 
-	client.cache.set(
-		`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`,
-		results,
-		"leaderboard"
-	);
+    client.cache.set(`leaderboard-${game_id}-${season_id}-${region}-${minimumMatches}-${includeInactive}`, results, "leaderboard");
 
-	return results;
+    return results;
 }
 
 module.exports = {
-	getLeaderboard,
+    getLeaderboard,
 };

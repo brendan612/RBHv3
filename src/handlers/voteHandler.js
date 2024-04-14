@@ -7,19 +7,19 @@ const { client } = require("../client");
 const app = express();
 
 app.post(
-	"/dslwebhook",
-	webhook.listener(async (vote) => {
-		const user = await User.findOne({ where: { user_id: vote.user } });
-		if (user) {
-			await user.awardVoteMoney(vote, client);
-		} else {
-			console.log("User not found");
-		}
-	})
+    "/dslwebhook",
+    webhook.listener(async (vote) => {
+        const user = await User.findOne({ where: { user_id: vote.user } });
+        if (user) {
+            await user.awardVoteMoney(vote, client);
+        } else {
+            console.log("User not found");
+        }
+    }),
 );
 
 module.exports = {
-	start() {
-		app.listen(5000, () => {});
-	},
+    start() {
+        app.listen(5000, () => {});
+    },
 };

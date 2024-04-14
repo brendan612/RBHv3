@@ -17,99 +17,93 @@ require("dotenv").config();
 const token = process.env.TOKEN;
 
 const loadFiles = (folderName, registerCallback, checkProperties) => {
-	const foldersPath = join(__dirname, folderName);
-	const folders = fs.readdirSync(foldersPath);
+    const foldersPath = join(__dirname, folderName);
+    const folders = fs.readdirSync(foldersPath);
 
-	for (const folder of folders) {
-		try {
-			const filesPath = join(foldersPath, folder);
-			const stats = fs.statSync(filesPath);
+    for (const folder of folders) {
+        try {
+            const filesPath = join(foldersPath, folder);
+            const stats = fs.statSync(filesPath);
 
-			if (stats.isDirectory()) {
-				const files = fs
-					.readdirSync(filesPath)
-					.filter((file) => file.endsWith(".js") && !file.startsWith("index"));
+            if (stats.isDirectory()) {
+                const files = fs.readdirSync(filesPath).filter((file) => file.endsWith(".js") && !file.startsWith("index"));
 
-				for (const file of files) {
-					const filePath = join(filesPath, file);
-					const item = require(filePath);
+                for (const file of files) {
+                    const filePath = join(filesPath, file);
+                    const item = require(filePath);
 
-					if (folderName === "commands") {
-						item.category = folder;
-					}
-					if (checkProperties(item)) {
-						registerCallback(item);
-					} else {
-						console.log(
-							`[WARNING] The file at ${filePath} is missing required properties.`
-						);
-					}
-				}
-			} else {
-				const item = require(filesPath);
+                    if (folderName === "commands") {
+                        item.category = folder;
+                    }
+                    if (checkProperties(item)) {
+                        registerCallback(item);
+                    } else {
+                        console.log(`[WARNING] The file at ${filePath} is missing required properties.`);
+                    }
+                }
+            } else {
+                const item = require(filesPath);
 
-				if (checkProperties(item)) {
-					registerCallback(item);
-				} else {
-					console.log(
-						`[WARNING] The file at ${filesPath} is missing required properties.`
-					);
-				}
-			}
-		} catch (error) {
-			console.log(error);
-			console.log(`[WARNING] Failed to load ${folderName}/${folder}`);
-		}
-	}
+                if (checkProperties(item)) {
+                    registerCallback(item);
+                } else {
+                    console.log(`[WARNING] The file at ${filesPath} is missing required properties.`);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            console.log(`[WARNING] Failed to load ${folderName}/${folder}`);
+        }
+    }
 };
 
 const loadCommands = () => {
-	client.commands = new Collection();
+    client.commands = new Collection();
 
-	loadFiles(
-		"commands",
-		(command) => client.commands.set(command.data.name, command),
-		(command) => "data" in command && "execute" in command
-	);
+    loadFiles(
+        "commands",
+        (command) => client.commands.set(command.data.name, command),
+        (command) => "data" in command && "execute" in command,
+    );
 };
 
 const loadEvents = () => {
-	loadFiles(
-		"events",
-		(event) => {
-			if (event.once) {
-				try {
-					client.once(event.name, (...args) => event.execute(...args));
-				} catch (e) {
-					console.log(e);
-				}
-			} else {
-				try {
-					client.on(event.name, (...args) => event.execute(...args));
-				} catch (e) {
-					console.log(e);
-				}
-			}
-		},
-		(event) => "name" in event && "execute" in event
-	);
+    loadFiles(
+        "events",
+        (event) => {
+            if (event.once) {
+                try {
+                    client.once(event.name, (...args) => event.execute(...args));
+                } catch (e) {
+                    console.log(e);
+                }
+            } else {
+                try {
+                    client.on(event.name, (...args) => event.execute(...args));
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        },
+        (event) => "name" in event && "execute" in event,
+    );
 };
 
 client.db = sequelize;
 client.managers = {
-	playerDraftManagerFactory,
-	draftManagerFactory,
+    playerDraftManagerFactory,
+    draftManagerFactory,
 };
 
 loadCommands();
 loadEvents();
 
 process.on("unhandledRejection", (error) => {
-	console.error("Unhandled promise rejection:", error);
+    console.error("Unhandled promise rejection:", error);
 });
 
 process.on("uncaughtException", (error) => {
-	console.error("Uncaught exception:", error);
+    console.error("Uncaught exception:", error);
 });
 
 client.login(token);

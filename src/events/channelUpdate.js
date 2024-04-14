@@ -5,18 +5,18 @@ const { ServerChannel } = require("../models");
 const client = require("../index.js");
 
 module.exports = {
-	name: Events.ChannelUpdate,
-	execute: async (oldChannel, newChannel) => {
-		const serverChannel = await ServerChannel.findOne({
-			where: {
-				channel_id: newChannel.id,
-			},
-		});
+    name: Events.ChannelUpdate,
+    execute: async (oldChannel, newChannel) => {
+        const serverChannel = await ServerChannel.findOne({
+            where: {
+                channel_id: newChannel.id,
+            },
+        });
 
-		if (!serverChannel) return;
+        if (!serverChannel) return;
 
-		serverChannel.name = newChannel.name;
-		serverChannel.parent_id = newChannel.parentId;
-		await serverChannel.save();
-	},
+        serverChannel.name = newChannel.name;
+        serverChannel.parent_id = newChannel.parentId;
+        await serverChannel.save();
+    },
 };

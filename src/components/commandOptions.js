@@ -1,8 +1,4 @@
-const {
-	SlashCommandStringOption,
-	SlashCommandIntegerOption,
-	SlashCommandUserOption,
-} = require("discord.js");
+const { SlashCommandStringOption, SlashCommandIntegerOption, SlashCommandUserOption } = require("discord.js");
 
 /**
  *
@@ -12,17 +8,8 @@ const {
  * @param {boolean} hasAutocomplete default true
  * @returns {SlashCommandStringOption}
  */
-function gameOption(
-	name = "game",
-	description = "Available Games",
-	isRequired = false,
-	hasAutocomplete = true
-) {
-	return new SlashCommandStringOption()
-		.setName(name)
-		.setDescription(description)
-		.setRequired(isRequired)
-		.setAutocomplete(hasAutocomplete);
+function gameOption(name = "game", description = "Available Games", isRequired = false, hasAutocomplete = true) {
+    return new SlashCommandStringOption().setName(name).setDescription(description).setRequired(isRequired).setAutocomplete(hasAutocomplete);
 }
 
 /**
@@ -33,17 +20,8 @@ function gameOption(
  * @param {boolean} hasAutocomplete default true
  * @returns {SlashCommandIntegerOption}
  */
-function lobbyOption(
-	name = "lobby",
-	description = "Available Lobbies",
-	isRequired = false,
-	hasAutocomplete = true
-) {
-	return new SlashCommandIntegerOption()
-		.setName(name)
-		.setDescription(description)
-		.setRequired(isRequired)
-		.setAutocomplete(hasAutocomplete);
+function lobbyOption(name = "lobby", description = "Available Lobbies", isRequired = false, hasAutocomplete = true) {
+    return new SlashCommandIntegerOption().setName(name).setDescription(description).setRequired(isRequired).setAutocomplete(hasAutocomplete);
 }
 
 /**
@@ -54,27 +32,12 @@ function lobbyOption(
  * @param {boolean} hasAutocomplete default false
  * @returns {SlashCommandUserOption}
  */
-function userOption(
-	name = "target",
-	description = "Targeted User",
-	isRequired = false
-) {
-	return new SlashCommandUserOption()
-		.setName(name)
-		.setDescription(description)
-		.setRequired(isRequired);
+function userOption(name = "target", description = "Targeted User", isRequired = false) {
+    return new SlashCommandUserOption().setName(name).setDescription(description).setRequired(isRequired);
 }
 
-function seasonOption(
-	name = "season",
-	description = "Season",
-	isRequired = false
-) {
-	return new SlashCommandStringOption()
-		.setName(name)
-		.setDescription(description)
-		.setRequired(isRequired)
-		.setAutocomplete(true);
+function seasonOption(name = "season", description = "Season", isRequired = false) {
+    return new SlashCommandStringOption().setName(name).setDescription(description).setRequired(isRequired).setAutocomplete(true);
 }
 
 /**
@@ -84,35 +47,19 @@ function seasonOption(
  * @param {boolean} isRequired
  * @returns {SlashCommandStringOption}
  */
-function championOption(
-	name = "champion",
-	description = "Champion",
-	isRequired = true
-) {
-	return new SlashCommandStringOption()
-		.setName(name)
-		.setDescription(description)
-		.setRequired(isRequired)
-		.setAutocomplete(true);
+function championOption(name = "champion", description = "Champion", isRequired = true) {
+    return new SlashCommandStringOption().setName(name).setDescription(description).setRequired(isRequired).setAutocomplete(true);
 }
 
-function regionOption(
-	name = "region",
-	description = "Region",
-	isRequired = false
-) {
-	return new SlashCommandStringOption()
-		.setName(name)
-		.setDescription(description)
-		.setRequired(isRequired)
-		.setAutocomplete(true);
+function regionOption(name = "region", description = "Region", isRequired = false) {
+    return new SlashCommandStringOption().setName(name).setDescription(description).setRequired(isRequired).setAutocomplete(true);
 }
 
 module.exports = {
-	gameOption,
-	lobbyOption,
-	userOption,
-	seasonOption,
-	championOption,
-	regionOption,
+    gameOption,
+    lobbyOption,
+    userOption,
+    seasonOption,
+    championOption,
+    regionOption,
 };
