@@ -4,7 +4,7 @@ module.exports = {
         .setName("sync-db")
         .setDescription("Sync the database and associated models")
         .addBooleanOption((option) => {
-            return option.setName("force").setDescription("Wipe the database").setRequired(false);
+            return option.setName("force").setDescription("Wipe the database. Currently Disabled.").setRequired(false);
         })
         .addBooleanOption((option) => {
             return option.setName("alter").setDescription("Alter the database").setRequired(false);
@@ -14,7 +14,8 @@ module.exports = {
      * @param {Interaction} interaction
      */
     async execute(interaction) {
-        const force = interaction.options.getBoolean("force");
+        //const force = interaction.options.getBoolean("force");
+        const force = false;
 
         //only allow me to force wipe the database
         if (interaction.member.id !== "105858401497546752") {
