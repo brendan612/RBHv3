@@ -8,6 +8,7 @@ client.cache = new GlobalCacheManager();
 client.features = new Map();
 client.invites = new Map();
 client.serverChannels = [];
+client.serverRoles = [];
 
 const playerDraftManagerFactory = require("../src/dataManager/managers/factories/playerDraftManagerFactory.js");
 const draftManagerFactory = require("../src/dataManager/managers/factories/draftManagerFactory.js");
@@ -63,7 +64,7 @@ const loadCommands = () => {
     loadFiles(
         "commands",
         (command) => client.commands.set(command.data.name, command),
-        (command) => "data" in command && "execute" in command,
+        (command) => "data" in command && "execute" in command
     );
 };
 
@@ -85,7 +86,7 @@ const loadEvents = () => {
                 }
             }
         },
-        (event) => "name" in event && "execute" in event,
+        (event) => "name" in event && "execute" in event
     );
 };
 

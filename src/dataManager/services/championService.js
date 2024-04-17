@@ -59,7 +59,7 @@ class ChampionService {
                     },
                     {
                         where: { champion_id: champion.key },
-                    },
+                    }
                 );
             } else {
                 await Champion.create({
@@ -91,8 +91,10 @@ class ChampionService {
 
         for (let champion of champions) {
             if (champion.enabled) {
+                console.log(champion.name);
                 client.cache.set(champion.name.replace("'", ""), champion.champion_id.toString(), "autoCompleteChampionData");
             } else {
+                console.log(champion.name, "disabled");
                 const log = await ModerationLog.findOne({
                     where: {
                         type: "TOGGLECHAMP",
@@ -100,10 +102,12 @@ class ChampionService {
                     },
                     order: [["created_at", "DESC"]],
                 });
-
+                console.log(log);
                 if (log) {
                     const expiration_date = new Date(log.duration);
+                    console.log(expiration_date);
                     if (expiration_date < new Date()) {
+                        console.log("enabling");
                         champion.enabled = true;
                         await champion.save();
                         client.cache.set(champion.name.replace("'", ""), champion.champion_id.toString(), "autoCompleteChampionData");

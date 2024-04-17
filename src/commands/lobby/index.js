@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Interaction } = require("discord.js");
+const { SlashCommandBuilder, Interaction, AutocompleteInteraction } = require("discord.js");
 const { lobbyEmbed, generatePlayerListForEmbed } = require("../../components/lobbyEmbed.js");
 const { gameAutocomplete, seasonAutocomplete, lobbyAutocomplete, championAutocomplete } = require("../../handlers/autocompleteHandler.js");
 const { gameOption, lobbyOption, userOption, seasonOption, championOption } = require("../../components/commandOptions.js");
@@ -8,6 +8,7 @@ const { baseEmbed } = require("../../components/embed.js");
 module.exports = {
     SlashCommandBuilder,
     Interaction,
+    AutocompleteInteraction,
     Sequelize,
     lobbyEmbed,
     generatePlayerListForEmbed,

@@ -1,4 +1,16 @@
-const { SlashCommandBuilder, Interaction, lobbyAutocomplete, lobbyOption, handleLobbyOption, championAutocomplete, handleChampionOption, championOption, DraftRound, Match } = require("./index.js");
+const {
+    SlashCommandBuilder,
+    AutocompleteInteraction,
+    Interaction,
+    lobbyAutocomplete,
+    lobbyOption,
+    handleLobbyOption,
+    championAutocomplete,
+    handleChampionOption,
+    championOption,
+    DraftRound,
+    Match,
+} = require("./index.js");
 
 const MatchService = require("../../dataManager/services/matchService.js");
 
@@ -13,7 +25,7 @@ module.exports = {
                 .setName("view")
                 .setDescription("View information about a player in a match")
                 .addIntegerOption(lobbyOption("lobby", "Lobby ID", true, true))
-                .addUserOption((option) => option.setName("player").setDescription("Player").setRequired(true)),
+                .addUserOption((option) => option.setName("player").setDescription("Player").setRequired(true))
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -31,10 +43,10 @@ module.exports = {
                             { name: "Jungle", value: "Jungle" },
                             { name: "Mid", value: "Mid" },
                             { name: "Bot", value: "Bot" },
-                            { name: "Support", value: "Support" },
-                        ),
+                            { name: "Support", value: "Support" }
+                        )
                 )
-                .addUserOption((option) => option.setName("player").setDescription("Player").setRequired(false)),
+                .addUserOption((option) => option.setName("player").setDescription("Player").setRequired(false))
         ),
     /**
      *
@@ -153,16 +165,24 @@ module.exports = {
             });
         }
     },
+    /**
+     *
+     * @param {AutocompleteInteraction} interaction
+     */
     async autocomplete(interaction) {
         const focusedValue = interaction.options.getFocused(true);
         if (focusedValue.name === "lobby") {
             lobbyAutocomplete(focusedValue.value, interaction, true);
         } else if (focusedValue.name === "champion") {
             const lobbyValue = interaction.options.get("lobby");
-            const match = await Match.findOne({
-                where: { lobby_id: lobbyValue.value },
-            });
-            championAutocomplete(focusedValue.value, interaction, match.match_id);
+            if (!lobbyValue) {
+                championAutocomplete(focusedValue.value, interaction);
+            } else {
+                const match = await Match.findOne({
+                    where: { lobby_id: lobbyValue.value },
+                });
+                championAutocomplete(focusedValue.value, interaction, match.match_id);
+            }
         }
     },
 };
