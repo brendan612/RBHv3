@@ -29,11 +29,11 @@ class RoleManager {
      *
      * @param {number} game_id
      * @param {string} region_id
-     * @param {string} purpose
+     * @param {string} type
      * @returns {ServerRole[]}
      */
-    static findServerRoles(game_id, region_id, purpose) {
-        return client.serverRoles.find((role) => role.game_id === game_id && role.region_id === region_id && role.purpose === purpose);
+    static findServerRoles(game_id, region_id, type) {
+        return client.serverRoles.find((role) => role.game_id === game_id && role.region_id === region_id && role.type === type);
     }
 
     /**
@@ -67,19 +67,12 @@ class RoleManager {
      *
      * @param {number} game_id
      * @param {string} region_id
-     * @param {string} purpose
+     * @param {string} type
      * @returns {Role}
      */
-    static getRoleViaServerRole(game_id, region_id, purpose) {
-        const serverRole = RoleManager.findServerRoles(game_id, region_id, purpose);
-        if (!serverRole) {
-            throw new Error("Role not found");
-        }
-        if (Array.isArray(serverRole)) {
-            return RoleManager.getRoleForServerRole(serverRole[0]);
-        }
-
-        return RoleManager.getRoleForServerRole(serverRole);
+    static getRoleViaServerRole(game_id, region_id, type) {
+        const serverRole = RoleManager.findServerRoles(game_id, region_id, type);
+        return RoleManager.getRoleForServerRole(serverRole[0]);
     }
 
     /**
@@ -139,8 +132,6 @@ class RoleManager {
         }
 
         const promises = users.map(async (user) => {
-            if (user.user_id.length < 5) return;
-
             const member = await client.guild.members.fetch(user.user_id);
 
             if (!member) {

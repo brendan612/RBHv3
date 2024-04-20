@@ -8,8 +8,6 @@ const client = require("../../client");
 
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles.permission_roles;
 
-const RoleManager = require("./roleManager.js");
-
 class ChannelManager {
     /**
      *
@@ -38,29 +36,30 @@ class ChannelManager {
      */
     static async createChannelForLobby(channelType, lobby, team) {
         const emoji = team === "Blue" ? `🔵` : `🔴`;
-
-        const lobbyParticipantRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "lobby_participant");
-        const queensCroquetRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "verified");
-        const regionRole = RoleManager.getRoleViaServerRole(lobby.game_id, lobby.region_id, "region");
-        const guestRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "guest");
-        const memberRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "member");
-        const refRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "moderator");
-        const babyRefRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "trainee");
-        const deckmasterrole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "admin");
-
-        const category = this.getServerChannel(lobby.game_id, "GLOBAL", "general", ChannelType.GuildCategory);
-
+        const lobbyParticipantRole = client.guild.roles.cache.find((role) => role.name === "Lobby Participant");
+        const queensCroquetRole = client.guild.roles.cache.find((role) => role.name === "Queen's Croquet");
+        const NARole = client.guild.roles.cache.find((role) => role.name === "NA");
+        const EUWRole = client.guild.roles.cache.find((role) => role.name === "EUW");
+        const guestRole = client.guild.roles.cache.find((role) => role.name === "Guest");
+        const memberRole = client.guild.roles.cache.find((role) => role.name === "Member");
+        const refRole = client.guild.roles.cache.find((role) => role.name === "⚔️Queen's Croquet Referee⚔️");
+        const babyRefRole = client.guild.roles.cache.find((role) => role.name === "🍼Referee Trainee🍼");
+        const deckmasterrole = client.guild.roles.cache.find((role) => role.name === "📛Deckmaster📛");
         const channel = await client.guild.channels.create({
             name: `${emoji} ${lobby.lobby_name} ${team}`,
             type: channelType,
-            parent: category.channel_id,
+            parent: "587057368731484170",
             permissionOverwrites: [
                 {
                     id: client.guild.id,
-                    deny: [PermissionsBitField.Flags.Speak, PermissionsBitField.Flags.Stream],
+                    deny: [PermissionsBitField.Flags.Speak],
                 },
                 {
-                    id: regionRole.id,
+                    id: NARole.id,
+                    allow: [PermissionsBitField.Flags.ViewChannel],
+                },
+                {
+                    id: EUWRole.id,
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
@@ -69,7 +68,7 @@ class ChannelManager {
                 },
                 {
                     id: lobbyParticipantRole.id,
-                    allow: [PermissionsBitField.Flags.Speak, PermissionsBitField.Flags.Stream],
+                    allow: [PermissionsBitField.Flags.Speak],
                 },
                 {
                     id: refRole.id,
@@ -103,11 +102,10 @@ class ChannelManager {
      * @param {number} game_id
      * @param {string} region_id
      * @param {string} purpose
-     * @param {number} type
      * @returns {ServerChannel}
      */
-    static getServerChannel(game_id, region_id, purpose, type = 0) {
-        return client.serverChannels.find((channel) => channel.game_id == game_id && channel.region_id == region_id && channel.purpose == purpose, type);
+    static getServerChannel(game_id, region_id, purpose) {
+        return client.serverChannels.find((channel) => channel.game_id == game_id && channel.region_id == region_id && channel.purpose == purpose);
     }
     /**
      *
