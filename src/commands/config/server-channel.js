@@ -26,20 +26,19 @@ module.exports = {
                         {
                             name: "Category",
                             value: "4",
-                        },
-                    ),
+                        }
+                    )
                 )
-                .addStringOption((option) => option.setName("channel_id").setDescription("The ID of the channel").setRequired(true))
+                .addChannelOption((option) => option.setName("channel").setDescription("The channel to create a server channel for").setRequired(true))
                 .addStringOption((option) => option.setName("purpose").setDescription("The purpose the channel is for").setRequired(true))
-                .addStringOption((option) => option.setName("name").setDescription("The name of the channel"))
                 .addStringOption(gameOption())
-                .addStringOption(regionOption()),
+                .addStringOption(regionOption())
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("view")
                 .setDescription("View a server channel.")
-                .addStringOption((option) => option.setName("channel_id").setDescription("The ID of the channel").setRequired(true)),
+                .addChannelOption((option) => option.setName("channel").setDescription("The channel to view").setRequired(true))
         ),
     /**
      *
@@ -48,14 +47,13 @@ module.exports = {
     async execute(interaction) {
         if (interaction.options.getSubcommand() === "create") {
             const type = interaction.options.getString("type");
-            let name = interaction.options.getString("name");
-            const channel_id = interaction.options.getString("channel_id");
+            const channel = interaction.options.getChannel("channel");
             const purpose = interaction.options.getString("purpose");
             const game = await handleGameOption(interaction);
             const region = await handleRegionOption(interaction, "GLOBAL");
 
             const existingCheck = await ServerChannel.findOne({
-                where: { channel_id },
+                where: { channel_id: channel.id },
             });
 
             if (existingCheck) {
@@ -65,16 +63,10 @@ module.exports = {
                 });
             }
 
-            const guildChannel = ChannelManager.getChannel(channel_id);
-
-            if (!name) {
-                name = guildChannel.name;
-            }
-
             const serverChannel = await ServerChannel.create({
                 type,
-                name,
-                channel_id,
+                name: channel.name,
+                channel_id: channel.id,
                 purpose,
                 game_id: game.game_id,
                 region_id: region.region_id,
@@ -87,7 +79,7 @@ module.exports = {
                 ephemeral: true,
             });
         } else if (interaction.options.getSubcommand() === "view") {
-            const channel_id = interaction.options.getString("channel_id");
+            const channel_id = interaction.options.getChannel("channel").id;
 
             const serverChannel = await ServerChannel.findOne({
                 where: { channel_id },

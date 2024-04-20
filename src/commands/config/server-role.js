@@ -34,20 +34,19 @@ module.exports = {
                         {
                             name: "Donor Role",
                             value: "4",
-                        },
-                    ),
+                        }
+                    )
                 )
-                .addStringOption((option) => option.setName("role_id").setDescription("The ID of the role").setRequired(true))
+                .addRoleOption((option) => option.setName("role").setDescription("The role to create a server role for").setRequired(true))
                 .addStringOption((option) => option.setName("purpose").setDescription("The purpose the role is for").setRequired(true))
-                .addStringOption((option) => option.setName("name").setDescription("The name of the role"))
                 .addStringOption(gameOption())
-                .addStringOption(regionOption()),
+                .addStringOption(regionOption())
         )
         .addSubcommand((subcommand) =>
             subcommand
                 .setName("view")
-                .setDescription("View a server channel.")
-                .addStringOption((option) => option.setName("channel_id").setDescription("The ID of the channel").setRequired(true)),
+                .setDescription("View a server role.")
+                .addRoleOption((option) => option.setName("role").setDescription("The role to view").setRequired(true))
         ),
     /**
      *
@@ -56,13 +55,12 @@ module.exports = {
     async execute(interaction) {
         if (interaction.options.getSubcommand() === "create") {
             const type = interaction.options.getString("type");
-            let name = interaction.options.getString("name");
-            const role_id = interaction.options.getString("role_id");
+            const guildRole = interaction.options.getRole("role");
             const purpose = interaction.options.getString("purpose");
             const game = await handleGameOption(interaction);
             const region = await handleRegionOption(interaction, "GLOBAL");
 
-            const existingRole = RoleManager.findServerRole(role_id);
+            const existingRole = RoleManager.findServerRole(guildRole.id);
             if (existingRole) {
                 return interaction.reply({
                     content: `Role already exists`,
@@ -70,11 +68,7 @@ module.exports = {
                 });
             }
 
-            if (!name) {
-                name = RoleManager.getRole(role_id).name;
-            }
-
-            const role = await RoleManager.createServerRole(role_id, name, purpose, game.game_id, type, region.region_id);
+            const role = await RoleManager.createServerRole(guildRole.id, guildRole.name, purpose, game.game_id, type, region.region_id);
 
             client.serverRoles = await ServerRole.findAll();
 
@@ -83,7 +77,7 @@ module.exports = {
                 ephemeral: true,
             });
         } else if (interaction.options.getSubcommand() === "view") {
-            const role_id = interaction.options.getString("role_id");
+            const role_id = interaction.options.getRole("role").id;
 
             const role = RoleManager.findServerRole(role_id);
 
