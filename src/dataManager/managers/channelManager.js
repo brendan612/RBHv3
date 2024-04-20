@@ -8,6 +8,8 @@ const client = require("../../client");
 
 const permission_roles = require(`../../../${process.env.CONFIG_FILE}`).roles.permission_roles;
 
+const RoleManager = require("./roleManager");
+
 class ChannelManager {
     /**
      *
@@ -36,59 +38,55 @@ class ChannelManager {
      */
     static async createChannelForLobby(channelType, lobby, team) {
         const emoji = team === "Blue" ? `🔵` : `🔴`;
-        const lobbyParticipantRole = client.guild.roles.cache.find((role) => role.name === "Lobby Participant");
-        const queensCroquetRole = client.guild.roles.cache.find((role) => role.name === "Queen's Croquet");
-        const NARole = client.guild.roles.cache.find((role) => role.name === "NA");
-        const EUWRole = client.guild.roles.cache.find((role) => role.name === "EUW");
-        const guestRole = client.guild.roles.cache.find((role) => role.name === "Guest");
-        const memberRole = client.guild.roles.cache.find((role) => role.name === "Member");
-        const refRole = client.guild.roles.cache.find((role) => role.name === "⚔️Queen's Croquet Referee⚔️");
-        const babyRefRole = client.guild.roles.cache.find((role) => role.name === "🍼Referee Trainee🍼");
-        const deckmasterrole = client.guild.roles.cache.find((role) => role.name === "📛Deckmaster📛");
+
+        const lobbyParticipantRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "lobby_participant");
+        const queensCroquetRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "verified");
+        const regionRole = RoleManager.getRoleViaServerRole(lobby.game_id, lobby.region_id, "region");
+        const guestRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "guest");
+        const memberRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "member");
+        const refRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "moderator");
+        const babyRefRole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "trainee");
+        const deckmasterrole = RoleManager.getRoleViaServerRole(lobby.game_id, "GLOBAL", "admin");
+
+        const category = this.getServerChannel(lobby.game_id, "GLOBAL", "general", ChannelType.GuildCategory);
+
+        const speakStream = [PermissionsBitField.Flags.Speak, PermissionsBitField.Flags.Stream];
+		
         const channel = await client.guild.channels.create({
             name: `${emoji} ${lobby.lobby_name} ${team}`,
             type: channelType,
-            parent: "587057368731484170",
+            parent: category.channel_id,
             permissionOverwrites: [
                 {
                     id: client.guild.id,
-                    deny: [PermissionsBitField.Flags.Speak],
-                },
-                {
-                    id: NARole.id,
-                    allow: [PermissionsBitField.Flags.ViewChannel],
-                },
-                {
-                    id: EUWRole.id,
-                    allow: [PermissionsBitField.Flags.ViewChannel],
-                },
-                {
-                    id: queensCroquetRole.id,
+                    deny: speakStream,
                     allow: [PermissionsBitField.Flags.ViewChannel],
                 },
                 {
                     id: lobbyParticipantRole.id,
-                    allow: [PermissionsBitField.Flags.Speak],
+                    allow: speakStream,
                 },
                 {
                     id: refRole.id,
-                    allow: [PermissionsBitField.Flags.Speak],
+                    allow: speakStream,
                 },
                 {
                     id: babyRefRole.id,
-                    allow: [PermissionsBitField.Flags.Speak],
+                    allow: speakStream,
                 },
                 {
                     id: deckmasterrole.id,
-                    allow: [PermissionsBitField.Flags.Speak],
+                    allow: speakStream,
                 },
             ],
         });
 
+        const vc_count = client.guild.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice && channel.parent === category.channel_id).size;
+
         if (team === "Blue") {
-            ChannelManager.setPosition(channel, 2);
+            ChannelManager.setPosition(channel, vc_count - 1);
         } else {
-            ChannelManager.setPosition(channel, 3);
+            ChannelManager.setPosition(channel, vc_count - 2);
         }
 
         //prettier-ignore
