@@ -51,7 +51,7 @@ class ChannelManager {
         const category = this.getServerChannel(lobby.game_id, "GLOBAL", "general", ChannelType.GuildCategory);
 
         const speakStream = [PermissionsBitField.Flags.Speak, PermissionsBitField.Flags.Stream];
-		
+
         const channel = await client.guild.channels.create({
             name: `${emoji} ${lobby.lobby_name} ${team}`,
             type: channelType,
@@ -93,6 +93,13 @@ class ChannelManager {
         ChannelManager.createServerChannel(channel, lobby.game_id, lobby.lobby_name + "_" + team, lobby.region_id);
 
         return channel;
+    }
+
+    static async getChannelsForLobby(region_id, lobby_id) {
+        const channel_ids = client.guild.channels.cache
+            .filter((channel) => channel.type === ChannelType.GuildVoice && channel.name.includes(lobby_id) && channel.name.includes(region_id))
+            .map((channel) => channel.id);
+        return channel_ids;
     }
 
     /**
@@ -182,7 +189,7 @@ class ChannelManager {
     static async moveUsersToChannel(channel, users) {
         for (const user of users) {
             const member = client.guild.members.cache.get(user);
-            if (member && member.voice.channel) {
+            if (member && member.voice.channel && member.voice.channel.name.includes("Lobby")) {
                 await member.voice.setChannel(channel);
             }
         }
