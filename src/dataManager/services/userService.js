@@ -42,9 +42,10 @@ class UserService {
      * @param {bigint} user_id
      * @param {Date} join_date
      * @param {string} region
+     * @param {string} summoner_name
      * @returns {Promise<User>}
      */
-    static async createUser(user_id, join_date, region = "NA") {
+    static async createUser(user_id, join_date, region = "NA", summoner_name = "") {
         const user = await User.findOrCreate({
             where: {
                 user_id: user_id,
@@ -53,6 +54,7 @@ class UserService {
                 user_id: user_id,
                 join_date: join_date,
                 region_id: region,
+                summoner_name: summoner_name,
             },
         });
 
@@ -300,22 +302,26 @@ class UserService {
     }
 
     async addExperience(experience) {
-        const userLevelManager = new UserLevelManager();
-        const { level } = userLevelManager.calculateLevelAndRemainingExp(this.user.server_experience);
+        try {
+            const userLevelManager = new UserLevelManager();
+            const { level } = userLevelManager.calculateLevelAndRemainingExp(this.user.server_experience);
 
-        this.user.server_experience += experience;
+            this.user.server_experience += experience;
 
-        const newLevelInfo = userLevelManager.calculateLevelAndRemainingExp(this.user.server_experience);
+            const newLevelInfo = userLevelManager.calculateLevelAndRemainingExp(this.user.server_experience);
 
-        if (newLevelInfo.level > level) {
-            const moneyReward = userLevelManager.calculateLevelReward(newLevelInfo.level);
-            this.user.server_level = newLevelInfo.level;
-            this.user.server_money += moneyReward;
+            if (newLevelInfo.level > level) {
+                const moneyReward = userLevelManager.calculateLevelReward(newLevelInfo.level);
+                this.user.server_level = newLevelInfo.level;
+                this.user.server_money += moneyReward;
 
-            await userLevelManager.assignLevelRole(this.user.user_id, newLevelInfo.level, true);
+                await userLevelManager.assignLevelRole(this.user.user_id, newLevelInfo.level, true);
+            }
+
+            await this.user.save();
+        } catch (e) {
+            console.error(e);
         }
-
-        await this.user.save();
     }
 
     /**

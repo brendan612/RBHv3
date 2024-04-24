@@ -31,7 +31,7 @@ module.exports = {
                 {
                     name: options[3][0],
                     value: options[3][1],
-                },
+                }
             );
         })
         .addIntegerOption((option) => {
@@ -73,13 +73,15 @@ module.exports = {
         const joinButton = new ButtonBuilder().setStyle(ButtonStyle.Success).setLabel("Repeat Wager").setCustomId(button_id);
 
         const components = new ActionRowBuilder().addComponents(joinButton);
-        if (won) {
-            user.server_money += winAmount;
-        } else {
-            user.server_money -= amount;
-        }
+        try {
+            if (won) {
+                user.server_money += winAmount;
+            } else {
+                user.server_money -= amount;
+            }
 
-        await user.save();
+            await user.save();
+        } catch {}
 
         let message = null;
         if (prevSuit) {
