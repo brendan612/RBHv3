@@ -46,16 +46,20 @@ class UserService {
      * @returns {Promise<User>}
      */
     static async createUser(user_id, join_date, region = "NA", summoner_name = "") {
+        const defaults = {
+            user_id: user_id,
+            join_date: join_date,
+            region_id: region,
+        };
+
+        if (summoner_name) {
+            defaults.summoner_name = summoner_name;
+        }
         const user = await User.findOrCreate({
             where: {
                 user_id: user_id,
             },
-            defaults: {
-                user_id: user_id,
-                join_date: join_date,
-                region_id: region,
-                summoner_name: summoner_name,
-            },
+            defaults: defaults,
         });
 
         return user[0];
