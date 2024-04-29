@@ -111,7 +111,8 @@ module.exports = {
                 });
             }
 
-            if (user.id !== interaction.member.id && !hasRequiredRoleOrHigher(interaction.member, "moderator")) {
+            const overridePerms = hasRequiredRoleOrHigher(interaction.member, "moderator");
+            if (user.id !== interaction.member.id && !overridePerms) {
                 return await interaction.reply({
                     content: "You do not have permission to update this player",
                     ephemeral: true,
@@ -136,7 +137,7 @@ module.exports = {
 
             const takenChamp = match.MatchPlayers.some((mp) => mp.champion_id === champion.champion_id);
 
-            if (takenChamp) {
+            if (takenChamp && !overridePerms) {
                 return await interaction.reply({
                     content: "Champion already taken. If you need to swap champions, please contact a moderator.",
                     ephemeral: true,
@@ -147,7 +148,7 @@ module.exports = {
 
             const takenRole = match.MatchPlayers.some((mp) => mp.role === role && mp.team === matchPlayer.team);
 
-            if (takenRole) {
+            if (takenRole && !overridePerms) {
                 return await interaction.reply({
                     content: "Role already taken. If you need to swap roles, please contact a moderator.",
                     ephemeral: true,
