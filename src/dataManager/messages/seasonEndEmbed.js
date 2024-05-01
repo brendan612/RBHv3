@@ -20,6 +20,10 @@ async function generateSeasonEndEmbed(game_id, season_id) {
         },
     });
 
+    console.log(
+        "Regions: ",
+        regions.map((r) => r.region_id)
+    );
     for (const region of regions) {
         const embed = baseEmbed(`${season.name}`, `**__Top Players for the season__**`);
 
