@@ -41,6 +41,7 @@ async function generateSeasonEndEmbed(game_id, season_id) {
             limit: 3,
         });
 
+        console.log(userEloRatings);
         const firstPlaceStats = await getStatsForUser(userEloRatings[0].user_id, game_id, season_id, region.region_id);
         const secondPlaceStats = await getStatsForUser(userEloRatings[1].user_id, game_id, season_id, region.region_id);
         const thirdPlaceStats = await getStatsForUser(userEloRatings[2].user_id, game_id, season_id, region.region_id);
