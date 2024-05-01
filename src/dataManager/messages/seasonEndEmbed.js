@@ -4,6 +4,7 @@ const { channels } = require(`../../../${process.env.CONFIG_FILE}`);
 const client = require("../../client.js");
 const { generateVeteransImage } = require("./veteransImage.js");
 const { getStatsForUser } = require("../queries/stats/stats.js");
+const { Op } = require("sequelize");
 
 /**
  *
@@ -17,6 +18,9 @@ async function generateSeasonEndEmbed(game_id, season_id) {
     const regions = await Region.findAll({
         where: {
             enabled: true,
+            region_id: {
+                [Op.notIn]: ["GLOBAL"],
+            },
         },
     });
 
