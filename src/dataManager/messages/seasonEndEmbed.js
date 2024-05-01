@@ -27,14 +27,12 @@ async function generateSeasonEndEmbed(game_id, season_id) {
             where: {
                 game_id: game_id,
                 season_id: season_id,
+                region_id: region.region_id,
             },
             include: [
                 {
                     model: User,
                     as: "User",
-                    where: {
-                        region_id: region.region_id,
-                    },
                 },
             ],
             order: [["elo_rating", "DESC"]],
