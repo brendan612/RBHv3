@@ -1,6 +1,7 @@
 const { Interaction, SlashCommandStringOption, ChannelType } = require("discord.js");
-const { sequelize, User, Lobby, Game, Season, Draft, DraftRound, Champion, Match, Region } = require("../models");
+const { sequelize, User, Lobby, Game, Season, Draft, DraftRound, Champion, Match, Region, GameMode } = require("../models");
 const { Op } = require("sequelize");
+const { parse } = require("dotenv");
 
 /**
  *
@@ -14,6 +15,20 @@ async function handleGameOption(interaction, allowNull = false) {
     }
     const gameName = option ?? "League of Legends";
     return await Game.findOne({ where: { name: gameName } });
+}
+
+/**
+ *
+ * @param {Interaction} interaction
+ * @param {number} game_id
+ * @returns {Promise<GameMode>}
+ */
+async function handleGameModeOption(interaction, game_id) {
+    const option = interaction.options.getString("game_mode");
+    if (!option) {
+        return await GameMode.findByPk(1);
+    }
+    return await GameMode.findOne({ where: { name: option, game_id } });
 }
 
 /**
@@ -150,6 +165,12 @@ async function handleChampionOption(interaction, draft_id, search = false) {
     const champion_id = interaction.options.getString("champion");
 
     if (champion_id === "none") {
+    } else if (parseInt(champion_id) == NaN) {
+        await interaction.reply({
+            content: "Invalid champion ID.",
+            ephemeral: true,
+        });
+        return null;
     }
 
     const champion = await Champion.findByPk(champion_id);
@@ -213,6 +234,7 @@ async function handleRegionOption(interaction, defaultRegion = "NA") {
 
 module.exports = {
     handleGameOption,
+    handleGameModeOption,
     handleLobbyOption,
     handleUserOption,
     handleSeasonOption,
