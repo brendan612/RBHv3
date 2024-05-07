@@ -1,5 +1,10 @@
 const { Client, GatewayIntentBits } = require("discord.js");
+const { REST } = require("@discordjs/rest");
+
 require("dotenv").config();
+
+const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
+rest.setOptions({ timeout: 30000 });
 
 const client = new Client({
     intents: [
