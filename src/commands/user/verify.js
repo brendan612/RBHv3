@@ -68,7 +68,7 @@ module.exports = {
 
         if (user.verified) {
             const userService = await UserService.createUserService(interaction.member.id);
-            await userService.verifyUser(interaction.member.id, game_name, tag_line, null, referrer?.id, region);
+            await userService.verifyUser(interaction.member.id, game_name, tag_line, user.puuid, referrer?.id, region);
             return await interaction.reply({
                 content: "You have been re-verified.",
                 ephemeral: true,
