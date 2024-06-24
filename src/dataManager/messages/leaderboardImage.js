@@ -99,8 +99,9 @@ async function generateLeaderboardImage(offset, limit, game, season, region = "N
         const elo = parseInt(player.elo_rating);
 
         const paddedRank = (player.rank.toString() + ".").padEnd(3, "\u2002");
-        const name = `${paddedRank} ` + user.summoner_name + "#" + user.tag_line;
+        const name = user.summoner_name + "#" + user.tag_line;
 
+        const rankMetrics = ctx.measureText(paddedRank);
         const nameMetrics = ctx.measureText(name);
 
         if (nameMetrics.width > 600) {
@@ -123,8 +124,14 @@ async function generateLeaderboardImage(offset, limit, game, season, region = "N
             ctx.fillStyle = "#FFF";
         }
 
-        ctx.strokeText(name, borderOffset + spacing, playerYStart + i * spacing);
-        ctx.fillText(name, borderOffset + spacing, playerYStart + i * spacing);
+        ctx.strokeText(paddedRank, borderOffset + spacing, playerYStart + i * spacing);
+        ctx.fillText(paddedRank, borderOffset + spacing, playerYStart + i * spacing);
+
+        const nameX = borderOffset + spacing + rankMetrics.width + 25;
+        ctx.strokeText(name, nameX, playerYStart + i * spacing);
+        ctx.fillText(name, nameX, playerYStart + i * spacing);
+
+        ctx.font = `bold 45px Noto Serif KR`;
 
         ctx.strokeText(elo.toString(), borderOffset + spacing + maxNameWidth + 125, playerYStart + i * spacing);
         ctx.fillText(elo.toString(), borderOffset + spacing + maxNameWidth + 125, playerYStart + i * spacing);
