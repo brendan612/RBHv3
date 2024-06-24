@@ -65,6 +65,26 @@ async function generateLeaderboardImage(offset, limit, game, season, region = "N
     let maxNameWidth = 0;
 
     ctx.font = `bold ${nameFontSize}px Noto Serif KR`;
+    leaderboard.forEach(async (player) => {
+        const user = await User.findByPk(player.user_id);
+
+        const name = user.summoner_name + "#" + user.tag_line;
+        let nameMetrics = ctx.measureText(name);
+
+        if (nameMetrics.width > 600) {
+            nameFontSize = 30;
+        } else {
+            nameFontSize = 45;
+        }
+
+        ctx.font = `bold ${nameFontSize}px Noto Serif KR`;
+
+        nameMetrics = ctx.measureText(name);
+
+        if (nameMetrics.width > maxNameWidth) {
+            maxNameWidth = nameMetrics.width;
+        }
+    });
 
     const playerYStart = 300;
     const spacing = 75;
@@ -81,16 +101,12 @@ async function generateLeaderboardImage(offset, limit, game, season, region = "N
         const paddedRank = (player.rank.toString() + ".").padEnd(3, "\u2002");
         const name = `${paddedRank} ` + user.summoner_name + "#" + user.tag_line;
 
-        let nameMetrics = ctx.measureText(name);
+        const nameMetrics = ctx.measureText(name);
+
         if (nameMetrics.width > 600) {
             nameFontSize = 30;
         } else {
             nameFontSize = 45;
-        }
-
-        nameMetrics = ctx.measureText(name);
-        if (nameMetrics.width > maxNameWidth) {
-            maxNameWidth = nameMetrics.width;
         }
 
         ctx.font = `bold ${nameFontSize}px Noto Serif KR`;
