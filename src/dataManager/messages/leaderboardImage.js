@@ -124,8 +124,12 @@ async function generateLeaderboardImage(offset, limit, game, season, region = "N
             ctx.fillStyle = "#FFF";
         }
 
+        ctx.font = `bold 45px Noto Serif KR`;
+
         ctx.strokeText(paddedRank, borderOffset + spacing, playerYStart + i * spacing);
         ctx.fillText(paddedRank, borderOffset + spacing, playerYStart + i * spacing);
+
+        ctx.font = `bold ${nameFontSize}px Noto Serif KR`;
 
         const nameX = borderOffset + spacing + rankMetrics.width + 25;
         ctx.strokeText(name, nameX, playerYStart + i * spacing);
